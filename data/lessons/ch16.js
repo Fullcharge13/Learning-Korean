@@ -169,7 +169,7 @@ export const LESSONS = [
     "q": "「대출하다」是什么意思？",
     "options": [
      "借出",
-     "关(닫다的被动词）",
+     "关（被动）",
      "发生",
      "参加"
     ],
@@ -1707,7 +1707,7 @@ export const LESSONS = [
      },
      {
       "ko": "닫히다",
-      "zh": "关(닫다的被动词）"
+      "zh": "关（被动）"
      }
     ]
    }
@@ -1804,7 +1804,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c06-u05-008",
-    "q": "「关(닫다的被动词）」用韩语怎么说？",
+    "q": "「关（被动）」用韩语怎么说？",
     "options": [
      "닫히다",
      "접수하다",
@@ -1812,7 +1812,7 @@ export const LESSONS = [
      "부치다"
     ],
     "answer": 0,
-    "explain": "닫히다 = 关(닫다的被动词）"
+    "explain": "닫히다 = 关（被动）"
    },
    {
     "type": "check",

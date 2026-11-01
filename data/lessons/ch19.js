@@ -1153,7 +1153,7 @@ export const LESSONS = [
      },
      {
       "ko": "성함",
-      "zh": "姓名（이름敬语）",
+      "zh": "姓名（敬语）",
       "hanja": "姓衔"
      },
      {
@@ -1236,12 +1236,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v02-c09-u03-006",
-    "q": "按顺序点音节：「姓名（이름敬语）」",
+    "q": "按顺序点音节：「姓名（敬语）」",
     "lines": [
      "성",
      "함"
     ],
-    "explain": "성함 = 姓名（이름敬语） · 姓衔 = 성·함"
+    "explain": "성함 = 姓名（敬语） · 姓衔 = 성·함"
    },
    {
     "type": "choice",
@@ -2049,7 +2049,7 @@ export const LESSONS = [
     "options": [
      "温泉",
      "单程",
-     "姓名（이름敬语）",
+     "姓名（敬语）",
      "动物"
     ],
     "answer": 0,
