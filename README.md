@@ -10,6 +10,12 @@
 
 > 바탕은 [리아와 파이썬!](https://github.com/Fullcharge13/Learning-Python) v0.7.2예요. Python 실행·코드 입력을 걷어내고 단어 학습으로 바꿨어요. 같은 github.io 주소에 올라가도 저장과 오프라인 저장본이 서로 섞이지 않아요.
 
+**▶ [앱 바로 열기 · 打开应用](https://fullcharge13.github.io/Learning-Korean/)**
+
+아이폰·아이패드는 사파리로 연 뒤 공유 → 「홈 화면에 추가」(添加到主屏幕)하면 앱처럼 쓰고 오프라인에서도 돼요.
+
+> 이 저장소는 앱의 **소스 코드**예요. 공부는 위 링크의 앱에서 하고, 아래 「실행 방법」은 앱을 고치거나 다시 만들 때 써요.
+
 ## 실행 방법
 
 처음 한 번: `npm install`, `pip install -r requirements-dev.txt`
