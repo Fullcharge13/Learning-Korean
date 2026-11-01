@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "獬豸老师教韩语",
+  "short_name": "獬豸韩语",
+  "description": "和獬豸老师一起，每天 10 分钟，用手机学韩语单词",
+  "lang": "ko",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FBF6EA",
+  "background_color": "#FBF6EA",
+  "categories": ["education"],
+  "icons": [
+    { "src": "icons/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
