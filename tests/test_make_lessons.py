@@ -6,6 +6,7 @@ from make_lessons import load_words, build_chapter
 
 FX = os.path.join(ROOT, "tests", "fixtures")
 VOCAB = os.path.join(FX, "vocab-mini.csv")
+VOCAB2 = os.path.join(FX, "vocab2-mini.csv")
 REVIEW = os.path.join(FX, "zh-review-mini.csv")
 
 
@@ -154,3 +155,38 @@ def test_no_same_meaning_distractor():
                     assert w["zh"] not in zh_of[o], (it["q"], o)
                 else:
                     assert w["ko"] not in ko_of[o], (it["q"], o)
+
+
+
+def _both():
+    return load_words([VOCAB, VOCAB2], REVIEW)
+
+
+def test_vol2_chapter_ids_and_titles():
+    ch = build_chapter(_both(), 11)
+    assert ch["CHAPTER"] == {"id": 11, "title": "第二册 第1课"}
+    assert ch["LESSONS"][0]["id"] == "11-1"
+    assert ch["LESSONS"][-1]["title"] == "第二册 第1课 测验"
+    assert all(l["chapter"] == 11 for l in ch["LESSONS"])
+
+
+def test_vol1_unchanged():
+    one = json.dumps(build_chapter(load_words(VOCAB, REVIEW), 1), ensure_ascii=False)
+    assert json.dumps(build_chapter(_both(), 1), ensure_ascii=False) == one
+
+
+def test_distractors_stay_in_app_chapter():
+    vol2 = {w["ko"] for w in _both() if w["chapter"] == 11} | {w["zh"] for w in _both() if w["chapter"] == 11}
+    for l in build_chapter(_both(), 11)["LESSONS"]:
+        for it in l["items"]:
+            for o in it.get("options", []):
+                assert o in vol2, (l["id"], o)
+
+
+def test_main_writes_vol2_concepts(tmp_path):
+    from make_lessons import main
+    concepts = tmp_path / "concepts.js"
+    main(str(tmp_path / "lessons"), [VOCAB, VOCAB2], REVIEW, str(concepts))
+    text = concepts.read_text(encoding="utf-8")
+    assert '"id": "v02-c01-u01-001", "name": "친구 · 朋友", "chapter": 11' in text
+    assert (tmp_path / "lessons" / "ch11.js").exists()

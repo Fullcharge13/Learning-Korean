@@ -6,7 +6,7 @@
   오답 보기의 단어가 정답과 뜻(中→韩)이나 한국어(韩→中)가 같지 않음(정답이 둘로 보이지 않게)
 - order: 2~5개 한글 음절 카드
 - 보류(hold) 단어는 어디에도 없음
-- 성공 기준 1: 보류 아닌 1권 단어가 모두 한 번 이상 문제에 나옴
+- 성공 기준 1: 보류 아닌 1·2권 단어가 모두 한 번 이상 문제에 나옴
 - 화면에 보이는 중국어는 모두 간체
 """
 import argparse
@@ -108,7 +108,7 @@ def main():
     ap.add_argument("--lessons-dir", default=os.path.join(ROOT, "data", "lessons"))
     a = ap.parse_args()
     mods = load(os.path.abspath(a.lessons_dir))
-    errs = check(mods, rows(os.path.join(ROOT, "vendor", "open-yonsei", "vol-01.csv")),
+    errs = check(mods, [r for v in (1, 2) for r in rows(os.path.join(ROOT, "vendor", "open-yonsei", "vol-%02d.csv" % v))],
                  rows(os.path.join(ROOT, "data", "zh-review.csv")))
     n = sum(len(m["LESSONS"]) for m in mods.values())
     for e in errs:
