@@ -3,8 +3,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 from zhcheck import is_simplified
 
-VOCAB = os.path.join(ROOT, "vendor", "open-yonsei", "vol-01.csv")
+VOCABS = [os.path.join(ROOT, "vendor", "open-yonsei", "vol-%02d.csv" % v) for v in (1, 2)]
 REVIEW = os.path.join(ROOT, "data", "zh-review.csv")
+
+
+def _vocab():
+    return [r for p in VOCABS for r in _rows(p)]
 
 
 def _rows(p):
@@ -13,7 +17,7 @@ def _rows(p):
 
 
 def test_every_low_entry_reviewed():
-    low = {r["entry_id"] for r in _rows(VOCAB) if r["review_status"] == "low"}
+    low = {r["entry_id"] for r in _vocab() if r["review_status"] == "low"}
     ids = [r["entry_id"] for r in _rows(REVIEW)]
     assert len(ids) == len(set(ids)), "duplicate review rows"
     assert low <= set(ids), sorted(low - set(ids))[:10]
@@ -30,7 +34,7 @@ def test_fix_has_new_text():
 def test_all_final_meanings_simplified():
     rev = {r["entry_id"]: r for r in _rows(REVIEW)}
     bad = []
-    for r in _rows(VOCAB):
+    for r in _vocab():
         x = rev.get(r["entry_id"])
         if x and x["verdict"] == "hold":
             continue
