@@ -19,7 +19,7 @@ export const RULES = {
   streak100: (s) => ((s.streak && s.streak.best) || 0) >= 100,
   perfectionist: (s) => stat(s, "perfect") >= 10,
   reviewer: (s) => stat(s, "review_items") >= 30,
-  collector: (s) => (s.outfits || []).filter((o) => o !== "basic").length >= 3,
+  collector: (s) => (s.items || []).filter((o) => o !== "none").length >= 3,
   night_owl: (s, ctx) => ctx.lessonDone === true && typeof ctx.hour === "number" && (ctx.hour >= 22 || ctx.hour < 4),
 };
 

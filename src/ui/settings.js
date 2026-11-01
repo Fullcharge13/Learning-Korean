@@ -151,7 +151,7 @@ export function render(root, ctx) {
     if (r.streakUp) toast(`오늘 목표 달성! 연속 ${r.save.streak.days}일이에요.`);
     if (r.milestone) {
       ctx.sound.play("levelup");
-      await celebrate({ outfit: ctx.save.outfit, milestone: r.milestone });
+      await celebrate({ item: ctx.save.item, milestone: r.milestone });
     }
     ctx.show("settings"); // 위 상태 줄 목표 숫자도 바로 맞춤
   }));

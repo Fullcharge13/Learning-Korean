@@ -1,13 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { LINES, FALLBACK_LINE } from "../../data/lines.js";
-import { OUTFITS } from "../../data/outfits.js";
+import { ITEMS } from "../../data/items.js";
 import { say } from "../../src/say.js";
 
 const SITUATIONS = [
   "course_done",
   "greet", "correct", "combo", "wrong", "running", "error", "hint",
-  "lesson_done", "streak_up", "streak_broken", "outfit_bought", "welcome_back",
+  "lesson_done", "streak_up", "streak_broken", "item_bought", "welcome_back",
 ];
 const FACES = ["smile", "joy", "sparkle", "think", "surprise", "worry", "cheer", "wink"];
 
@@ -29,7 +29,7 @@ test("no_repeat: 같은 상황 100번 → 연달아 같은 줄 0회", () => {
     let last = null;
     let repeats = 0;
     for (let i = 0; i < 100; i++) {
-      const r = say(s, { name: "민지", streak: 3, xp: 20, outfit: "실험복" }, rng, last);
+      const r = say(s, { name: "민지", streak: 3, xp: 20, item: "장구 · 长鼓" }, rng, last);
       if (r.index === last) repeats++;
       last = r.index;
     }
@@ -59,7 +59,7 @@ test("lines: 말풍선에 들어가는 길이(60자 이하), 알려진 자리 �
       const filled = l.text.replace(/\{name\}/g, "가나다").replace(/\{\w+\}/g, "00");
       assert.ok(filled.length <= 60, `${s}: 너무 김 (${filled.length}) ${l.text}`);
       for (const m of l.text.matchAll(/\{(\w+)\}/g)) {
-        assert.ok(["name", "streak", "xp", "outfit"].includes(m[1]), `${s}: 모르는 자리 표시 ${m[0]}`);
+        assert.ok(["name", "streak", "xp", "item"].includes(m[1]), `${s}: 모르는 자리 표시 ${m[0]}`);
       }
     }
   }
@@ -73,7 +73,7 @@ test("name_blank: 이름 없음 → {name}이나 빈 호칭이 남지 않음", (
       // 해당 줄을 정확히 고르도록 rng를 맞춤
       const rng = () => (i + 0.5) / LINES[s].length;
       for (const vars of [{}, { name: "" }, { name: "   " }]) {
-        const r = say(s, { streak: 2, xp: 10, outfit: "실험복", ...vars }, rng, null);
+        const r = say(s, { streak: 2, xp: 10, item: "장구 · 长鼓", ...vars }, rng, null);
         assert.equal(r.index, i);
         assert.ok(!/\{\w*\}/.test(r.text), `자리 표시 남음: ${r.text}`);
         assert.ok(!/(^|[\s,.!?])님[,\s!?.]/.test(r.text) && !/^님/.test(r.text), `빈 호칭 남음: ${r.text}`);
@@ -112,23 +112,16 @@ test("placeholders: {streak}·{xp} 채움", () => {
   }
 });
 
-test("outfit_short: 모든 의상에 short 이름이 있음 (C16)", () => {
-  assert.equal(OUTFITS.length, 10);
-  for (const o of OUTFITS) {
-    assert.equal(typeof o.short, "string", o.id);
-    assert.ok(o.short.length > 0 && o.short.length <= 8, `${o.id}: ${o.short}`);
-  }
-});
-
-test("placeholders_outfit: 실제 의상 short 이름 10개 × {outfit} 줄 전부", () => {
-  const s = "outfit_bought";
-  const idx = LINES[s].map((l, i) => (l.text.includes("{outfit}") ? i : -1)).filter((i) => i >= 0);
+test("placeholders_item: 실제 물건 이름 10개 × {item} 줄 전부", () => {
+  const s = "item_bought";
+  const idx = LINES[s].map((l, i) => (l.text.includes("{item}") ? i : -1)).filter((i) => i >= 0);
   assert.ok(idx.length >= 1);
-  for (const o of OUTFITS) {
+  for (const o of ITEMS) {
+    const name = `${o.ko} · ${o.zh}`;
     for (const i of idx) {
-      const r = say(s, { outfit: o.short }, () => (i + 0.5) / LINES[s].length, null);
+      const r = say(s, { item: name }, () => (i + 0.5) / LINES[s].length, null);
       assert.equal(r.index, i);
-      assert.ok(r.text.includes(o.short), r.text);
+      assert.ok(r.text.includes(name), r.text);
       assert.ok(!/\{\w*\}/.test(r.text), r.text);
       assert.ok(r.text.length <= 60, r.text);
     }

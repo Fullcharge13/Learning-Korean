@@ -117,12 +117,12 @@ export function addDailyXp(save, xp, today) {
 export function applyMilestones(prevSave, nextSave) {
   const prevBest = prevSave.streak.best || 0;
   const days = nextSave.streak.days;
-  const out = { ...nextSave, streak: { ...nextSave.streak }, outfits: [...nextSave.outfits], badges: [...nextSave.badges] };
+  const out = { ...nextSave, streak: { ...nextSave.streak }, items: [...nextSave.items], badges: [...nextSave.badges] };
   let milestone = null;
   for (const n of MILESTONES) {
     if (days < n || prevBest >= n) continue;
     if (n === 7) out.bytes += 50;
-    if (n === 30 && !out.outfits.includes("graduate")) out.outfits.push("graduate");
+    if (n === 30 && !out.items.includes("buk")) out.items.push("buk");
     if (n === 100 && !out.badges.includes("streak100")) out.badges.push("streak100");
     milestone = n;
   }

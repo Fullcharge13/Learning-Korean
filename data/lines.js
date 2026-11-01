@@ -1,8 +1,8 @@
 // 리아 교수 대사 표 — 상황 12종 × 4~5줄 (설계서 6-2·6-3, ledger 「공통 이름」)
 // 표정: smile joy sparkle think surprise worry cheer wink
-// 자리 표시: {name} {streak} {xp} {outfit}
-//   {outfit}에는 의상 표의 short 이름이 들어간다(C16). 조사가 붙지 않는 자리에만 쓴다.
-//   {streak}·{xp}·{outfit} 값이 없으면 say()가 그 줄을 건너뛴다. 상황마다 자리 표시 없는 줄을 하나 이상 둔다.
+// 자리 표시: {name} {streak} {xp} {item}
+//   {item}에는 의상 표의 short 이름이 들어간다(C16). 조사가 붙지 않는 자리에만 쓴다.
+//   {streak}·{xp}·{item} 값이 없으면 say()가 그 줄을 건너뛴다. 상황마다 자리 표시 없는 줄을 하나 이상 둔다.
 // {name}은 줄 맨 앞에 「{name}님, 」 꼴로 한 번만 쓴다.
 //   이름이 비어 있으면 say()가 이 덩어리를 통째로 빼므로 문장이 그대로 자연스럽다.
 //   (문장 가운데 「{name}님이」처럼 쓰면 빼고 나서 조사가 남으므로 금지. 시험 name_form)
@@ -76,10 +76,10 @@ export const LINES = {
     { text: "기록은 숫자일 뿐, 실력은 안 줄었어요.", face: "smile" },
     { text: "{name}님, 다시 와서 반가워요. 오늘 새로 시작해요!", face: "joy" },
   ],
-  outfit_bought: [
-    { text: "{outfit}, 어때요? 잘 어울리나요?", face: "sparkle" },
-    { text: "{outfit}, 마음에 들어요. 오늘은 이걸로 할게요.", face: "joy" },
-    { text: "새 의상 {outfit}! 고르는 안목이 있네요.", face: "wink" },
+  item_bought: [
+    { text: "{item}, 어때요? 잘 어울리나요?", face: "sparkle" },
+    { text: "{item}, 마음에 들어요. 오늘은 이걸로 할게요.", face: "joy" },
+    { text: "새 의상 {item}! 고르는 안목이 있네요.", face: "wink" },
     { text: "옷은 바뀌어도 브로치는 그대로예요. 짝꿍이거든요.", face: "smile" },
   ],
   welcome_back: [

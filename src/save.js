@@ -1,6 +1,6 @@
 // 저장: localStorage 한 칸에 JSON 하나. 옛 저장은 migrate로 새 형식에 맞춘다.
 // 리아와 파이썬과 같은 주소(github.io)에 올라가므로 저장 키를 따로 둔다(리아 저장은 읽지도 지우지도 않음).
-import { OUTFITS } from "../data/outfits.js";
+import { ITEMS } from "../data/items.js";
 import { cleanSeenUpdates } from "./newcontent.js";
 
 export const SAVE_KEY = "haechi-korean.save";
@@ -23,7 +23,7 @@ export function newSave() {
     streak: { days: 0, best: 0, lastGoalDate: null, todayDate: null, todayXp: 0 },
     freezes: 0,
     quests: { date: null, ids: [], progress: {}, done: [], chest: false },
-    badges: [], outfits: ["basic"], outfit: "basic",
+    badges: [], items: ["none"], item: "none",
     stats: { lessons: 0, perfect: 0, review_items: 0 },
     settings: { sound: true, dailyGoal: 20, name: "" },
     seen_updates: {},  // v0.7.1 「새 내용」 점: { 레슨 id: 끝까지 다시 본 판 "v0.7.1" }. saveVer 그대로, 없으면 {}
@@ -94,13 +94,13 @@ function clampRanges(s) {
   return s;
 }
 
-const OUTFIT_ORDER = OUTFITS.map((o) => o.id);
+const ITEM_ORDER = ITEMS.map((o) => o.id);
 
-// 가진 의상·입은 의상 정리: 의상 표 순서, 중복 없음, basic 항상 포함, 표에 없는 id는 버림. 입은 옷이 가진 옷이 아니면 basic.
-function cleanOutfits(s) {
-  const owned = new Set(["basic", ...s.outfits.filter((x) => typeof x === "string")]);
-  s.outfits = OUTFIT_ORDER.filter((id) => owned.has(id));
-  if (!s.outfits.includes(s.outfit)) s.outfit = "basic";
+// 가진 물건·둔 물건 정리: 물건 표 순서, 중복 없음, none 항상 포함, 표에 없는 id는 버림. 둔 물건이 가진 것이 아니면 none.
+function cleanItems(s) {
+  const owned = new Set(["none", ...s.items.filter((x) => typeof x === "string")]);
+  s.items = ITEM_ORDER.filter((id) => owned.has(id));
+  if (!s.items.includes(s.item)) s.item = "none";
   return s;
 }
 
@@ -109,7 +109,7 @@ export function migrate(raw) {
   const oldVer = raw.saveVer;
   const ver = typeof oldVer === "number" && Number.isFinite(oldVer) ? oldVer : 1; // saveVer 없음 = 첫 판(1)
   const s = clampRanges(fill(newSave(), structuredClone(raw)));
-  cleanOutfits(s);
+  cleanItems(s);
   s.saveVer = ver > SAVE_VER ? ver : SAVE_VER;
   return s;
 }

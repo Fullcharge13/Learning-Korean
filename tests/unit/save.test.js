@@ -24,7 +24,7 @@ const LEDGER_SHAPE = {
   streak: { days: 0, best: 0, lastGoalDate: null, todayDate: null, todayXp: 0 },
   freezes: 0,
   quests: { date: null, ids: [], progress: {}, done: [], chest: false },
-  badges: [], outfits: ["basic"], outfit: "basic",
+  badges: [], items: ["none"], item: "none",
   stats: { lessons: 0, perfect: 0, review_items: 0 },
   settings: { sound: true, dailyGoal: 20, name: "" },
   seen_updates: {}, // v0.7.1: 「새 내용」 점 — 다시 본 판 { 레슨 id: "v0.7.1" } (saveVer 그대로)
@@ -40,7 +40,7 @@ test("new", () => {
   assert.equal(s.saveVer, 2);
   assert.equal(s.xp, 0);
   assert.equal(s.bytes, 0);
-  assert.equal(s.outfit, "basic");
+  assert.equal(s.item, "none");
 });
 
 test("new: exactly the ledger Save shape", () => {
@@ -49,10 +49,10 @@ test("new: exactly the ledger Save shape", () => {
 
 test("new: returns independent objects", () => {
   const a = newSave();
-  a.outfits.push("casual");
+  a.items.push("janggu");
   a.streak.days = 5;
   const b = newSave();
-  assert.deepEqual(b.outfits, ["basic"]);
+  assert.deepEqual(b.items, ["none"]);
   assert.equal(b.streak.days, 0);
 });
 
@@ -130,7 +130,7 @@ test("cap", () => {
 test("store: round trip", () => {
   const st = fakeStorage();
   const s = newSave();
-  s.xp = 42; s.outfits.push("casual");
+  s.xp = 42; s.items.push("janggu");
   store(st, s);
   assert.deepEqual(load(st), s);
 });
@@ -149,7 +149,7 @@ test("C2: wrong-typed fields fall back to defaults", () => {
   const s = migrate({
     streak: null, settings: null, xp: "30", bytes: "abc",
     completed_lessons: {}, grading_results: null,
-    outfit: 5, settings_x: 1, freezes: Infinity,
+    item: 5, settings_x: 1, freezes: Infinity,
   });
   assert.deepEqual(s.streak, LEDGER_SHAPE.streak);
   assert.deepEqual(s.settings, LEDGER_SHAPE.settings);
@@ -157,7 +157,7 @@ test("C2: wrong-typed fields fall back to defaults", () => {
   assert.equal(s.bytes, 0);
   assert.deepEqual(s.completed_lessons, []);
   assert.deepEqual(s.grading_results, {});
-  assert.equal(s.outfit, "basic");
+  assert.equal(s.item, "none");
   assert.equal(s.freezes, 0);
 });
 
@@ -290,23 +290,21 @@ test("range: weak_concepts keeps only finite numbers >= 0", () => {
   );
 });
 
-// ---- 의상 칸 정리 (리아 옛 저장 옮기기는 없앰) ----
-import { OUTFITS } from "../../data/outfits.js";
+// ---- 물건 칸 정리 ----
+import { ITEMS } from "../../data/items.js";
 
-test("outfits clean: unknown ids dropped, basic always owned, worn falls back to basic", () => {
-  const ids = new Set(OUTFITS.map((o) => o.id));
-  const s = migrate({ saveVer: 2, outfits: ["pirate", 7, null, "chef", "chef", "__proto__"], outfit: "pirate", bytes: 3 });
-  assert.deepEqual(s.outfits, ["basic", "chef"]);
-  assert.equal(s.outfit, "basic");
-  assert.equal(s.bytes, 3, "no refund");
-  for (const id of s.outfits) assert.ok(ids.has(id), id);
-  assert.equal(migrate({ outfits: ["basic", "chef"], outfit: "chef" }).outfit, "chef");
+test("new save has no item beside haechi", () => {
+  assert.equal(newSave().item, "none");
+  assert.deepEqual(newSave().items, ["none"]);
 });
 
-test("newer saveVer (3) is not downgraded and still loads", () => {
-  const s = migrate({ saveVer: 3, outfits: ["basic", "hologram"], outfit: "hologram" });
-  assert.equal(s.saveVer, 3);
-  assert.equal(s.outfit, "basic");
+test("items clean: unknown ids dropped, none always owned, placed falls back to none", () => {
+  const ids = new Set(ITEMS.map((o) => o.id));
+  const s = migrate({ items: ["pirate", 7, null, "janggu", "janggu", "__proto__"], item: "pirate", bytes: 3 });
+  assert.deepEqual(s.items, ["none", "janggu"]);
+  assert.equal(s.item, "none");
+  for (const id of s.items) assert.ok(ids.has(id), id);
+  assert.equal(migrate({ items: ["none", "janggu"], item: "janggu" }).item, "janggu");
 });
 
 test("save key is haechi-korean.save", () => {

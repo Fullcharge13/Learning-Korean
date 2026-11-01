@@ -15,9 +15,9 @@ export const $ = (root, sel) => root.querySelector(sel);
 export const $$ = (root, sel) => Array.from(root.querySelectorAll(sel));
 
 /** 리아 + 말풍선. sfx: 효과음 말풍선 글자(딩동! 등) */
-export function riaSays({ outfit, face, text, size = 96, sfx = "", cls = "" }) {
+export function riaSays({ item, face, text, size = 96, sfx = "", cls = "" }) {
   return `<div class="ria-row ${cls}">
-    <div class="ria-wrap">${haechiImg({ face, size })}${sfx ? `<span class="sfx" aria-hidden="true">${esc(sfx)}</span>` : ""}</div>
+    <div class="ria-wrap">${haechiImg({ face, item, size })}${sfx ? `<span class="sfx" aria-hidden="true">${esc(sfx)}</span>` : ""}</div>
     <p class="bubble">${esc(text)}</p>
   </div>`;
 }
@@ -111,17 +111,17 @@ export function cardExample(c) {
 
 export const MILESTONE_REWARD = {
   7: "보너스 50바이트를 받았어요",
-  30: "졸업 가운과 학사모를 선물로 받았어요",
+  30: "북(鼓)을 선물로 받았어요",
   100: "「연속 100일」 배지를 받았어요",
 };
 
 /** 연속 기록 이정표 축하 창. 누르면(또는 Enter·Esc) 닫히고 resolve */
-export function celebrate({ outfit, milestone }) {
+export function celebrate({ item, milestone }) {
   return new Promise((resolve) => {
     const prev = document.activeElement;
     const wrap = el(`<div class="celebrate" role="dialog" aria-modal="true" aria-labelledby="cel-title">
       <div class="cel-card">
-        <div class="ria-wrap big jump">${haechiImg({ face: "sparkle", size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
+        <div class="ria-wrap big jump">${haechiImg({ face: "sparkle", item, size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
         <h2 id="cel-title" class="cel-title">${icon("flame")}연속 ${esc(milestone)}일!</h2>
         <p class="cel-reward">${esc(MILESTONE_REWARD[milestone] || "")}</p>
         <button class="btn sun wide" id="cel-ok">좋아요</button>

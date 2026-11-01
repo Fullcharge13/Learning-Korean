@@ -6,7 +6,7 @@ export function render(root, ctx) {
   const line = ctx.say("greet");
   root.innerHTML = `<main class="screen splash">
     <div class="splash-hero">
-      <div class="ria-wrap big">${haechiImg({ face: "hello", size: 200 })}</div>
+      <div class="ria-wrap big">${haechiImg({ face: "hello", item: ctx.save.item, size: 200 })}</div>
       <h1 class="logo">리아와 파이썬<span class="bang">!</span></h1>
       <p class="tagline">하루 10분, 문리아 교수와 첫 코드부터</p>
     </div>

@@ -14,7 +14,7 @@ function mkSave(over = {}) {
     streak: { days: 0, best: 0, lastGoalDate: null, todayDate: null, todayXp: 0 },
     freezes: 0,
     quests: { date: null, ids: [], progress: {}, done: [], chest: false },
-    badges: [], outfits: ["basic"], outfit: "basic",
+    badges: [], items: ["none"], item: "none",
     stats: { lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0 },
     settings: { sound: true, dailyGoal: 20, name: "" },
     ...over,

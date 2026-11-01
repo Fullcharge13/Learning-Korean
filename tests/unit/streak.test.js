@@ -13,7 +13,7 @@ function fixture(over = {}) {
     streak: { days: 0, best: 0, lastGoalDate: null, todayDate: null, todayXp: 0 },
     freezes: 0,
     quests: { date: null, ids: [], progress: {}, done: [], chest: false },
-    badges: [], outfits: ["basic"], outfit: "basic",
+    badges: [], items: ["none"], item: "none",
     stats: { lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0 },
     settings: { sound: true, dailyGoal: 20, name: "" },
   };
@@ -263,12 +263,12 @@ test("M7_again: 끊긴 뒤 다시 7일 (best ≥ 7) → 보상 없음", () => {
   assert.equal(r.save.bytes, 0);
 });
 
-test("M30: 30일 → graduate(졸업 가운) 의상, 중복 없음", () => {
+test("M30: 30일 → 북(buk), 중복 없음", () => {
   const r = earnXp(at(29, 29), 20, "2026-10-29");
   assert.equal(r.milestone, 30);
-  assert.deepEqual(r.save.outfits, ["basic", "graduate"]);
-  const r2 = applyMilestones(at(29, 29, { outfits: ["basic", "graduate"] }), { ...r.save });
-  assert.deepEqual(r2.save.outfits, ["basic", "graduate"]);
+  assert.deepEqual(r.save.items, ["none", "buk"]);
+  const r2 = applyMilestones(at(29, 29, { items: ["none", "buk"] }), { ...r.save });
+  assert.deepEqual(r2.save.items, ["none", "buk"]);
 });
 
 test("M100: 100일 → streak100 배지, 중복 없음", () => {
@@ -285,7 +285,7 @@ test("M_none: 이정표 아님 → milestone null, 원본 불변", () => {
   assert.equal(r.milestone, null);
   assert.equal(r.save.streak.days, 4);
   assert.equal(s0.streak.days, 3);
-  assert.deepEqual(r.save.outfits, ["basic"]);
+  assert.deepEqual(r.save.items, ["none"]);
 });
 
 // ---- 재검토 후속 ----

@@ -41,7 +41,7 @@ async function buildReview(ctx) {
  *  state: blank(0.3초 전) · wait(준비 중) · error. kind(error일 때): offline · stale(새 판) · broken(그리다 실패) */
 function waitScreen(root, ctx, state, kind = "offline") {
   const err = state === "error";
-  const face = (f) => riaSays({ outfit: ctx.save.outfit, face: f, text: err ? ERROR_LINES[kind].say : "준비 중… 레슨을 펼치고 있어요", size: 92 });
+  const face = (f) => riaSays({ item: ctx.save.item, face: f, text: err ? ERROR_LINES[kind].say : "준비 중… 레슨을 펼치고 있어요", size: 92 });
   const body = err
     ? `<h1 class="sr">레슨을 열지 못했어요</h1>${face("think")}
        <p class="muted center">${esc(ERROR_LINES[kind].note)}</p>
@@ -69,7 +69,7 @@ async function askResume(ctx, lesson, S0) {
   const p = Math.round(summary(S0.flow).progress * 100);
   const v = await dialog({
     title: "레슨 이어 하기",
-    body: riaSays({ outfit: ctx.save.outfit, face: "smile", text: RESUME_ASK, size: 72, cls: "small resume-ask" })
+    body: riaSays({ item: ctx.save.item, face: "smile", text: RESUME_ASK, size: 72, cls: "small resume-ask" })
       + `<p class="muted resume-meta">${esc(`${lesson.id} ${lesson.title || ""}`.trim())} · ${p}% 했어요</p>`,
     buttons: [{ label: "이어서 하기", value: "resume", kind: "primary" }, { label: "처음부터", value: "restart" }],
   });

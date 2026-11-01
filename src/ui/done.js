@@ -25,7 +25,7 @@ export function render(root, ctx, params = {}) {
   root.innerHTML = `<div class="screen done">
     <main>
       <div class="done-hero">
-        <div class="ria-wrap big jump">${haechiImg({ face: "done", size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
+        <div class="ria-wrap big jump">${haechiImg({ face: "done", item: ctx.save.item, size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
         <h1>${review ? "복습 완료!" : finished ? "과정 완주!" : adv ? esc(`${lesson.id} 심화 완료!`) : esc(`${lesson.id} 레슨 완료!`)}</h1>
         <p class="bubble center">${esc(line.text)}</p>
       </div>
@@ -52,7 +52,7 @@ export function render(root, ctx, params = {}) {
   (async () => {
     if (r.milestone) {
       ctx.sound.play("levelup");
-      await celebrate({ outfit: ctx.save.outfit, milestone: r.milestone });
+      await celebrate({ item: ctx.save.item, milestone: r.milestone });
     }
     await ctx.afterDone(); // 첫 레슨이면 「홈 화면에 추가」 안내(아이폰 사파리만)
     root.querySelector("#home")?.focus({ preventScroll: true });

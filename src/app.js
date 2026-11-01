@@ -3,7 +3,7 @@ import { loadEx, store, migrate } from "./save.js";
 import { rollDay } from "./rules.js";
 import { ensureQuests } from "./quests.js";
 import { say as pickLine } from "./say.js";
-import { OUTFITS } from "../data/outfits.js";
+import { ITEMS } from "../data/items.js";
 import { localDate, daysSince } from "./today.js";
 import { finishLesson } from "./finish.js";
 import { createPersist } from "./persist.js";
@@ -138,14 +138,14 @@ function currentLessonId() {
   return next ? next.id : (app.lessons.length ? app.lessons[app.lessons.length - 1].id : null);
 }
 
-function outfitShort() {
-  const o = OUTFITS.find((x) => x.id === app.save.outfit);
-  return o ? o.short : "";
+function itemName() {
+  const o = ITEMS.find((x) => x.id === app.save.item);
+  return o && o.id !== "none" ? `${o.ko} · ${o.zh}` : "";
 }
 
 /** 대사 고르기: 상황별 직전 줄을 따로 기억(C17) */
 function say(situation, vars = {}) {
-  const v = { name: app.save.settings.name, streak: app.save.streak.days || undefined, outfit: outfitShort(), ...vars };
+  const v = { name: app.save.settings.name, streak: app.save.streak.days || undefined, item: itemName(), ...vars };
   const r = pickLine(situation, v, Math.random, app.lastLine[situation] ?? null);
   app.lastLine[situation] = r.index;
   return r;
@@ -182,7 +182,7 @@ function isStandalone() {
 function showInstallSheet(kind) {
   const ua = navigator.userAgent;
   const k = kind || (isIOS(ua, navigator.maxTouchPoints) && isInAppBrowser(ua) ? "inapp" : "safari");
-  return openInstallSheet({ outfit: app.save.outfit, kind: k });
+  return openInstallSheet({ item: app.save.item, kind: k });
 }
 /** 첫 레슨 완료 화면이 끝난 뒤 한 번만 */
 async function afterDone() {

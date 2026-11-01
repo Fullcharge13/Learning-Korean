@@ -159,7 +159,7 @@ export function render(root, ctx) {
     <main>
       <h1 class="sr">학습 길</h1>
       <section class="hello">
-        ${riaSays({ outfit: save.outfit, face: line.face, text: line.text, size: 92 })}
+        ${riaSays({ item: save.item, face: line.face, text: line.text, size: 92 })}
         ${cur && !allDone ? `<button class="btn primary wide" id="continue">${icon("play")}<span>${save.completed_lessons.length ? "이어서 하기" : "첫 레슨 시작"} · ${esc(cur.id)} ${esc(cur.title)}</span></button>` : ""}
         ${allDone ? `<p class="all-done">준비된 레슨을 모두 끝냈어요. 다시 풀거나 복습하며 XP를 모아 봐요.</p>` : ""}
       </section>

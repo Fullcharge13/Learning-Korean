@@ -9,6 +9,6 @@ export const BADGES = [
   { id: "streak100", name: "연속 100일", desc: "100일 연속으로 하루 목표를 채워요" },
   { id: "perfectionist", name: "완벽주의자", desc: "실수 없는 레슨을 10번 끝내요" },
   { id: "reviewer", name: "복습왕", desc: "복습 문제를 30개 풀어요" },
-  { id: "collector", name: "의상 수집가", desc: "기본 옷 말고 의상 3벌을 모아요" },
+  { id: "collector", name: "物品收藏家", desc: "收集 3 件传统物品" },
   { id: "night_owl", name: "밤 공부", desc: "밤 10시부터 새벽 4시 사이에 레슨을 끝내요" },
 ];

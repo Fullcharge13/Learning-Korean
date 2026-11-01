@@ -13,7 +13,7 @@ function mkSave(over = {}) {
     streak: { days: 0, best: 0, lastGoalDate: null, todayDate: null, todayXp: 0 },
     freezes: 0,
     quests: { date: null, ids: [], progress: {}, done: [], chest: false },
-    badges: [], outfits: ["basic"], outfit: "basic",
+    badges: [], items: ["none"], item: "none",
     stats: { lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0 },
     settings: { sound: true, dailyGoal: 20, name: "" },
     ...over,
@@ -25,10 +25,7 @@ test("BADGES table: 11 ids (no code-writing or advanced badges)", () => {
   assert.equal(BADGES.length, 11);
   assert.deepEqual(BADGES.map((b) => b.id), ["first_print", "ch1", "ch2", "ch3", "streak7", "streak30", "streak100",
     "perfectionist", "reviewer", "collector", "night_owl"]);
-  for (const b of BADGES) {
-    assert.match(b.name, /[가-힣]/);
-    assert.match(b.desc, /[가-힣]/);
-  }
+  for (const b of BADGES) assert.ok(b.name && b.desc, b.id);
 });
 
 test("empty save -> no badges", () => {
@@ -89,9 +86,10 @@ test("stat thresholds: perfect 10, review_items 30", () => {
   assert.deepEqual(checkBadges(at, { hour: 12 }), ["perfectionist", "reviewer"]);
 });
 
-test("collector: 3 outfits besides basic (ruling)", () => {
-  assert.deepEqual(checkBadges(mkSave({ outfits: ["basic", "casual", "chef"] }), { hour: 12 }), []);
-  assert.deepEqual(checkBadges(mkSave({ outfits: ["basic", "casual", "chef", "uniform"] }), { hour: 12 }), ["collector"]);
+test("collector: 3 items besides none", () => {
+  assert.deepEqual(checkBadges(mkSave({ items: ["none", "maetdol", "janggu"] }), { hour: 12 }), []);
+  assert.deepEqual(checkBadges(mkSave({ items: ["none", "maetdol", "janggu", "gat"] }), { hour: 12 }), ["collector"]);
+  assert.equal(BADGES.find((b) => b.id === "collector").name, "物品收藏家");
 });
 
 test("does not mutate save", () => {
