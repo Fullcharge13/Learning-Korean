@@ -5,7 +5,7 @@ import { esc } from "./dom.js";
 import { tabBar, bindTabs, statusBar } from "./nav.js";
 
 const ART = {
-  first_print: ["teal", ">_"], ch1: ["teal", "1课"], ch2: ["teal", "2课"], ch3: ["teal", "3课"],
+  first_print: ["teal", "一"], ch1: ["teal", "1课"], ch2: ["teal", "2课"], ch3: ["teal", "3课"],
   streak7: ["coral", "7天"], streak30: ["coral", "30天"], streak100: ["coral", "100"],
   perfectionist: ["sun", "★"],
   reviewer: ["navy", "30"], collector: ["sun", "3件"], night_owl: ["navy", "☾"],

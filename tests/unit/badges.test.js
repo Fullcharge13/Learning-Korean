@@ -118,3 +118,8 @@ test("chapter badges follow each chapter's exam lesson id (ctx.examIds)", () => 
   assert.ok(!checkBadges(mkSave({ completed_lessons: ["1-5"] }), { examIds: { 1: "1-12" } }).includes("ch1"));
   assert.ok(!checkBadges(s, {}).includes("ch1"), "unknown exam id → no badge");
 });
+
+test("first badge art is not the Python prompt glyph", async () => {
+  const { badgeArt } = await import("../../src/ui/badges.js");
+  assert.ok(!badgeArt("first_print", true).includes("&gt;_"));
+});

@@ -114,8 +114,8 @@ def test_manifest_and_icons():
     with open(os.path.join(DIST, "manifest.webmanifest"), encoding="utf-8") as f:
         m = json.load(f)
     assert m["name"] == "獬豸老师教韩语"
+    assert m["lang"] == "zh-Hans", m.get("lang")
     assert m["short_name"] == "獬豸韩语"
-    assert m["lang"] == "ko"
     assert m["display"] == "standalone"
     assert m["start_url"] and m["scope"]
     for k in ("theme_color", "background_color"):

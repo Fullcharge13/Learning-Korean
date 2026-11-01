@@ -6,7 +6,6 @@ import { packResume, restoreSession, hasProgress } from "../resume.js";
 import { haechiImg } from "../haechi.js";
 import { esc, icon, bar, codeBlock, dialog, riaSays, cardExample } from "./dom.js";
 import { shuffleChoices, shuffleOrder, newSeed } from "../shuffle.js";
-import { isCodey } from "../textkind.js";
 import { reviewPool } from "../lessondata.js";
 
 const GUARD_MS = 400;
@@ -289,7 +288,7 @@ function run(root, ctx, lesson, review, resumed = null) {
     let pick = -1;
     body.innerHTML = `<article class="item">${itemHead(cur)}
       <div class="options" role="radiogroup" aria-label="选项">${it.options.map((o, i) =>
-        `<button class="opt${isCodey(o) ? " mono" : ""}" role="radio" aria-checked="false" data-i="${i}"><span class="opt-key" aria-hidden="true">${i + 1}</span><span class="opt-text">${esc(o)}</span></button>`).join("")}</div>
+        `<button class="opt" role="radio" aria-checked="false" data-i="${i}"><span class="opt-key" aria-hidden="true">${i + 1}</span><span class="opt-text">${esc(o)}</span></button>`).join("")}</div>
     </article>`;
     const act = footButton("确认", { disabled: true });
     body.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
@@ -299,7 +298,7 @@ function run(root, ctx, lesson, review, resumed = null) {
     }));
     act.addEventListener("click", () => {
       if (pick < 0) return;
-      judged(cur, pick === it.answer, `<p class="answer">正确答案：<span class="${isCodey(it.options[it.answer]) ? "mono" : ""}">${esc(it.options[it.answer])}</span></p>`);
+      judged(cur, pick === it.answer, `<p class="answer">正确答案：<span>${esc(it.options[it.answer])}</span></p>`);
     });
   }
 
@@ -312,13 +311,13 @@ function run(root, ctx, lesson, review, resumed = null) {
       <ol class="order-answer" id="oa" aria-label="选择的顺序"></ol>
       <p class="ex-label">音节卡片 <small>（按点击顺序放入）</small></p>
       <div class="order-pool" id="op">${order.map((li) =>
-        `<button class="line mono" data-li="${li}">${esc(it.lines[li])}</button>`).join("")}</div>
+        `<button class="line" lang="ko" data-li="${li}">${esc(it.lines[li])}</button>`).join("")}</div>
     </article>`;
     const act = footButton("确认", { disabled: true });
     const oa = body.querySelector("#oa");
     const paint = () => {
       oa.innerHTML = chosen.length ? chosen.map((li, k) =>
-        `<li><button class="line mono placed" data-k="${k}" aria-label="${esc(`拿掉第 ${k + 1} 个：${it.lines[li]}`)}">${esc(it.lines[li])}</button></li>`).join("")
+        `<li><button class="line placed" lang="ko" data-k="${k}" aria-label="${esc(`拿掉第 ${k + 1} 个：${it.lines[li]}`)}">${esc(it.lines[li])}</button></li>`).join("")
         : `<li class="empty">点下面的卡片</li>`;
       body.querySelectorAll("#op .line").forEach((b) => {
         const used = chosen.includes(+b.dataset.li);

@@ -40,3 +40,7 @@ test("order_differs: 순서 문제 섞기는 저장된 순서와 다름 (C23)", 
   }
   assert.deepEqual(shuffleOrder(["only"], 1), [0]);
 });
+
+test("order_differs_two: 2음절 카드도 처음부터 정답 순서로 나오지 않음", () => {
+  for (let seed = 0; seed < 500; seed++) assert.deepEqual(shuffleOrder(["친", "구"], seed), [1, 0]);
+});

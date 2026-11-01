@@ -40,7 +40,7 @@ export function render(root, ctx, params = {}) {
       ${!r.firstTime && !review ? `<p class="muted center">重做没有课程字节，但 XP 和今日任务照样计算。</p>` : ""}
       ${r.firstTime && r.perfect ? `<p class="perk">${icon("star")}无失误完成（+5 XP，+5 字节）</p>` : ""}
       ${streakLine ? `<div class="ria-row small"><div class="ria-wrap">${haechiImg({ face: streakLine.face, size: 56 })}</div><p class="bubble">${esc(streakLine.text)}</p></div>` : ""}
-      ${lesson && lesson.summary ? `<section class="panel summary"><h2>今天学到的</h2><ol>${lesson.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : ""}
+      ${lesson && lesson.summary && lesson.summary.length ? `<section class="panel summary"><h2>今天学到的</h2><ol>${lesson.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : ""}
       ${quests.length || r.chest ? `<section class="panel"><h2>完成的任务</h2><ul class="plain">${quests.map((q) => `<li>${icon("check")}${esc(q.name)} <b class="sun-text">+${q.reward}</b></li>`).join("")}
         ${r.chest ? `<li>${icon("chestOpen")}打开了宝箱 <b class="sun-text">+10</b></li>` : ""}</ul></section>` : ""}
       ${badges.length ? `<section class="panel"><h2>新徽章</h2><ul class="new-badges">${badges.map((b) => `<li>${badgeArt(b.id, true, 56)}<span>${esc(b.name)}</span></li>`).join("")}</ul></section>` : ""}

@@ -3,7 +3,7 @@
   "name": "獬豸老师教韩语",
   "short_name": "獬豸韩语",
   "description": "和獬豸老师一起，每天 10 分钟，用手机学韩语单词",
-  "lang": "ko",
+  "lang": "zh-Hans",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",

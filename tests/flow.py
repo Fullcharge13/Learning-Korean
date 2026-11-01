@@ -559,6 +559,45 @@ def test_longest_meaning_fits():
         assert not a.errors, a.errors
 
 
+def test_no_code_font():
+    """음절 카드·보기에 코드(고정폭) 글꼴이 쓰이지 않음"""
+    q = "() => [...document.querySelectorAll('.mono')].filter(e => e.offsetParent).length"
+    with App("iPhone 17") as a:
+        a.start()
+        a.page.click("#continue")
+        seen = []
+        items = a.lesson("1-1")["items"]
+        for _ in range(40):
+            a.page.wait_for_timeout(80)
+            if a.page.query_selector(".screen.done"):
+                break
+            if a.page.query_selector(".card-view"):
+                a.page.click("#act")
+                continue
+            if not a.page.query_selector("article.item"):
+                continue
+            it = items[a.which_item(items)]
+            seen.append((it["type"], a.js(q)))
+            a.answer_touch(it)
+            a.page.wait_for_selector("#result:not([hidden])")
+            a.cont()
+        print("    mono per item: %s" % seen)
+        assert any(t == "order" for t, _ in seen), seen
+        assert all(n == 0 for _, n in seen), seen
+
+
+def test_exam_done_has_no_empty_summary():
+    with App("iPhone 17") as a:
+        a.start()
+        exam = a.js("() => window.__ria.ctx.chapters[0].lessons.find((l) => l.isExam).id")
+        a.js("(id) => window.__ria.ctx.show('lesson', { id })", exam)
+        a.page.wait_for_selector("article.item, .card-view")
+        a.play(exam)
+        n = a.js("() => document.querySelectorAll('.panel.summary').length")
+        print("    %s done: summary panels %d" % (exam, n))
+        assert n == 0
+
+
 def test_ria_save_coexists():
     ria = json.dumps({"saveVer": 2, "xp": 777, "completed_lessons": ["1-1", "1-2"]})
     with App("iPhone 17", extra={RIA_KEY: ria}) as a:
