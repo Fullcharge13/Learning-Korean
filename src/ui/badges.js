@@ -7,7 +7,7 @@ import { tabBar, bindTabs, statusBar } from "./nav.js";
 const ART = {
   first_print: ["teal", ">_"], ch1: ["teal", "1장"], ch2: ["teal", "2장"], ch3: ["teal", "3장"],
   streak7: ["coral", "7일"], streak30: ["coral", "30일"], streak100: ["coral", "100"],
-  fixer: ["navy", "fix"], hintfree10: ["navy", "10"], perfectionist: ["sun", "★"],
+  perfectionist: ["sun", "★"],
   reviewer: ["navy", "30"], collector: ["sun", "3벌"], night_owl: ["navy", "☾"],
   advanced1: ["teal", "A+"], advancedAll: ["sun", "A★"],   // v0.7 심화
 };
@@ -58,8 +58,6 @@ export function render(root, ctx) {
           ${advTotal ? `<div><dt>끝낸 심화</dt><dd>${n(advDone)}<small>/${advTotal}</small></dd></div>` : ""}
           <div><dt>맞힌 문제</dt><dd>${n(st.items)}</dd></div>
           <div><dt>실수 없는 레슨</dt><dd>${n(st.perfect)}</dd></div>
-          <div><dt>힌트 없이 통과</dt><dd>${n(st.hintfree)}</dd></div>
-          <div><dt>오류 고쳐 통과</dt><dd>${n(st.fixed)}</dd></div>
           <div><dt>복습 문제</dt><dd>${n(st.review_items)}</dd></div>
           <div><dt>최고 연속 기록</dt><dd>${n(s.streak.best)}<small>일</small></dd></div>
           <div><dt>모은 XP</dt><dd>${n(s.xp)}</dd></div>

@@ -21,22 +21,22 @@ function fixture(over = {}) {
   };
 }
 
-test("reward: 첫 완료·실수 없음·힌트 없이 → {xp 20, bytes 15}", () => {
-  assert.deepEqual(lessonReward({ firstTime: true, perfect: true, hintFreeWrite: true, isExam: false }), { xp: 20, bytes: 15 });
+test("reward: 첫 완료·실수 없음 → {xp 15, bytes 15} (힌트 보너스 없음)", () => {
+  assert.deepEqual(lessonReward({ firstTime: true, perfect: true, isExam: false }), { xp: 15, bytes: 15 });
 });
 test("reward: 평가 첫 완료 → {xp 30, bytes 10}", () => {
-  assert.deepEqual(lessonReward({ firstTime: true, perfect: false, hintFreeWrite: false, isExam: true }), { xp: 30, bytes: 10 });
+  assert.deepEqual(lessonReward({ firstTime: true, perfect: false, isExam: true }), { xp: 30, bytes: 10 });
 });
 test("reward(C24): 다시 하기·실수 없음·힌트 없이 → {xp 10, bytes 0} (보너스 없음)", () => {
-  assert.deepEqual(lessonReward({ firstTime: false, perfect: true, hintFreeWrite: true, isExam: false }), { xp: 10, bytes: 0 });
-  assert.deepEqual(lessonReward({ firstTime: false, perfect: false, hintFreeWrite: false, isExam: false }), { xp: 10, bytes: 0 });
+  assert.deepEqual(lessonReward({ firstTime: false, perfect: true, isExam: false }), { xp: 10, bytes: 0 });
+  assert.deepEqual(lessonReward({ firstTime: false, perfect: false, isExam: false }), { xp: 10, bytes: 0 });
 });
 test("reward(C24): 평가 다시 하기 → {xp 15, bytes 0}", () => {
-  assert.deepEqual(lessonReward({ firstTime: false, perfect: true, hintFreeWrite: true, isExam: true }), { xp: 15, bytes: 0 });
-  assert.deepEqual(lessonReward({ firstTime: false, perfect: false, hintFreeWrite: false, isExam: true }), { xp: 15, bytes: 0 });
+  assert.deepEqual(lessonReward({ firstTime: false, perfect: true, isExam: true }), { xp: 15, bytes: 0 });
+  assert.deepEqual(lessonReward({ firstTime: false, perfect: false, isExam: true }), { xp: 15, bytes: 0 });
 });
 test("reward: 첫 완료 기본(보너스 없음) → {xp 10, bytes 10}", () => {
-  assert.deepEqual(lessonReward({ firstTime: true, perfect: false, hintFreeWrite: false, isExam: false }), { xp: 10, bytes: 10 });
+  assert.deepEqual(lessonReward({ firstTime: true, perfect: false, isExam: false }), { xp: 10, bytes: 10 });
 });
 test("reward(C24): 복습 한 판 → {xp 10, bytes 0}", () => {
   assert.deepEqual(reviewReward(), { xp: 10, bytes: 0 });

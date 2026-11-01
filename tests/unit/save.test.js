@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { SAVE_KEY, SAVE_VER, newSave, migrate, load, loadEx, store, takeRefundNotice, refundNoticeText } from "../../src/save.js";
+import { SAVE_KEY, SAVE_VER, newSave, migrate, load, loadEx, store } from "../../src/save.js";
 
 function fakeStorage(initial = {}) {
   const data = { ...initial };
@@ -25,14 +25,13 @@ const LEDGER_SHAPE = {
   freezes: 0,
   quests: { date: null, ids: [], progress: {}, done: [], chest: false },
   badges: [], outfits: ["basic"], outfit: "basic",
-  stats: { lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0 },
+  stats: { lessons: 0, perfect: 0, review_items: 0 },
   settings: { sound: true, dailyGoal: 20, name: "" },
-  pending_refund: 0,
   seen_updates: {}, // v0.7.1: 「새 내용」 점 — 다시 본 판 { 레슨 id: "v0.7.1" } (saveVer 그대로)
 };
 
 test("constants", () => {
-  assert.equal(SAVE_KEY, "ria-python.save");
+  assert.equal(SAVE_KEY, "haechi-korean.save");
   assert.equal(SAVE_VER, 2);
 });
 
@@ -272,13 +271,13 @@ test("range: xp/bytes/streak/stats are non-negative integers", () => {
   const s = migrate({
     xp: -3, bytes: -5,
     streak: { days: -2, best: 4.9 },
-    stats: { lessons: -1, perfect: 2.5, hintfree: "3", fixed: -0.5, review_items: 7 },
+    stats: { lessons: -1, perfect: 2.5, review_items: "7" },
   });
   assert.equal(s.xp, 0);
   assert.equal(s.bytes, 0);
   assert.equal(s.streak.days, 0);
   assert.equal(s.streak.best, 4);
-  assert.deepEqual(s.stats, { lessons: 0, perfect: 2, hintfree: 3, fixed: 0, review_items: 7 });
+  assert.deepEqual(s.stats, { lessons: 0, perfect: 2, review_items: 7 });
   assert.equal(migrate({ xp: 30.9, bytes: 120 }).xp, 30);
   assert.equal(migrate({ bytes: 120 }).bytes, 120);
 });
@@ -291,144 +290,34 @@ test("range: weak_concepts keeps only finite numbers >= 0", () => {
   );
 });
 
-// ---- v0.6 의상 교체: saveVer 1 → 2 (설계 2026-10-31 §2) ----
+// ---- 의상 칸 정리 (리아 옛 저장 옮기기는 없앰) ----
 import { OUTFITS } from "../../data/outfits.js";
 
-const v1 = (outfits, outfit = "basic", over = {}) => ({ ...JSON.parse(JSON.stringify(LEDGER_SHAPE)), saveVer: 1, outfits, outfit, ...over });
-
-test("v2 rename rows: lab→whitecoat, chef→chef, camping→explorer, astronaut→graduate", () => {
-  for (const [oldId, newId] of [["lab", "whitecoat"], ["chef", "chef"], ["camping", "explorer"], ["astronaut", "graduate"]]) {
-    const s = migrate(v1(["basic", oldId], oldId, { bytes: 7 }));
-    assert.deepEqual(s.outfits, ["basic", newId], oldId);
-    assert.equal(s.outfit, newId, oldId + " 입은 옷도 새 id로");
-    assert.equal(s.bytes, 7, oldId + " 환불 없음");
-    assert.equal(s.saveVer, 2);
-  }
-});
-
-test("v2 refund rows: detective·painter·gardener 180, rain 240, worn one falls back to basic", () => {
-  for (const [oldId, price] of [["detective", 180], ["painter", 180], ["gardener", 180], ["rain", 240]]) {
-    const s = migrate(v1(["basic", oldId], oldId, { bytes: 5 }));
-    assert.deepEqual(s.outfits, ["basic"], oldId);
-    assert.equal(s.bytes, 5 + price, oldId);
-    assert.equal(s.outfit, "basic", oldId);
-  }
-});
-
-test("v2 refund sum: all nine old outfits → 780 bytes back, 5 owned", () => {
-  const all = ["basic", "lab", "detective", "chef", "painter", "gardener", "rain", "camping", "astronaut"];
-  const s = migrate(v1(all, "painter", { bytes: 20 }));
-  assert.equal(s.bytes, 20 + 180 + 180 + 180 + 240);
-  assert.deepEqual(s.outfits, ["basic", "whitecoat", "chef", "explorer", "graduate"]);
-  assert.equal(s.outfit, "basic");
-});
-
-test("v2 dedupe: old id + its new pair (and repeats) → one, refunds counted once", () => {
-  const s = migrate(v1(["basic", "lab", "whitecoat", "lab", "rain", "rain", "basic"], "whitecoat"));
-  assert.deepEqual(s.outfits, ["basic", "whitecoat"]);
-  assert.equal(s.bytes, 240);
-  assert.equal(s.outfit, "whitecoat");
-});
-
-test("v2 unknown ids: dropped without refund, never crash; basic always owned", () => {
-  const s = migrate(v1(["pirate", 7, null, "lab", "__proto__"], "pirate", { bytes: 3 }));
-  assert.deepEqual(s.outfits, ["basic", "whitecoat"]);
-  assert.equal(s.outfit, "basic");
-  assert.equal(s.bytes, 3);
-  const e = migrate(v1([], 42));
-  assert.deepEqual(e.outfits, ["basic"]);
-  assert.equal(e.outfit, "basic");
-});
-
-test("v2: worn outfit not owned → basic; owned new outfit kept", () => {
-  assert.equal(migrate(v1(["basic"], "chef")).outfit, "basic");
-  assert.equal(migrate({ saveVer: 2, outfits: ["basic", "wizard"], outfit: "wizard" }).outfit, "wizard");
-  assert.equal(migrate({ saveVer: 2, outfits: ["basic"], outfit: "wizard" }).outfit, "basic");
-});
-
-test("v2: save without saveVer is treated as v1 (refunds apply)", () => {
-  const s = migrate({ outfits: ["basic", "gardener", "camping"], outfit: "camping", bytes: 1 });
-  assert.deepEqual(s.outfits, ["basic", "explorer"]);
-  assert.equal(s.outfit, "explorer");
-  assert.equal(s.bytes, 181);
-});
-
-test("v2: a v2 save with old/unknown ids loads, no refund (refunds only from v1)", () => {
-  const s = migrate({ saveVer: 2, outfits: ["basic", "rain", "future_x", "gym"], outfit: "future_x", bytes: 10 });
-  assert.deepEqual(s.outfits, ["basic", "gym"]);
-  assert.equal(s.outfit, "basic");
-  assert.equal(s.bytes, 10);
-});
-
-test("v2 idempotent: migrating twice gives the same save, bytes not refunded twice", () => {
-  const all = ["basic", "lab", "detective", "chef", "painter", "gardener", "rain", "camping", "astronaut", "zzz"];
-  const once = migrate(v1(all, "lab", { bytes: 11 }));
-  const twice = migrate(JSON.parse(JSON.stringify(once)));
-  assert.deepEqual(twice, once);
-  assert.equal(twice.bytes, 11 + 780);
-});
-
-test("v2: every owned id after migrate is in the outfit table", () => {
+test("outfits clean: unknown ids dropped, basic always owned, worn falls back to basic", () => {
   const ids = new Set(OUTFITS.map((o) => o.id));
-  const s = migrate(v1(["basic", "lab", "detective", "camping", "astronaut", "x"], "x"));
-  for (const id of s.outfits) assert.ok(ids.has(id), id);
-  assert.ok(ids.has(s.outfit));
-});
-
-test("v2 load: old v1 text in storage is migrated; broken text still kept in .broken", () => {
-  const st = fakeStorage({ [SAVE_KEY]: JSON.stringify(v1(["basic", "lab", "rain"], "rain", { bytes: 0, xp: 50 })) });
-  const s = load(st);
-  assert.equal(s.saveVer, 2);
-  assert.equal(s.xp, 50);
-  assert.deepEqual(s.outfits, ["basic", "whitecoat"]);
+  const s = migrate({ saveVer: 2, outfits: ["pirate", 7, null, "chef", "chef", "__proto__"], outfit: "pirate", bytes: 3 });
+  assert.deepEqual(s.outfits, ["basic", "chef"]);
   assert.equal(s.outfit, "basic");
-  assert.equal(s.bytes, 240);
-  const br = fakeStorage({ [SAVE_KEY]: '{"saveVer":1,"outfits":["lab"' });
-  assert.deepEqual(load(br), newSave());
-  assert.equal(br.data[SAVE_KEY + ".broken"], '{"saveVer":1,"outfits":["lab"');
+  assert.equal(s.bytes, 3, "no refund");
+  for (const id of s.outfits) assert.ok(ids.has(id), id);
+  assert.equal(migrate({ outfits: ["basic", "chef"], outfit: "chef" }).outfit, "chef");
 });
 
-test("v2: newer saveVer (3) is not downgraded and still loads", () => {
+test("newer saveVer (3) is not downgraded and still loads", () => {
   const s = migrate({ saveVer: 3, outfits: ["basic", "hologram"], outfit: "hologram" });
   assert.equal(s.saveVer, 3);
   assert.equal(s.outfit, "basic");
 });
 
-// ---- 판정 C42: 환불 안내는 한 번만 ----
-test("C42 refund notice: v1 환불 금액을 pending_refund에 남기고, 다시 옮겨도 늘지 않음", () => {
-  const s = migrate(v1(["basic", "detective", "rain"], "detective", { bytes: 2 }));
-  assert.equal(s.pending_refund, 420);
-  assert.equal(s.bytes, 422);
-  const again = migrate(JSON.parse(JSON.stringify(s)));
-  assert.equal(again.pending_refund, 420);
-  assert.equal(again.bytes, 422);
-  assert.equal(migrate(v1(["basic", "lab"], "lab")).pending_refund, 0, "환불 없으면 0");
-  assert.equal(newSave().pending_refund, 0);
+test("save key is haechi-korean.save", () => {
+  assert.equal(SAVE_KEY, "haechi-korean.save");
 });
 
-test("C42 refund notice: take는 한 번만 금액을 돌려주고 깃발(0)을 남긴다", () => {
-  const s = migrate(v1(["basic", "painter"], "basic"));
-  const r1 = takeRefundNotice(s);
-  assert.equal(r1.bytes, 180);
-  assert.equal(r1.save.pending_refund, 0);
-  assert.equal(s.pending_refund, 180, "원본 불변");
-  assert.equal(r1.save.bytes, s.bytes, "바이트는 이미 들어가 있음 — 다시 더하지 않음");
-  const r2 = takeRefundNotice(r1.save);
-  assert.equal(r2.bytes, 0);
-  assert.equal(r2.save, r1.save, "보여 줄 것 없으면 같은 저장");
-  // 저장 → 다시 읽기(새로 고침)해도 다시 나오지 않음
-  const st = fakeStorage();
-  store(st, r1.save);
-  assert.equal(takeRefundNotice(load(st)).bytes, 0);
-});
-
-test("C42 refund notice: 이상한 값은 0으로", () => {
-  for (const bad of [-5, "abc", null, 1.7, Infinity]) assert.ok(migrate({ saveVer: 2, pending_refund: bad }).pending_refund >= 0, String(bad));
-  assert.equal(migrate({ saveVer: 2, pending_refund: -5 }).pending_refund, 0);
-  assert.equal(migrate({ saveVer: 2, pending_refund: 1.7 }).pending_refund, 1);
-  assert.equal(takeRefundNotice(migrate({ saveVer: 2, pending_refund: "x" })).bytes, 0);
-});
-
-test("C42 refund notice text", () => {
-  assert.equal(refundNoticeText(780), "없어진 옷 값 780바이트를 돌려 드렸어요. 새 옷도 구경해 보세요!");
+test("save keeps ria key untouched", () => {
+  const ria = JSON.stringify({ saveVer: 2, xp: 999 });
+  const st = fakeStorage({ "ria-python.save": ria });
+  const { save } = loadEx(st);
+  assert.equal(save.xp, 0);
+  store(st, save);
+  assert.equal(st.data["ria-python.save"], ria);
 });

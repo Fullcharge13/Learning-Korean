@@ -208,13 +208,6 @@ main { padding: 16px calc(16px + var(--sar)) 0 calc(16px + var(--sal)); }
 .logo { font-size: 2.1rem; font-weight: 900; letter-spacing: -0.03em; margin: 8px 0 2px; }
 .logo .bang { color: var(--teal); display: inline-block; transform: rotate(10deg) translateY(-2px); margin-left: 2px; }
 .tagline { color: var(--ink-2); margin: 0; }
-.load { text-align: center; }
-.load-bar { height: 8px; border-radius: 6px; background: var(--paper-2); overflow: hidden; border: 1.5px solid var(--line); }
-.load-bar > span { display: block; height: 100%; width: 35%; background: var(--teal); border-radius: 6px; animation: slide 1.4s ease-in-out infinite; }
-.load-bar[data-state="ready"] > span { width: 100%; animation: none; }
-.load-bar[data-state="error"] > span { width: 100%; animation: none; background: var(--line); }
-@keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(290%); } }
-.load-text { font-size: .9rem; color: var(--ink-2); margin: 8px 0 0; }
 .ver { color: var(--ink-2); font-size: .85rem; text-align: center; margin: 0; }
 
 /* ---------- 홈 ---------- */
@@ -398,7 +391,6 @@ body.result-open .lesson-foot { visibility: hidden; }
 .py-chip.err { background: var(--coral-soft); color: var(--coral-ink); border-radius: 14px; display: block; }
 @keyframes blink { 50% { opacity: .25; } }
 .editor-box { border: 2px solid var(--ink); border-radius: 16px; background: var(--card); margin-bottom: 12px; overflow: hidden; }
-.editor-box .cm-editor { border-radius: 14px; }
 .help-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
 .hints { list-style: none; padding: 0; margin: 0 0 10px; display: grid; gap: 8px; }
 .hint { background: var(--sun-soft); border-left: 5px solid var(--sun-deep); border-radius: 10px; padding: 10px 12px; }
@@ -526,7 +518,6 @@ input[type="text"]:focus { border-color: var(--teal-ink); outline: 3px solid var
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .ria .ria-body, .jump .ria .ria-body { animation: none !important; }
-  .load-bar > span { width: 100%; }
 }
 
 /* ---------- 이정표 축하 ---------- */
@@ -567,8 +558,6 @@ input[type="text"]:focus { border-color: var(--teal-ink); outline: 3px solid var
 .kbd-compact .lesson-top { grid-template-columns: 44px 1fr; padding-top: calc(var(--sat) + 2px); padding-bottom: 2px; }
 .kbd-compact .lesson-body { padding-top: 8px; padding-bottom: 8px; }
 .kbd-compact .editor-box { margin-bottom: 0; }
-.kbd-compact .editor-box .cm-editor { height: var(--edh, auto); }
-.kbd-compact .editor-box .cm-content { min-height: 0 !important; }
 .symwrap { position: relative; min-width: 0; }
 .sym-more {
   position: absolute; top: 0; right: 0; bottom: 4px; width: 44px; display: none;

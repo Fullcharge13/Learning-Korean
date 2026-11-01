@@ -45,7 +45,6 @@ APP_VERSION = re.search(r'VERSION = "(v[0-9.]+)"', open(os.path.join(ROOT, "src"
 DIST = os.path.join(ROOT, "dist")
 OUT = os.path.join(ROOT, "tests", "out")
 DEV_OUT = os.path.join(OUT, "dist-dev")
-CDN = "https://cdn.jsdelivr.net/npm/pyodide@314.0.7/"
 MAX_RAW = 700 * 1024
 V02_RAW = 667397  # v0.2 dist/index.html (651.8 KB). v0.3부터 이보다 작아야 함
 CHAPTER_FILE = re.compile(r"^ch(\d+)-([0-9a-f]{8})\.json$")
@@ -101,9 +100,8 @@ def test_html_static():
     assert 'rel="stylesheet"' not in html, "CSS must be inlined"
     assert raw <= MAX_RAW, "too big: %d bytes" % raw
     assert APP_VERSION in html
-    assert CDN in html, "deploy build must point Pyodide at the CDN (C19)"
     assert "/node_modules/" not in html
-    assert "RIA_WORKER_URL" in html and "RIA_RUNNER_SRC" in html
+    assert "pyodide" not in html.lower() and "RIA_WORKER_URL" not in html
     assert '<link rel="manifest" href="manifest.webmanifest">' in html
     assert 'rel="apple-touch-icon"' in html
     assert 'name="apple-mobile-web-app-capable"' in html
@@ -135,31 +133,11 @@ def test_manifest_and_icons():
 def test_sw_static():
     _build()
     sw = _read(os.path.join(DIST, "sw.js"))
-    assert CDN in sw
+    assert "pyodide" not in sw.lower()
+    assert '"haechi-game-' in sw and "ria-" not in sw, "own cache prefix so Ria's caches on the same origin survive"
     assert "__RIA_" not in sw, "placeholders left in sw.js"
     assert APP_VERSION in sw
     assert "NETWORK_TIMEOUT_MS = 4000" in sw
-
-
-def test_sqlite3_in_precached_core():
-    """v0.5: 16장 sqlite3가 오프라인에서 돌려면 그 파일이 sw.js가 미리 받는 Pyodide 핵심 파일 안에 있어야 한다.
-    Pyodide 314.0.7: _sqlite3는 pyodide.asm.wasm에 내장, sqlite3 모듈은 python_stdlib.zip 안 → 따로 받을 꾸러미 없음.
-    Pyodide를 올렸는데 sqlite3가 따로 받는 꾸러미가 되면 이 시험이 실패한다(그때는 worker.js에서 loadPackage를
-    부르고 그 파일들을 sw.js PY_CORE와 offline.js PYODIDE_REQUIRED에 더해야 함)."""
-    import zipfile
-    pyo = os.path.join(ROOT, "node_modules", "pyodide")
-    with open(os.path.join(pyo, "pyodide-lock.json"), encoding="utf-8") as f:
-        lock = json.load(f)
-    pkgs = {k for k, v in lock["packages"].items() if "sqlite3" in v.get("imports", []) or k in ("sqlite3", "_sqlite3")}
-    assert not pkgs, "sqlite3 became a separate Pyodide package: %r" % pkgs
-    names = zipfile.ZipFile(os.path.join(pyo, "python_stdlib.zip")).namelist()
-    assert "sqlite3/__init__.py" in names and "sqlite3/dbapi2.py" in names
-    _build()
-    sw = _read(os.path.join(DIST, "sw.js"))
-    core = json.loads(re.search(r"const PY_CORE = (\[[^\]]*\]);", sw).group(1))
-    assert {"pyodide.asm.wasm", "python_stdlib.zip"} <= set(core), core
-    offline = _read(os.path.join(ROOT, "src", "offline.js"))
-    assert '"pyodide.asm.wasm"' in offline and '"python_stdlib.zip"' in offline
 
 
 def test_clean_and_docs_icons():
@@ -191,15 +169,6 @@ def test_node_missing():
 
 def test_guards():
     b = _build_module()
-    ok = "const py = new PyRun({ indexURL, workerURL: window.RIA_WORKER_URL, runnerSource: window.RIA_RUNNER_SRC });"
-    b.check_app_hooks(ok)
-    for bad in ("const py = new PyRun({ indexURL });", "new PyRun({ indexURL, workerURL: window.RIA_WORKER_URL })"):
-        try:
-            b.check_app_hooks(bad)
-        except SystemExit as e:
-            assert "RIA_" in str(e), e
-        else:
-            raise AssertionError("check_app_hooks accepted: " + bad)
     try:
         b.check_output('<head><link rel="stylesheet" href="style.css"></head>')
     except SystemExit as e:
@@ -289,7 +258,7 @@ class _Browser:
         device = {k: v for k, v in self.pw.devices["iPhone 17"].items() if k != "default_browser_type"}
         self.context = self.browser.new_context(service_workers=service_workers, **device)
         if init_save is not None:
-            self.context.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('ria-python.save', %s); sessionStorage.setItem('seeded', '1'); }"
+            self.context.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('haechi-korean.save', %s); sessionStorage.setItem('seeded', '1'); }"
                                          % json.dumps(json.dumps(init_save)))
         self.page = self.context.new_page()
         self.errors = []
@@ -329,43 +298,26 @@ class _Browser:
 
 
 def test_browser_offline():
-    _build("--dev-pyodide", "--out", DEV_OUT)
+    _build("--out", DEV_OUT)
     b = _Browser(DEV_OUT)
     try:
         pg = b.page
-        # 1) 온라인: 홈 화면, Blob 작업자로 print(1)
+        # 1) 온라인: 홈 화면
         pg.goto(b.url)
         b.home()
-        info = pg.evaluate("() => ({ worker: String(window.__ria.ctx.py.workerURL), idx: window.__ria.ctx.py.indexURL })")
-        assert info["worker"].startswith("blob:"), info
-        assert info["idx"] == b.url + "node_modules/pyodide/", info
-        r = pg.evaluate("() => window.__ria.ctx.py.run('print(1)')")
-        assert r["stdout"] == "1\n" and r["error"] is None, r
-        print("    online print(1): %r in %.0f ms" % (r["stdout"], r["ms"]))
 
         # 2) 서비스 작업자가 이 페이지를 통제할 때까지
         b.wait_controlled()
         cached = b.cached_urls()
         assert any(u.endswith("/index.html") or u == b.url for u in cached), cached
-        assert any("pyodide.asm.wasm" in u for u in cached), "Pyodide files not cached: %r" % cached
-        print("    cached entries: %d (game + Pyodide)" % len(cached))
+        print("    cached entries: %d" % len(cached))
 
         # 3) 오프라인 → 새로고침 → 홈 화면, print(1)
         b.context.set_offline(True)
         resp = pg.reload()
         assert resp is not None and resp.from_service_worker, "offline page not served by sw.js"
         b.home()
-        r = pg.evaluate("() => window.__ria.ctx.py.run('print(1)')")
-        assert r["stdout"] == "1\n" and r["error"] is None, r
-        print("    offline reload: home OK, print(1): %r" % r["stdout"])
-        # v0.5: 16장 sqlite3와 17장 chart도 오프라인에서(sw 저장본만으로) 돈다
-        sql = ("import sqlite3\ncon = sqlite3.connect(':memory:')\ncon.execute('CREATE TABLE t (n INTEGER)')\n"
-               "con.execute('INSERT INTO t VALUES (7)')\nprint(con.execute('SELECT n * 6 FROM t').fetchone()[0])\n"
-               "import chart\nchart.bar(['a'], [1])\nchart.show()\n")
-        r = pg.evaluate("(c) => window.__ria.ctx.py.run(c)", sql)
-        assert r["error"] is None and r["stdout"] == "42\n", r
-        assert r["charts"] == [{"kind": "bar", "labels": ["a"], "values": [1]}], r
-        print("    offline sqlite3 + chart: %r, %d chart" % (r["stdout"], len(r["charts"])))
+        print("    offline reload: home OK")
         b.context.set_offline(False)
         pg.screenshot(path=os.path.join(OUT, "build_offline_home.png"))
         assert b.errors == [], b.errors
@@ -373,32 +325,8 @@ def test_browser_offline():
         b.close()
 
 
-def test_blocked_pyodide_install():
-    _build("--dev-pyodide", "--out", DEV_OUT)
-    b = _Browser(DEV_OUT)
-    try:
-        _Handler.STATE["block_pyodide"] = True
-        b.page.goto(b.url)
-        b.home()
-        b.wait_controlled()  # 설치·활성화가 Pyodide 실패에 막히지 않음
-        cached = b.cached_urls()
-        assert not any("pyodide" in u for u in cached), cached
-        assert any(u.endswith("/index.html") for u in cached), cached
-        b.context.set_offline(True)
-        resp = b.page.reload()
-        assert resp is not None and resp.from_service_worker
-        b.home()
-        st = b.page.evaluate("() => window.__ria.ctx.pyState().status")
-        print("    blocked CDN: sw installed, %d game files cached, offline home OK (python status: %s)"
-              % (len(cached), st))
-        assert not [e for e in b.errors if e.startswith("pageerror")], b.errors
-    finally:
-        _Handler.STATE["block_pyodide"] = False
-        b.close()
-
-
 def test_slow_network_falls_back():
-    _build("--dev-pyodide", "--out", DEV_OUT)
+    _build("--out", DEV_OUT)
     b = _Browser(DEV_OUT)
     try:
         b.page.goto(b.url)
@@ -419,22 +347,22 @@ def test_slow_network_falls_back():
 
 def test_cache_rotation():
     folder = os.path.join(OUT, "dist-rotate")
-    r = _run_build("--dev-pyodide", "--out", folder, "--build-id", "A")
+    r = _run_build("--out", folder, "--build-id", "A")
     assert r.returncode == 0, r.stdout + r.stderr
     b = _Browser(folder)
     try:
         b.page.goto(b.url)
         b.home()
         b.wait_controlled()
-        old = [k for k in b.cache_keys() if k.startswith("ria-game-")]
+        old = [k for k in b.cache_keys() if k.startswith("haechi-game-")]
         assert len(old) == 1, old
-        r = _run_build("--dev-pyodide", "--out", folder, "--build-id", "B")
+        r = _run_build("--out", folder, "--build-id", "B")
         assert r.returncode == 0, r.stdout + r.stderr
         b.page.evaluate("async () => { const r = await navigator.serviceWorker.getRegistration(); await r.update(); }")
         # wait_for_function은 async 판정을 기다리지 않으므로 직접 되풀이해 본다
         deadline = time.monotonic() + 30
         while True:
-            new = [k for k in b.cache_keys() if k.startswith("ria-game-")]
+            new = [k for k in b.cache_keys() if k.startswith("haechi-game-")]
             if old[0] not in new and new or time.monotonic() > deadline:
                 break
             b.page.wait_for_timeout(200)
@@ -499,7 +427,7 @@ DEV_SPLIT = os.path.join(OUT, "dist-dev-split")
 
 def _dev_split():
     """장 따로 불러오기 브라우저 시험용 빌드: 스냅숏 내용, Pyodide는 /node_modules/"""
-    _build("--dev-pyodide", "--out", DEV_SPLIT, "--lessons-dir", _snapshot())
+    _build("--out", DEV_SPLIT, "--lessons-dir", _snapshot())
     return DEV_SPLIT
 
 
@@ -551,84 +479,6 @@ def _lesson_index(html):
     return json.loads(m.group(1))
 
 
-def test_split_advanced():
-    """v0.7 작업 1: 장 파일의 ADVANCED는 그 장 JSON에, 목록(index)에는 장의 advanced 칸에 stub만. 없는 장은 그대로"""
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from fixtures.advanced_dir import make
-    make(_snapshot(), ADV_SNAP, chapters=(1, 2))
-    _build("--out", ADV_OUT, "--lessons-dir", ADV_SNAP)
-    html = _read(os.path.join(ADV_OUT, "index.html"))
-    src = _source_lessons(ADV_SNAP)
-    table = _chapter_table(html)
-    for n in (1, 2):
-        got = json.loads(_read(os.path.join(ADV_OUT, table[n])))
-        assert [l["id"] for l in got["ADVANCED"]] == ["%d-A1" % n, "%d-A2" % n, "%d-A3" % n], got.get("ADVANCED")
-        assert got == src["ch%d.js" % n], "chapter %d file differs from source" % n
-    no_adv = [n for n in table if n > 2 and "ADVANCED" not in src["ch%d.js" % n]]
-    assert no_adv, "need a chapter without ADVANCED"
-    for n in no_adv:
-        got = json.loads(_read(os.path.join(ADV_OUT, table[n])))
-        assert "ADVANCED" not in got, "chapter %d without ADVANCED must not get an empty list" % n
-    idx = {c["id"]: c for c in _lesson_index(html)}
-    stubs = idx[1]["advanced"]
-    assert [x["id"] for x in stubs] == ["1-A1", "1-A2", "1-A3"], stubs
-    assert set(stubs[0]) == {"id", "chapter", "title", "goal", "concepts", "isAdvanced"}, stubs[0]
-    assert stubs[0]["isAdvanced"] is True and stubs[0]["chapter"] == 1 and stubs[0]["concepts"] == ["print"]
-    assert [l["id"] for l in idx[1]["lessons"]] == ["1-%d" % k for k in range(1, 6)], "main lessons unchanged"
-    for n in no_adv:
-        assert "advanced" not in idx[n]
-    assert "심화 시험 작성 1-A1" not in html and "심화 시험 카드 1-A2" not in html, "advanced lesson text leaked into index.html"
-
-
-UPD_SNAP = os.path.join(OUT, "lessons-upd")
-UPD_OUT = os.path.join(OUT, "dist-upd")
-
-
-def test_split_updated():
-    """v0.7.1: 레슨의 updated("v0.7.1")는 목록 stub에도 옮겨진다(「새 내용」 점). 없는 레슨 stub에는 칸이 없다"""
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from fixtures.advanced_dir import make
-    make(_snapshot(), UPD_SNAP, chapters=(), updated={"1-2": "v0.7.1", "1-A1": "v0.7.1"})
-    _build("--out", UPD_OUT, "--lessons-dir", UPD_SNAP)
-    html = _read(os.path.join(UPD_OUT, "index.html"))
-    idx = {c["id"]: c for c in _lesson_index(html)}
-    by = {l["id"]: l for l in idx[1]["lessons"] + idx[1].get("advanced", [])}
-    assert by["1-2"].get("updated") == "v0.7.1", by["1-2"]
-    assert by["1-A1"].get("updated") == "v0.7.1", by["1-A1"]
-    assert "updated" not in by["1-1"] and "updated" not in by["1-3"], (by["1-1"], by["1-3"])  # 보강 대상 아님
-    table = _chapter_table(html)
-    got = json.loads(_read(os.path.join(UPD_OUT, table[1])))
-    assert [l.get("updated") for l in got["LESSONS"]][:3] == [None, "v0.7.1", None]
-
-
-def test_split_advanced_bad_id():
-    """ADVANCED 레슨 id가 N-Ak 꼴이 아니거나 isAdvanced가 없으면 빌드가 멈춘다"""
-    bad = os.path.join(OUT, "lessons-adv-bad")
-    shutil.rmtree(bad, ignore_errors=True)
-    shutil.copytree(_snapshot(), bad)
-    os.rename(os.path.join(bad, "ch1.js"), os.path.join(bad, "ch1.orig.mjs"))
-    for body, why in (('export const ADVANCED = [{ id: "1-B1", chapter: 1, isAdvanced: true, title: "x", items: [] }];', "id"),
-                      ('export const ADVANCED = [{ id: "1-A1", chapter: 1, isAdvanced: false, title: "x", items: [] }];', "isAdvanced"),
-                      ('export const ADVANCED = [{ id: "2-A1", chapter: 1, isAdvanced: true, title: "x", items: [] }];', "id")):
-        with open(os.path.join(bad, "ch1.js"), "w", encoding="utf-8") as f:
-            f.write('export * from "./ch1.orig.mjs";\n' + body + "\n")
-        r = _run_build("--out", os.path.join(OUT, "dist-adv-bad"), "--lessons-dir", bad)
-        assert r.returncode != 0, "build must fail for bad ADVANCED (%s)" % why
-        assert "ADVANCED" in (r.stdout + r.stderr), r.stdout + r.stderr
-    # isAdvanced를 빠뜨린 것은 멈추지 않고 채워 넣는다(ADVANCED 안이면 심화)
-    with open(os.path.join(bad, "ch1.js"), "w", encoding="utf-8") as f:
-        f.write('export * from "./ch1.orig.mjs";\nexport const ADVANCED = [{ id: "1-A1", chapter: 1, title: "x", goal: "", items: [] }];\n')
-    out = os.path.join(OUT, "dist-adv-bad")
-    r = _run_build("--out", out, "--lessons-dir", bad)
-    assert r.returncode == 0, r.stdout + r.stderr
-    html = _read(os.path.join(out, "index.html"))
-    got = json.loads(_read(os.path.join(out, _chapter_table(html)[1])))
-    assert got["ADVANCED"][0]["isAdvanced"] is True
-    assert {c["id"]: c for c in _lesson_index(html)}[1]["advanced"][0]["isAdvanced"] is True
-    shutil.rmtree(bad, ignore_errors=True)
-    shutil.rmtree(out, ignore_errors=True)
-
-
 def test_split_deterministic():
     _build("--out", SPLIT_OUT, "--lessons-dir", _snapshot())
     other = os.path.join(OUT, "dist-det")
@@ -658,43 +508,6 @@ def _flow_module():
     return mod
 
 
-def _driver(page):
-    """flow.py의 레슨 풀기 도우미를 이 page에 빌려 씀"""
-    App = _flow_module().App
-
-    class Drv:
-        def __init__(self, pg):
-            self.page = pg
-        js = App.js
-        lesson = App.lesson
-        which_item = App.which_item
-        answer_touch = App.answer_touch
-        wait_py = App.wait_py
-        set_code = App.set_code
-        submit_write = App.submit_write
-        cont = App.cont
-    return Drv(page)
-
-
-def _play_to_write(d, lid):
-    """lid 레슨을 직접 작성 문제까지 정답으로 풀고, 직접 작성을 정답으로 제출한다. 결과 창 클래스를 돌려줌."""
-    items = d.lesson(lid)["items"]
-    for _ in range(40):
-        d.page.wait_for_timeout(80)
-        if d.page.query_selector(".card-view"):
-            d.page.click("#act")
-            continue
-        if d.page.query_selector(".item.write"):
-            it = next(x for x in items if x["type"] == "write")
-            d.submit_write(it["solution"])
-            return d.page.get_attribute("#result", "class")
-        if d.page.query_selector("article.item"):
-            d.answer_touch(items[d.which_item(items)])
-            d.page.wait_for_selector("#result:not([hidden])")
-            d.cont()
-    raise AssertionError("write item not reached in " + lid)
-
-
 def _wait_chapters_cached(b, files, timeout=30):
     deadline = time.monotonic() + timeout
     while True:
@@ -703,38 +516,6 @@ def _wait_chapters_cached(b, files, timeout=30):
         if not missing or time.monotonic() > deadline:
             return missing
         b.page.wait_for_timeout(200)
-
-
-def test_offline_chapter_write():
-    folder = _dev_split()
-    b = _Browser(folder)
-    try:
-        pg = b.page
-        pg.goto(b.url)
-        b.home()
-        b.wait_controlled()
-        files = pg.evaluate("() => Object.values(window.RIA_CHAPTER_FILES)")
-        assert len(files) >= 6, files
-        missing = _wait_chapters_cached(b, files)
-        assert not missing, "chapter files not precached: %r" % missing
-        r = pg.evaluate("() => window.__ria.ctx.py.run('print(1)')")  # Pyodide 저장본 채우기
-        assert r["stdout"] == "1\n", r
-        b.context.set_offline(True)
-        resp = pg.reload()
-        assert resp is not None and resp.from_service_worker
-        b.home()
-        pg.evaluate("() => window.__ria.ctx.show('lesson', { id: '6-1' })")
-        pg.wait_for_selector(".card-view", timeout=10_000)
-        cls = _play_to_write(_driver(pg), "6-1")
-        assert "ok" in (cls or ""), cls
-        print("    offline: 6-1 opened from cached chapter file, write task passed")
-        pg.evaluate("() => window.__ria.ctx.show('settings')")
-        pg.wait_for_selector("#offline[data-ready]", timeout=10_000)
-        assert pg.get_attribute("#offline", "data-ready") == "true", pg.inner_text("#offline")
-        b.context.set_offline(False)
-        assert not [e for e in b.errors if e.startswith("pageerror")], b.errors
-    finally:
-        b.close()
 
 
 def test_chapter_blocked_retry():
@@ -788,7 +569,7 @@ def test_chapter_cache_rotation():
     assert changed != src
     with open(p, "w", encoding="utf-8") as f:
         f.write(changed)
-    r = _run_build("--dev-pyodide", "--out", folder, "--lessons-dir", alt)
+    r = _run_build("--out", folder, "--lessons-dir", alt)
     assert r.returncode == 0, r.stdout + r.stderr
     old_files = _chapter_files(folder)
     b = _Browser(folder)
@@ -798,8 +579,8 @@ def test_chapter_cache_rotation():
         b.wait_controlled()
         old_table = b.page.evaluate("() => window.RIA_CHAPTER_FILES")
         assert not _wait_chapters_cached(b, list(old_table.values()))
-        old_game = [k for k in b.cache_keys() if k.startswith("ria-game-")]
-        r = _run_build("--dev-pyodide", "--out", folder, "--lessons-dir", _snapshot())
+        old_game = [k for k in b.cache_keys() if k.startswith("haechi-game-")]
+        r = _run_build("--out", folder, "--lessons-dir", _snapshot())
         assert r.returncode == 0, r.stdout + r.stderr
         new_files = _chapter_files(folder)
         gone = sorted(set(old_files) - set(new_files))
@@ -808,7 +589,7 @@ def test_chapter_cache_rotation():
         b.page.evaluate("async () => { const r = await navigator.serviceWorker.getRegistration(); await r.update(); }")
         deadline = time.monotonic() + 30
         while True:
-            keys = [k for k in b.cache_keys() if k.startswith("ria-game-")]
+            keys = [k for k in b.cache_keys() if k.startswith("haechi-game-")]
             if (keys and old_game[0] not in keys) or time.monotonic() > deadline:
                 break
             b.page.wait_for_timeout(200)
@@ -869,7 +650,7 @@ def test_new_index_not_cached_without_new_sw():
     (새 index가 저장되면 오프라인에서 저장 안 된 새 장 파일을 찾다가 실패한다)."""
     folder = os.path.join(OUT, "dist-sw-fail")
     alt = _rotate_alt()
-    r = _run_build("--dev-pyodide", "--out", folder, "--lessons-dir", alt)
+    r = _run_build("--out", folder, "--lessons-dir", alt)
     assert r.returncode == 0, r.stdout + r.stderr
     b = _Browser(folder)
     try:
@@ -878,7 +659,7 @@ def test_new_index_not_cached_without_new_sw():
         b.home()
         b.wait_controlled()
         assert not _wait_chapters_cached(b, list(pg.evaluate("() => window.RIA_CHAPTER_FILES").values()))
-        r = _run_build("--dev-pyodide", "--out", folder, "--lessons-dir", _snapshot())
+        r = _run_build("--out", folder, "--lessons-dir", _snapshot())
         assert r.returncode == 0, r.stdout + r.stderr
         _Handler.STATE["block_sw"] = True
         pg.reload()
@@ -1001,12 +782,7 @@ def test_third_party_notices():
     path = os.path.join(DIST, "licenses.txt")
     assert os.path.exists(path), "dist/licenses.txt missing"
     txt = _read(path)
-    for pkg in ("@codemirror/view", "@codemirror/state", "@lezer/python", "@lezer/lr",
-                "crelt", "style-mod", "w3c-keyname"):
-        assert ("== %s " % pkg) in txt, pkg
-    assert "Copyright (C) 2018-2021 by Marijn Haverbeke" in txt
-    assert txt.count("Permission is hereby granted, free of charge") >= 8
-    assert "pyodide" in txt.lower() and "MPL-2.0" in txt and "cdn.jsdelivr.net/npm/pyodide@" in txt
+    assert "pyodide" not in txt.lower() and "codemirror" not in txt.lower(), "no code runner or editor is shipped"
     assert "esbuild" not in txt, "build tool is not shipped, keep it out"
     sw = _read(os.path.join(DIST, "sw.js"))
     assert '"licenses.txt"' in sw, "licenses.txt must be precached for offline"
@@ -1014,7 +790,8 @@ def test_third_party_notices():
     assert "licenses.txt" in html, "settings must link to licenses.txt"
 
 def main():
-    tests = [(n, f) for n, f in globals().items() if n.startswith("test_") and callable(f)]
+    only = set(sys.argv[1:])  # 이름을 주면 그 시험만
+    tests = [(n, f) for n, f in globals().items() if n.startswith("test_") and callable(f) and (not only or n in only)]
     fails = 0
     for name, f in tests:
         try:

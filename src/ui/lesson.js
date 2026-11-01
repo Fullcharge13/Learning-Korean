@@ -1,11 +1,10 @@
-// 레슨 화면: 개념 카드 → 터치 문제 → (직접 작성) → 재도전 → 이해도 확인 → 완료
+// 레슨 화면: 개념 카드 → 터치 문제 → 재도전 → 이해도 확인 → 완료
 // 진행 순서는 lessonflow.js 상태 기계가 정하고, 이 파일은 그리기와 채점만 한다.
 import { current, nextCard, answer, summary } from "../lessonflow.js";
-import { newSession, mark as markConcept, touchResult, writePass, writeWrong, writeHint, logSubmit, finishInfo } from "../session.js";
+import { newSession, mark as markConcept, touchResult, logSubmit, finishInfo } from "../session.js";
 import { packResume, restoreSession, hasProgress } from "../resume.js";
 import { riaSVG } from "../ria.js";
-import { esc, icon, bar, codeBlock, dialog, riaSays, filesNote, chartNote, stdinNote, cardExample } from "./dom.js";
-import { mountWrite } from "./write.js";
+import { esc, icon, bar, codeBlock, dialog, riaSays, cardExample } from "./dom.js";
 import { shuffleChoices, shuffleOrder, newSeed } from "../shuffle.js";
 import { isCodey } from "../textkind.js";
 import { reviewPool } from "../lessondata.js";
@@ -162,14 +161,12 @@ function run(root, ctx, lesson, review, resumed = null) {
     ...(resumed ? resumed.S : newSession(lesson)),
     guardUntil: 0, onContinue: null, cleanupItem: null,
     itemDone: false,   // 이 문제의 답을 냈고 「계속」을 기다림 → 그동안은 이어 하기 기록을 남기지 않음
-    writeUI: null,     // 지금 write 문제의 { index, code, hintsShown, solutionSeen, submits, hadError }
   };
-  let pendingItem = resumed && resumed.item ? resumed.item : null;   // 처음 그리는 write 문제에만 씀
 
   // ---- 이어 하기 기록 (v0.6.2 다) ----
   function saveResume() {
     if (review || !ctx.resume || S.itemDone || !hasProgress(S.flow)) return;
-    ctx.resume.write(packResume({ lessonId: lesson.id, S, item: S.writeUI, now: Date.now() }));
+    ctx.resume.write(packResume({ lessonId: lesson.id, S, item: null, now: Date.now() }));
   }
 
   root.innerHTML = `<div class="screen lesson">
@@ -282,7 +279,7 @@ function run(root, ctx, lesson, review, resumed = null) {
       : it.type === "check" ? `<span class="tag check">이해도 확인</span>`
       : review && it.from ? `<span class="tag">${esc(it.from)} 복습</span>` : "";
     return `${tag}<h1 class="q">${esc(it.q || (it.type === "order" ? "줄을 차례대로 눌러 코드를 완성해 보세요." : "답을 골라 보세요."))}</h1>
-      ${filesNote(it.files)}${it.code && it.type !== "blank" ? codeBlock(it.code) : ""}${stdinNote(it.stdin)}${chartNote(it.chart)}`;
+      ${it.code ? codeBlock(it.code) : ""}`;
   }
 
   function renderChoice(cur) {
@@ -303,33 +300,6 @@ function run(root, ctx, lesson, review, resumed = null) {
     act.addEventListener("click", () => {
       if (pick < 0) return;
       judged(cur, pick === it.answer, `<p class="answer">정답: <span class="${isCodey(it.options[it.answer]) ? "mono" : ""}">${esc(it.options[it.answer])}</span></p>`);
-    });
-  }
-
-  function renderBlank(cur) {
-    const orig = cur.item;
-    const sh = shuffleChoices(orig.chips, orig.answer, newSeed());
-    const it = { ...orig, chips: sh.options, answer: sh.answer };
-    let pick = -1;
-    const parts = String(it.code || "___").split("___");
-    const codeHTML = () => `<pre class="code blank-code"><code>${parts.map((p, i) => esc(p) + (i < parts.length - 1
-      ? `<span class="slot${pick >= 0 ? " filled" : ""}">${pick >= 0 ? esc(it.chips[pick]) : "    "}</span>` : "")).join("")}</code></pre>`;
-    body.innerHTML = `<article class="item">${itemHead(cur)}
-      <div id="bc">${codeHTML()}</div>
-      <div class="chips" role="radiogroup" aria-label="빈칸에 넣을 조각">${it.chips.map((c, i) =>
-        `<button class="chip mono" role="radio" aria-checked="false" data-i="${i}">${esc(c)}</button>`).join("")}</div>
-    </article>`;
-    const act = footButton("확인", { disabled: true });
-    body.querySelectorAll(".chip").forEach((b) => b.addEventListener("click", () => {
-      pick = +b.dataset.i;
-      body.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
-      body.querySelector("#bc").innerHTML = codeHTML();
-      act.disabled = false;
-    }));
-    act.addEventListener("click", () => {
-      if (pick < 0) return;
-      const filled = parts.join(it.chips[it.answer]);
-      judged(cur, pick === it.answer, `<p class="answer">정답</p>${codeBlock(filled)}`);
     });
   }
 
@@ -371,41 +341,6 @@ function run(root, ctx, lesson, review, resumed = null) {
     });
   }
 
-  function renderWriteItem(cur) {
-    const init = pendingItem && pendingItem.index === cur.index ? pendingItem : null;
-    pendingItem = null;
-    S.writeUI = init ? { ...init } : null;
-    S.cleanupItem = mountWrite({
-      ctx, item: cur.item, lesson, body, foot, initial: init,
-      onState(st) { S.writeUI = { index: cur.index, ...st }; saveResume(); },
-      onPass({ solutionSeen, hintUsed, hadError, firstSubmit }) {
-        S.itemDone = true;
-        const it = cur.item;
-        const { flowCorrect } = writePass(S, cur, { solutionSeen, hintUsed, hadError, firstSubmit });
-        ctx.sound.play("correct");
-        openResult({
-          ok: true, flowCorrect,
-          title: solutionSeen ? "통과했어요" : hadError ? "단서를 따라 고쳐서 통과!" : "통과했어요!",
-          text: (solutionSeen ? "정답을 보고 통과했어요. 다음에 혼자 다시 써 보면 금방 익숙해져요. " : "") + (it.explain || ""),
-          situation: "correct", sfx: "딩동!",
-          onContinue: () => { S.cleanupItem && S.cleanupItem(); S.cleanupItem = null; S.flow = answer(S.flow, flowCorrect); step(); },
-        });
-      },
-      onWrong() { writeWrong(S, cur); },
-      onHint() { writeHint(S, cur); },
-      log(entry) { logSubmit(S, lesson.id, cur.index, entry.pass, new Date().toISOString()); },
-      showCards() { showCardsModal(); },
-    });
-  }
-
-  function showCardsModal() {
-    dialog({
-      title: "개념 카드 다시 보기",
-      body: (lesson.cards || []).map((c) => `<p>${esc(c.say)}</p>${cardExample(c)}`).join(""),
-      buttons: [{ label: "닫기", value: true, kind: "primary" }],
-    });
-  }
-
   function finishLesson() {
     const sum = summary(S.flow);
     if (!review && ctx.resume) ctx.resume.clear();
@@ -417,7 +352,6 @@ function run(root, ctx, lesson, review, resumed = null) {
   function step() {
     S.judged = false;
     S.itemDone = false;
-    S.writeUI = null;
     setProgress();
     const cur = current(S.flow);
     body.scrollTop = 0;
@@ -427,9 +361,7 @@ function run(root, ctx, lesson, review, resumed = null) {
     else {
       const t = cur.item.type;
       if (t === "choice" || t === "check") renderChoice(cur);
-      else if (t === "blank") renderBlank(cur);
       else if (t === "order") renderOrder(cur);
-      else if (t === "write") renderWriteItem(cur);
       else { S.flow = answer(S.flow, true); step(); return; }
     }
     saveResume();

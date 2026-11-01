@@ -12,7 +12,6 @@ const num = (v) => (typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0
 /**
  * @param save  현재 저장(바꾸지 않음)
  * @param info  { lesson, mode: "lesson"|"review", perfect, accuracy, marks: [concept, outcome][],
- *               write: { passed, hintUsed, solutionSeen, fixedError } | null,
  *               itemsSolved, reviewCorrect, logs, nextLessonId, nextChapter,
  *               advancedIds: 지금 과정의 심화 id 전부(배지 「깊이 파는 사람」) }
  * @param now   Date
@@ -22,20 +21,17 @@ export function finishLesson(save, info, now = new Date()) {
   const isReview = info.mode === "review";
   const lesson = info.lesson || {};
   let s = structuredClone(save);
-  s.stats = { lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0, items: 0, ...s.stats };
+  s.stats = { lessons: 0, perfect: 0, review_items: 0, items: 0, ...s.stats };
 
   for (const [concept, outcome] of info.marks || []) {
     if (concept) s = markConcept(s, concept, outcome);
   }
 
-  const w = info.write || null;
   const firstTime = !isReview && !s.completed_lessons.includes(lesson.id);
-  const hintFreeWrite = !isReview && !!(w && w.passed && !w.hintUsed && !w.solutionSeen);
-  const fixedError = !isReview && !!(w && w.passed && w.fixedError && !w.solutionSeen);
   const perfect = !isReview && !!info.perfect;
   const reward = isReview
     ? reviewReward()
-    : lessonReward({ firstTime, perfect, hintFreeWrite, isExam: !!lesson.isExam, isAdvanced: isAdvancedLesson(lesson) });
+    : lessonReward({ firstTime, perfect, isExam: !!lesson.isExam, isAdvanced: isAdvancedLesson(lesson) });
 
   const goalBefore = s.streak.lastGoalDate;
   const bytesBeforeXp = num(s.bytes);
@@ -59,8 +55,6 @@ export function finishLesson(save, info, now = new Date()) {
   };
   if (!isReview) ev("lesson_done");
   ev("xp", reward.xp);
-  if (hintFreeWrite) ev("hintfree_pass");
-  if (fixedError) ev("fixed_error_pass");
   if (perfect) ev("perfect_lesson");
   if (isReview) ev("review_item", num(info.reviewCorrect));
   const questBytes = s.bytes - bytesBeforeQuests;
@@ -69,8 +63,6 @@ export function finishLesson(save, info, now = new Date()) {
   const st = { ...s.stats };
   if (!isReview) st.lessons += 1;
   if (perfect) st.perfect += 1;
-  if (hintFreeWrite) st.hintfree += 1;
-  if (fixedError) st.fixed += 1;
   if (isReview) st.review_items += num(info.reviewCorrect);
   st.items += num(info.itemsSolved);
   s.stats = st;
@@ -103,7 +95,7 @@ export function finishLesson(save, info, now = new Date()) {
       mode: info.mode, lessonId: lesson.id, xp: reward.xp, lessonBytes: reward.bytes, questBytes, milestoneBytes,
       totalBytes: num(s.bytes) - num(save.bytes),
       finished, chest, newBadges, milestone: earned.milestone, streakUp, streak: s.streak.days,
-      firstTime, perfect, hintFreeWrite, accuracy: info.accuracy,
+      firstTime, perfect, accuracy: info.accuracy,
     },
   };
 }

@@ -14,6 +14,3 @@ export const OUTFITS = [
   { id: "graduate", short: "졸업 가운", name: "졸업 가운·학사모", price: null, unlock: "streak30", desc: "꾸준함이 졸업장을 만들어요!" },
 ];
 
-// saveVer 1 → 2 옮기기 표 (설계 §2). 새 짝이 있는 옛 의상은 이름만 바꾸고, 없어진 의상은 산 값만큼 바이트로 돌려준다.
-export const OUTFIT_RENAME_V2 = Object.freeze({ lab: "whitecoat", chef: "chef", camping: "explorer", astronaut: "graduate" });
-export const OUTFIT_REFUND_V2 = Object.freeze({ detective: 180, painter: 180, gardener: 180, rain: 240 });

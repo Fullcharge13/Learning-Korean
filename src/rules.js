@@ -50,10 +50,10 @@ function copy(save) {
 // ---- 보상 ----
 // 다시 하기(판정 C24): 고정 XP 10(평가 15), 보너스·바이트 없음. 심화도 같은 규칙(10).
 // 15레슨을 다 끝낸 뒤에도 하루 목표 20을 다시 하기 2번으로 채울 수 있게 한 값.
-// 심화(v0.7): 처음 끝내면 XP 15·바이트 15 + 보통 레슨과 같은 보너스(실수 없음 +5 XP·+5 바이트, 힌트 없음 +5 XP).
-export function lessonReward({ firstTime, perfect, hintFreeWrite, isExam, isAdvanced }) {
+// 심화(v0.7): 처음 끝내면 XP 15·바이트 15 + 보통 레슨과 같은 보너스(실수 없음 +5 XP·+5 바이트).
+export function lessonReward({ firstTime, perfect, isExam, isAdvanced }) {
   if (!firstTime) return { xp: isExam ? 15 : 10, bytes: 0 };
-  const xp = (isExam ? 30 : isAdvanced ? ADV_XP : 10) + (perfect ? 5 : 0) + (hintFreeWrite ? 5 : 0);
+  const xp = (isExam ? 30 : isAdvanced ? ADV_XP : 10) + (perfect ? 5 : 0);
   return { xp, bytes: (isAdvanced ? ADV_BYTES : 10) + (perfect ? 5 : 0) };
 }
 

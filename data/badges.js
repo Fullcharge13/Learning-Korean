@@ -7,12 +7,8 @@ export const BADGES = [
   { id: "streak7", name: "연속 7일", desc: "7일 연속으로 하루 목표를 채워요" },
   { id: "streak30", name: "연속 30일", desc: "30일 연속으로 하루 목표를 채워요" },
   { id: "streak100", name: "연속 100일", desc: "100일 연속으로 하루 목표를 채워요" },
-  { id: "fixer", name: "오류 해결사", desc: "오류 난 코드를 고쳐서 5번 통과해요" },
-  { id: "hintfree10", name: "힌트 없이 10회", desc: "힌트 없이 코드를 10번 통과해요" },
   { id: "perfectionist", name: "완벽주의자", desc: "실수 없는 레슨을 10번 끝내요" },
   { id: "reviewer", name: "복습왕", desc: "복습 문제를 30개 풀어요" },
   { id: "collector", name: "의상 수집가", desc: "기본 옷 말고 의상 3벌을 모아요" },
   { id: "night_owl", name: "밤 공부", desc: "밤 10시부터 새벽 4시 사이에 레슨을 끝내요" },
-  { id: "advanced1", name: "심화 첫걸음", desc: "심화 레슨을 하나 끝내요" },
-  { id: "advancedAll", name: "깊이 파는 사람", desc: "지금 있는 심화 레슨을 모두 끝내요" },
 ];

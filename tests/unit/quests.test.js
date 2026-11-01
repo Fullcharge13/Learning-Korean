@@ -31,13 +31,11 @@ function dates(n, start = "2026-01-01") {
   return out;
 }
 
-test("QUESTS table: 6 ledger ids, rewards 5/5/8/8/5/8", () => {
-  assert.deepEqual(QUESTS.map((q) => q.id),
-    ["q_lessons2", "q_xp20", "q_hintfree", "q_fixerr", "q_review3", "q_perfect"]);
-  assert.deepEqual(QUESTS.map((q) => q.reward), [5, 5, 8, 8, 5, 8]);
-  assert.deepEqual(QUESTS.map((q) => q.key),
-    ["lesson_done", "xp", "hintfree_pass", "fixed_error_pass", "review_item", "perfect_lesson"]);
-  assert.deepEqual(QUESTS.map((q) => q.goal), [2, 20, 1, 1, 3, 1]);
+test("QUESTS table: 4 ids (no code-writing quests), rewards 5/5/5/8", () => {
+  assert.deepEqual(QUESTS.map((q) => q.id), ["q_lessons2", "q_xp20", "q_review3", "q_perfect"]);
+  assert.deepEqual(QUESTS.map((q) => q.reward), [5, 5, 5, 8]);
+  assert.deepEqual(QUESTS.map((q) => q.key), ["lesson_done", "xp", "review_item", "perfect_lesson"]);
+  assert.deepEqual(QUESTS.map((q) => q.goal), [2, 20, 3, 1]);
   for (const q of QUESTS) assert.ok(typeof q.name === "string" && q.name.length > 0);
 });
 

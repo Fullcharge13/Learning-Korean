@@ -3,24 +3,18 @@
 //
 // - 게임 파일(index.html, manifest, 아이콘): 네트워크 먼저 → 끊기거나 4초 넘게 느리면 저장본. 새 판이 바로 보이게.
 //   저장본은 설치 때만 채운다(받은 새 판을 옛 저장본에 섞지 않음 → 오프라인은 언제나 한 판이 통째로).
-// - Pyodide 파일(주소가 PYODIDE_PREFIX로 시작): 저장본 먼저 → 없으면 받아서 저장. 버전 고정 주소라 바뀌지 않음.
 // - 장 파일(lessons/chN-<지문8자>.json, v0.3 작업 1): 설치 때 모두 미리 받음(하나가 실패해도 설치는 계속, 처음 열 때 받음).
 //   이름에 내용 지문이 있어 바뀌지 않으므로 저장본 먼저. 게임 저장본에 함께 들어 있어 새 판 활성화 때 함께 지워진다.
 // - GET이 아닌 요청, 다른 주소의 요청은 건드리지 않는다.
 // - 게임 저장본 이름에 판 번호와 내용 지문이 들어 있어, 새 판을 올리면 활성화 때 옛 저장본을 지운다.
-//   Pyodide 저장본은 Pyodide 버전으로만 이름이 바뀐다(판을 올려도 10MB를 다시 받지 않게).
+//   저장본 접두는 haechi- (같은 github.io 주소의 리아와 파이썬 저장본을 지우지 않게).
 
 const VERSION = "__RIA_VERSION__";
-const GAME_CACHE = "ria-game-__RIA_VERSION__-__RIA_HASH__";
-const PY_CACHE = "ria-pyodide-__RIA_PYODIDE_VERSION__";
-const PYODIDE_PREFIX = new URL("__RIA_PYODIDE_URL__", self.location.href).href;
+const GAME_CACHE = "haechi-game-__RIA_VERSION__-__RIA_HASH__";
 const GAME_FILES = __RIA_GAME_FILES__;
 const CHAPTER_FILES = __RIA_CHAPTER_FILES__;
 const CHAPTER_RE = /\/lessons\/ch[1-9]\d*-[0-9a-f]{8}\.json$/;
 const NETWORK_TIMEOUT_MS = 4000; // 게임 파일: 이보다 느리면 저장본을 먼저 보여 줌
-// 처음 설치 때 미리 받아 두는 Pyodide 핵심 파일(실패해도 설치는 계속, 쓸 때 다시 받음)
-// sqlite3(16장)도 여기에 들어 있다: _sqlite3는 pyodide.asm.wasm에, sqlite3 모듈은 python_stdlib.zip에(Pyodide 314.0.7)
-const PY_CORE = ["pyodide.mjs", "pyodide.asm.mjs", "pyodide.asm.wasm", "python_stdlib.zip", "pyodide-lock.json"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
@@ -33,18 +27,6 @@ self.addEventListener("install", (event) => {
         if (res.ok) await game.put(f, res);
       } catch (_) { /* 이 장은 처음 열 때 받는다 */ }
     }));
-    try {
-      const py = await caches.open(PY_CACHE);
-      const missing = [];
-      for (const f of PY_CORE) {
-        const url = PYODIDE_PREFIX + f;
-        if (!(await py.match(url))) missing.push(url);
-      }
-      await Promise.all(missing.map(async (url) => {
-        const res = await fetch(url, { mode: "cors", credentials: "omit" });
-        if (res.ok) await py.put(url, res);
-      }));
-    } catch (_) { /* 네트워크가 약하면 나중에 실제로 쓸 때 저장한다 */ }
     await self.skipWaiting();
   })());
 });
@@ -52,22 +34,11 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith("ria-") && key !== GAME_CACHE && key !== PY_CACHE) await caches.delete(key);
+      if (key.startsWith("haechi-") && key !== GAME_CACHE) await caches.delete(key);
     }
     await self.clients.claim();
   })());
 });
-
-async function pyodideFirst(request) {
-  const cache = await caches.open(PY_CACHE);
-  const hit = await cache.match(request.url);
-  if (hit) return hit;
-  const res = await fetch(request);
-  if (res.ok && (res.type === "basic" || res.type === "cors")) {
-    try { await cache.put(request.url, res.clone()); } catch (_) { /* 저장 공간 부족 등 */ }
-  }
-  return res;
-}
 
 // 장 파일: 저장본 먼저 → 없으면 받아서 저장(이름이 내용 지문이라 바뀌지 않음)
 async function chapterFirst(request) {
@@ -114,10 +85,6 @@ async function networkFirst(request) {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-  if (req.url.startsWith(PYODIDE_PREFIX)) {
-    event.respondWith(pyodideFirst(req));
-    return;
-  }
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   if (CHAPTER_RE.test(url.pathname)) {

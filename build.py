@@ -2,7 +2,6 @@
 """배포 빌드: src/를 HTML 한 장(dist/index.html)으로 합친다 (계획 작업 10).
 
     python3 build.py                                   # 배포용 → dist/
-    python3 build.py --dev-pyodide --out tests/out/dist-dev   # 시험용(Pyodide를 /node_modules/pyodide/에서)
     python3 build.py --update-docs-icons               # docs/img/ 아이콘 복사본도 갱신
     python3 build.py --build-id 2026-10-29a            # 빌드 표시를 넣음(내용 지문·저장본 이름이 바뀜)
 
@@ -11,22 +10,17 @@
     python3 build.py --lessons-dir 다른/폴더              # 장 파일을 다른 폴더에서(시험용, 기본 data/lessons)
 
 결과물 (out 폴더):
-  index.html              CSS·앱·작업자·runner.py·레슨 목록이 들어간 한 장. 외부 <script src> 없음
+  index.html              CSS·앱·레슨 목록이 들어간 한 장. 외부 <script src> 없음
   lessons/chN-<지문>.json  장 하나의 레슨 전체(v0.3 작업 1). 지문 = 파일 내용 sha256 앞 8자
                           장 파일에 ADVANCED(심화 레슨, v0.7)가 있으면 함께 넣고, 목록에는 그 stub을 장의 advanced 칸에
   manifest.webmanifest    홈 화면 앱 설명
-  sw.js                   서비스 작업자(판 번호·내용 지문·Pyodide 주소를 채움)
+  sw.js                   서비스 작업자(판 번호·내용 지문을 채움)
   icons/*.png             리아 얼굴 아이콘(tools/icon.py)
 
 합치는 방법
 - src/app.js → esbuild로 묶고 줄임(IIFE). src/lessondev.js(개발판의 data/lessons import)는 빈 모듈로 바꿔 끼워
   레슨 내용이 index.html에 들어가지 않는다. 대신 레슨 목록(window.RIA_LESSON_INDEX)과 장 파일 이름표
   (window.RIA_CHAPTER_FILES)를 넣고, 앱은 레슨을 열 때 장 파일을 받는다. sw.js는 설치 때 장 파일을 모두 미리 받는다.
-- src/worker.js → 따로 묶고 줄여(ES 모듈) 글자로 넣고, 실행할 때 Blob 주소로 만든다(window.RIA_WORKER_URL).
-- src/py/runner.py → 글자 그대로 window.RIA_RUNNER_SRC로 넣는다.
-- Pyodide 주소: 배포는 jsDelivr(판정 C19), --dev-pyodide는 /node_modules/pyodide/.
-- app.js가 PyRun에 window.RIA_WORKER_URL·RIA_RUNNER_SRC를 넘기지 않으면 빌드를 멈춘다
-  (한 장짜리 HTML에는 worker.js·runner.py 파일이 따로 없어서 Python이 돌지 않는다).
 """
 import argparse
 import gzip
@@ -40,9 +34,6 @@ import sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "src")
-PYODIDE_VERSION = "314.0.7"
-PYODIDE_CDN = "https://cdn.jsdelivr.net/npm/pyodide@%s/" % PYODIDE_VERSION
-PYODIDE_DEV = "/node_modules/pyodide/"
 MAX_RAW = 700 * 1024  # 판정 C28
 TARGET = ["es2022", "safari16"]
 
@@ -59,10 +50,9 @@ const noDevLessons = { name: "ria-no-dev-lessons", setup(b) {
 } };
 const app = await esbuild.build({ ...common, entryPoints: [a.app], format: "iife", plugins: [noDevLessons],
   define: { "import.meta.url": "location.href" } });
-const worker = await esbuild.build({ ...common, entryPoints: [a.worker], format: "esm" });
 const css = await esbuild.build({ ...common, entryPoints: [a.css], loader: { ".css": "css" } });
-const inputs = [...Object.keys(app.metafile.inputs), ...Object.keys(worker.metafile.inputs), ...Object.keys(css.metafile.inputs)];
-process.stdout.write(JSON.stringify({ app: app.outputFiles[0].text, worker: worker.outputFiles[0].text, css: css.outputFiles[0].text, inputs }));
+const inputs = [...Object.keys(app.metafile.inputs), ...Object.keys(css.metafile.inputs)];
+process.stdout.write(JSON.stringify({ app: app.outputFiles[0].text, css: css.outputFiles[0].text, inputs }));
 """
 
 # 장 파일 나누기: data/lessons/chN.js → 레슨 목록 + lessons/chN-<지문>.json (목록·이름은 src/lessondata.js가 만듦)
@@ -111,7 +101,6 @@ process.stdout.write(JSON.stringify({ index, files, contents, tasks }));
 
 
 OWNED = ("index.html", "manifest.webmanifest", "sw.js", "icons", "lessons", "licenses.txt")
-HOOKS = ("RIA_WORKER_URL", "RIA_RUNNER_SRC")
 
 
 
@@ -125,8 +114,8 @@ def bundled_packages(inputs):
     return sorted(pkgs)
 
 
-def third_party_notices(inputs, pyodide_url):
-    """판정 C43: 묶어 넣은 꾸러미의 라이선스 전문 + CDN에서 받는 Pyodide 안내."""
+def third_party_notices(inputs):
+    """판정 C43: 묶어 넣은 꾸러미의 라이선스 전문."""
     parts = ["리아와 파이썬! — 사용한 프로그램과 라이선스 (Third-party notices)", "",
              "이 앱에는 아래 공개 소프트웨어가 들어 있습니다. 각 저작권자에게 감사드립니다.", ""]
     for pkg in bundled_packages(inputs):
@@ -139,19 +128,7 @@ def third_party_notices(inputs, pyodide_url):
         with open(lic, encoding="utf-8") as f:
             body = f.read().strip()
         parts += ["== %s %s (%s)" % (pkg, meta.get("version", ""), meta.get("license", "")), "", body, "", ""]
-    parts += ["== pyodide %s (MPL-2.0)" % PYODIDE_VERSION, "",
-              "Python 실행기 Pyodide는 앱에 묶지 않고 실행할 때 아래 주소에서 받습니다(고치지 않은 원본).",
-              pyodide_url, "라이선스: Mozilla Public License 2.0 — https://www.mozilla.org/MPL/2.0/",
-              "소스: https://github.com/pyodide/pyodide", ""]
     return "\n".join(parts)
-
-def check_app_hooks(src):
-    """app.js가 PyRun에 작업자 주소와 runner.py 글자를 넘기는지 확인한다."""
-    missing = [h for h in HOOKS if ("window." + h) not in src]
-    if missing:
-        raise SystemExit("build: src/app.js must pass %s to PyRun (single-file build has no worker.js/runner.py)"
-                         % ", ".join("window." + h for h in missing))
-
 
 def check_output(html):
     """한 장짜리 결과에 바깥 파일을 부르는 script·stylesheet가 남지 않았는지 확인한다."""
@@ -178,7 +155,7 @@ def clean(out):
 
 
 def bundle():
-    args = {"app": os.path.join(SRC, "app.js"), "worker": os.path.join(SRC, "worker.js"),
+    args = {"app": os.path.join(SRC, "app.js"),
             "css": os.path.join(SRC, "style.css"), "target": TARGET}
     esb = os.path.join(ROOT, "node_modules", "esbuild", "lib", "main.js")
     r = subprocess.run(["node", "--input-type=module", "-e", NODE_BUNDLE, "file://" + esb, json.dumps(args)],
@@ -259,14 +236,9 @@ HEAD_LINKS = """<meta name="mobile-web-app-capable" content="yes">
 
 CONFIG = """<script>
 window.RIA_VERSION = {version};
-window.RIA_PYODIDE_URL = {pyodide};
-window.RIA_RUNNER_SRC = {runner};
 window.RIA_LESSON_INDEX = {lesson_index};
 window.RIA_CHAPTER_FILES = {chapter_files};
 (function () {{
-  try {{
-    window.RIA_WORKER_URL = URL.createObjectURL(new Blob([{worker}], {{ type: "text/javascript" }}));
-  }} catch (e) {{ console.warn("worker blob", e); }}
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {{
     window.addEventListener("load", function () {{
       navigator.serviceWorker.register("sw.js").catch(function (e) {{ console.warn("sw", e); }});
@@ -276,19 +248,13 @@ window.RIA_CHAPTER_FILES = {chapter_files};
 </script>"""
 
 
-def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_dir=None):
+def build(out, update_docs_icons=False, build_id="", lessons_dir=None):
     need_node()
     with open(os.path.join(SRC, "app.js"), encoding="utf-8") as f:
         app_src = f.read()
-    check_app_hooks(app_src)
     version = app_version(app_src)
-    pyodide_url = PYODIDE_DEV if dev_pyodide else PYODIDE_CDN
     split = split_lessons(lessons_dir or os.path.join(ROOT, "data", "lessons"))
     b = bundle()
-    if not all(h in b["app"] for h in HOOKS):
-        raise SystemExit("build: bundled app lost %s" % "/".join(HOOKS))
-    with open(os.path.join(SRC, "py", "runner.py"), encoding="utf-8") as f:
-        runner = f.read()
     with open(os.path.join(SRC, "index.html"), encoding="utf-8") as f:
         html = f.read()
 
@@ -297,9 +263,7 @@ def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_
         version=version, build_meta=('\n<meta name="ria-build" content="%s">' % html_attr(build_id)) if build_id else ""), 1)
     if 'rel="manifest"' not in html:
         raise SystemExit("build: could not insert head links after <title>")
-    config = CONFIG.format(version=js_string(version), pyodide=js_string(pyodide_url),
-                           runner=js_string(runner), worker=js_string(b["worker"]),
-                           lesson_index=js_value(split["index"]), chapter_files=js_value(split["files"]))
+    config = CONFIG.format(version=js_string(version), lesson_index=js_value(split["index"]), chapter_files=js_value(split["files"]))
     if "<!-- RIA:CONFIG -->" not in html:
         raise SystemExit("build: marker CONFIG not found in src/index.html")
     html = html.replace("<!-- RIA:CONFIG -->", config, 1)
@@ -331,7 +295,7 @@ def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_
         manifest = json.load(f)
     icon_files = sorted({i["src"] for i in manifest["icons"]} | {"icons/apple-touch-icon.png"})
     with open(os.path.join(out, "licenses.txt"), "w", encoding="utf-8") as f:
-        f.write(third_party_notices(b["inputs"], pyodide_url))
+        f.write(third_party_notices(b["inputs"]))
     game_files = ["./", "index.html", "manifest.webmanifest", "licenses.txt"] + icon_files
 
     h = hashlib.sha256(data)
@@ -341,7 +305,6 @@ def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_
     with open(os.path.join(ROOT, "sw.js"), encoding="utf-8") as f:
         sw = f.read()
     sw = (sw.replace("__RIA_VERSION__", version).replace("__RIA_HASH__", h.hexdigest()[:10])
-            .replace("__RIA_PYODIDE_VERSION__", PYODIDE_VERSION).replace("__RIA_PYODIDE_URL__", pyodide_url)
             .replace("__RIA_GAME_FILES__", json.dumps(game_files))
             .replace("__RIA_CHAPTER_FILES__", json.dumps(chapter_files)))
     if "__RIA_" in sw:
@@ -351,10 +314,8 @@ def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_
 
     raw, gz = len(data), len(gzip.compress(data, 9))
     print("dist: %s" % os.path.relpath(out, ROOT))
-    print("version %s, Pyodide %s" % (version, pyodide_url))
-    print("app.js %.1f KB, worker %.1f KB, runner.py %.1f KB, css %.1f KB" % (
-        len(b["app"].encode()) / 1024, len(b["worker"].encode()) / 1024, len(runner.encode()) / 1024,
-        len(b["css"].encode()) / 1024))
+    print("version %s" % version)
+    print("app.js %.1f KB, css %.1f KB" % (len(b["app"].encode()) / 1024, len(b["css"].encode()) / 1024))
     print("sw cache %s" % re.search(r'GAME_CACHE = "([^"]+)"', sw).group(1))
     print("index.html raw %.1f KB (limit %d KB), gzip %.1f KB" % (raw / 1024, MAX_RAW // 1024, gz / 1024))
     print("lessons: %d chapter files, %.1f KB total" % (len(chapter_sizes), sum(sz for _, sz in chapter_sizes) / 1024))
@@ -367,12 +328,11 @@ def build(out, dev_pyodide=False, update_docs_icons=False, build_id="", lessons_
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=os.path.join(ROOT, "dist"))
-    ap.add_argument("--dev-pyodide", action="store_true", help="Pyodide를 /node_modules/pyodide/에서 받음(시험용)")
     ap.add_argument("--update-docs-icons", action="store_true", help="docs/img/ 아이콘 복사본도 갱신")
     ap.add_argument("--build-id", default="", help="빌드 표시(meta ria-build). 바꾸면 게임 저장본 이름도 바뀜")
     ap.add_argument("--lessons-dir", default=None, help="장 파일(chN.js) 폴더. 기본 data/lessons (시험용)")
     a = ap.parse_args()
-    build(os.path.abspath(a.out), dev_pyodide=a.dev_pyodide, update_docs_icons=a.update_docs_icons,
+    build(os.path.abspath(a.out), update_docs_icons=a.update_docs_icons,
           build_id=a.build_id, lessons_dir=os.path.abspath(a.lessons_dir) if a.lessons_dir else None)
 
 

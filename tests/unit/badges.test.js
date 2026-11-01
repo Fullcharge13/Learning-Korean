@@ -21,10 +21,10 @@ function mkSave(over = {}) {
 }
 const stats = (o) => ({ lessons: 0, perfect: 0, hintfree: 0, fixed: 0, review_items: 0, ...o });
 
-test("BADGES table: 15 ids (ledger 12 + streak100 + v0.7 심화 2) with Korean name/desc", () => {
-  assert.equal(BADGES.length, 15);
+test("BADGES table: 11 ids (no code-writing or advanced badges)", () => {
+  assert.equal(BADGES.length, 11);
   assert.deepEqual(BADGES.map((b) => b.id), ["first_print", "ch1", "ch2", "ch3", "streak7", "streak30", "streak100",
-    "fixer", "hintfree10", "perfectionist", "reviewer", "collector", "night_owl", "advanced1", "advancedAll"]);
+    "perfectionist", "reviewer", "collector", "night_owl"]);
   for (const b of BADGES) {
     assert.match(b.name, /[가-힣]/);
     assert.match(b.desc, /[가-힣]/);
@@ -82,11 +82,11 @@ test("streak100: already granted (by Task 2 milestone) -> not returned again", (
   assert.equal(b.desc, "100일 연속으로 하루 목표를 채워요");
 });
 
-test("stat thresholds: fixed 5, hintfree 10, perfect 10, review_items 30", () => {
-  const below = mkSave({ stats: stats({ fixed: 4, hintfree: 9, perfect: 9, review_items: 29 }) });
+test("stat thresholds: perfect 10, review_items 30", () => {
+  const below = mkSave({ stats: stats({ perfect: 9, review_items: 29 }) });
   assert.deepEqual(checkBadges(below, { hour: 12 }), []);
-  const at = mkSave({ stats: stats({ fixed: 5, hintfree: 10, perfect: 10, review_items: 30 }) });
-  assert.deepEqual(checkBadges(at, { hour: 12 }), ["fixer", "hintfree10", "perfectionist", "reviewer"]);
+  const at = mkSave({ stats: stats({ perfect: 10, review_items: 30 }) });
+  assert.deepEqual(checkBadges(at, { hour: 12 }), ["perfectionist", "reviewer"]);
 });
 
 test("collector: 3 outfits besides basic (ruling)", () => {

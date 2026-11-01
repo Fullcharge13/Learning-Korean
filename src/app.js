@@ -1,9 +1,8 @@
 // 리아와 파이썬! — 앱 입구. 상태는 app = { save, screen, modal } 하나, 화면 전환은 show() 하나.
-import { loadEx, store, migrate, takeRefundNotice, refundNoticeText } from "./save.js";
+import { loadEx, store, migrate } from "./save.js";
 import { rollDay } from "./rules.js";
 import { ensureQuests } from "./quests.js";
 import { say as pickLine } from "./say.js";
-import { PyRun, PYODIDE_CDN } from "./pyrun.js";
 import { OUTFITS } from "../data/outfits.js";
 import { localDate, daysSince } from "./today.js";
 import { finishLesson } from "./finish.js";
@@ -61,28 +60,10 @@ const app = {
   cleanup: null,
   greetOverride: null,   // 다음 홈 인사 한 번: "welcome_back" | "streak_broken"
   lastLine: {},          // 대사 상황별 직전 줄 번호
-  py: null, pyStatus: "loading", pyPhase: "first-load", pyListeners: new Set(),
   storeFailedShown: false,
 };
 
 const sound = createSound(() => app.save && app.save.settings && app.save.settings.sound !== false);
-
-// ---- Python 작업자 ----
-function initPy() {
-  const indexURL = (typeof window !== "undefined" && window.RIA_PYODIDE_URL) || PYODIDE_CDN;
-  // build.py가 작업자·runner를 HTML에 넣으면 이 두 값을 채운다(판정 C29). 개발판에서는 undefined → 기본 동작
-  const py = new PyRun({ indexURL, workerURL: window.RIA_WORKER_URL, runnerSource: window.RIA_RUNNER_SRC });
-  let everReady = false;
-  py.onstatus = (status, phase) => {
-    if (status === "ready") everReady = true;
-    // 옛 모양(phase 없음)에도 동작하도록: 한 번이라도 준비됐으면 다시 준비로 봄
-    app.pyPhase = phase === "first-load" || phase === "restart" ? phase : (everReady ? "restart" : "first-load");
-    app.pyStatus = status;
-    for (const f of app.pyListeners) { try { f(status, app.pyPhase); } catch (e) { console.error(e); } }
-  };
-  app.py = py;
-  py.preload().catch(() => { /* 상태 표시가 알려 줌. run()이 다시 시도 */ });
-}
 
 // ---- 날 넘김: 앱을 열 때, 다시 보일 때 ----
 function dayStart() {
@@ -237,18 +218,8 @@ const ctx = {
   get chapterFiles() { return app.data ? app.data.fileList() : []; },
   lessonState, currentLessonId,
   today: () => localDate(),
-  get py() { return app.py; },
-  pyState: () => ({ status: app.pyStatus, phase: app.pyPhase }),
-  onPy(f) { app.pyListeners.add(f); return () => app.pyListeners.delete(f); },
   dayStart,
   takeGreeting() { const g = app.greetOverride; app.greetOverride = null; return g; },
-  // 의상 교체로 돌려준 바이트 안내(판정 C42): 처음 한 번만. 깃발을 내린 저장을 바로 남긴다
-  takeNotice() {
-    const r = takeRefundNotice(app.save);
-    if (!r.bytes) return null;
-    commit(r.save);
-    return { text: refundNoticeText(r.bytes), face: "wink", situation: "refund" };
-  },
   migrate,
 };
 
@@ -257,7 +228,6 @@ async function boot() {
   const { save, readFailed } = loadEx(storage);
   app.save = save;
   if (readFailed) toast("저장을 읽지 못해 새로 시작해요. 이 브라우저의 저장 공간 설정을 확인해 주세요.", "warn");
-  initPy();
   requestPersist();
   try {
     // 처음 설치(작업자 없음 → 생김)는 새 판이 아님. 다루던 작업자가 바뀔 때만

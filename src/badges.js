@@ -1,6 +1,5 @@
 // 배지 판정 (설계서 5-5). 새로 얻은 id만 돌려줌
 import { BADGES } from "../data/badges.js";
-import { isAdvancedId } from "./advanced.js";
 
 const done = (s, id) => (s.completed_lessons || []).includes(id);
 const stat = (s, k) => (s.stats && s.stats[k]) || 0;
@@ -16,14 +15,10 @@ export const RULES = {
   streak7: (s) => ((s.streak && s.streak.best) || 0) >= 7,
   streak30: (s) => ((s.streak && s.streak.best) || 0) >= 30,
   streak100: (s) => ((s.streak && s.streak.best) || 0) >= 100,
-  fixer: (s) => stat(s, "fixed") >= 5,
-  hintfree10: (s) => stat(s, "hintfree") >= 10,
   perfectionist: (s) => stat(s, "perfect") >= 10,
   reviewer: (s) => stat(s, "review_items") >= 30,
   collector: (s) => (s.outfits || []).filter((o) => o !== "basic").length >= 3,
   night_owl: (s, ctx) => ctx.lessonDone === true && typeof ctx.hour === "number" && (ctx.hour >= 22 || ctx.hour < 4),
-  advanced1: (s) => (s.completed_lessons || []).some(isAdvancedId),
-  advancedAll: (s, ctx) => Array.isArray(ctx.advancedIds) && ctx.advancedIds.length > 0 && ctx.advancedIds.every((id) => done(s, id)),
 };
 
 export function checkBadges(save, ctx = {}) {
