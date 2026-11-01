@@ -1,0 +1,7 @@
+entry_id,volume,chapter,unit,sequence,source_order,korean,chinese,english,entry_kind,pos,pos_zh,origin_type,origin_detail,pronunciation,dictionary_source,dictionary_candidate_count,match_method,english_method,match_confidence,review_status,revision_note
+v02-c01-u01-001,2,1,1,1,1,친구,朋友,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v02-c01-u01-002,2,1,1,2,2,회사,公司,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v02-c01-u01-003,2,1,1,3,3,은행,银行,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v02-c01-u01-004,2,1,1,4,4,우체국,邮局,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v02-c01-u01-005,2,1,1,5,5,시장,市场,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v02-c01-u01-006,2,1,1,6,6,공항,机场,x,lexeme,명사,,native,,,,0,,,0.9,high,

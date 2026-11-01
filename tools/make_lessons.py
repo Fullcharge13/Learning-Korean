@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """단어 CSV → 레슨 표(data/lessons/chN.js).
 
-    python3 tools/make_lessons.py            # vendor/open-yonsei/vol-01.csv + data/zh-review.csv → data/lessons/
+    python3 tools/make_lessons.py            # vendor/open-yonsei/vol-01·02.csv + data/zh-review.csv → data/lessons/
+
+- 앱 장 id = (권 - 1) × 10 + 과: 1권 1~10과 → 1~10장, 2권 1~10과 → 11~20장(제목 「第二册 第N课」).
 
 - 장 = 1권 과(chapter), 레슨 = 단원 단어를 sequence 순 8개씩(남는 4개 이하는 앞 레슨에 붙임), 장 끝에 장 평가.
 - 문제: 韩→中, 中→韩(choice), 음절 카드(order). 일반 레슨 터치 max(6, 단어 수) + check 1(단어마다 한 문제 이상),
@@ -32,23 +34,28 @@ def _cjk(s):
     return bool(s) and all("一" <= c <= "鿿" for c in s)
 
 
-def load_words(vocab_csv, review_csv):
+def load_words(vocab_csvs, review_csv):
+    """단어 CSV(하나 또는 목록) + 검토 표 → 단어 목록. chapter = 앱 장 id((권-1)*10+과)."""
     with open(review_csv, encoding="utf-8", newline="") as f:
         review = {r["entry_id"]: r for r in csv.DictReader(f)}
+    rows = []
+    for p in [vocab_csvs] if isinstance(vocab_csvs, str) else vocab_csvs:
+        with open(p, encoding="utf-8", newline="") as f:
+            rows += list(csv.DictReader(f))
     out = []
-    with open(vocab_csv, encoding="utf-8", newline="") as f:
-        for r in csv.DictReader(f):
-            rv = review.get(r["entry_id"])
-            if r["review_status"] == "low" and not rv:
-                raise ValueError("unreviewed low entry: " + r["entry_id"])
-            if rv and rv["verdict"] == "hold":
-                continue
-            zh = rv["chinese_new"] if rv and rv["verdict"] == "fix" else r["chinese"]
-            ko, od = r["korean"], r["origin_detail"].strip()
-            # 한자 대응은 순한자어이고 한자 수 = 음절 수일 때만(혼종어·표현은 대응 해설 없음)
-            hanja = to_simplified(od) if r["origin_type"] == "hanja" and _cjk(od) and _hangul(ko) and len(od) == len(ko) else None
-            out.append({"entry_id": r["entry_id"], "chapter": int(r["chapter"]), "unit": int(r["unit"]),
-                        "sequence": int(r["sequence"]), "ko": ko, "zh": zh, "pos": r["pos"], "hanja": hanja})
+    for r in rows:
+        rv = review.get(r["entry_id"])
+        if r["review_status"] == "low" and not rv:
+            raise ValueError("unreviewed low entry: " + r["entry_id"])
+        if rv and rv["verdict"] == "hold":
+            continue
+        zh = rv["chinese_new"] if rv and rv["verdict"] == "fix" else r["chinese"]
+        ko, od = r["korean"], r["origin_detail"].strip()
+        # 한자 대응은 순한자어이고 한자 수 = 음절 수일 때만(혼종어·표현은 대응 해설 없음)
+        hanja = to_simplified(od) if r["origin_type"] == "hanja" and _cjk(od) and _hangul(ko) and len(od) == len(ko) else None
+        vol, book_ch = int(r["volume"]), int(r["chapter"])
+        out.append({"entry_id": r["entry_id"], "volume": vol, "book_chapter": book_ch, "chapter": (vol - 1) * 10 + book_ch,
+                    "unit": int(r["unit"]), "sequence": int(r["sequence"]), "ko": ko, "zh": zh, "pos": r["pos"], "hanja": hanja})
     return out
 
 
@@ -142,8 +149,13 @@ def _cards(words):
             for i in range(0, len(words), 4)]
 
 
+def _chapter_title(w):
+    return ("第%d课" if w["volume"] == 1 else "第二册 第%d课") % w["book_chapter"]
+
+
 def build_chapter(words, chapter):
     pool = sorted((w for w in words if w["chapter"] == chapter), key=lambda w: (w["unit"], w["sequence"]))
+    ch_title = _chapter_title(pool[0])
     lessons = []
     units = sorted({w["unit"] for w in pool})
     for u in units:
@@ -156,15 +168,15 @@ def build_chapter(words, chapter):
                             "cards": _cards(part), "items": _items(part, pool, max(TOUCH, len(part)), lid)})
     eid = "%d-%d" % (chapter, len(lessons) + 1)
     exam_words = random.Random("exam:%d" % chapter).sample(pool, min(len(pool), EXAM_TOUCH))
-    lessons.append({"id": eid, "chapter": chapter, "title": "第%d课 测验" % chapter, "goal": "复习本课单词",
+    lessons.append({"id": eid, "chapter": chapter, "title": ch_title + " 测验", "goal": "复习本课单词",
                     "summary": [], "isExam": True, "cards": [], "items": _items(exam_words, pool, EXAM_TOUCH, eid)})
-    return {"CHAPTER": {"id": chapter, "title": "第%d课" % chapter}, "LESSONS": lessons}
+    return {"CHAPTER": {"id": chapter, "title": ch_title}, "LESSONS": lessons}
 
 
 def main(out_dir=None, vocab=None, review=None, concepts_file=None):
     out_dir = out_dir or os.path.join(ROOT, "data", "lessons")
     concepts_file = concepts_file or os.path.join(ROOT, "data", "concepts.js")
-    words = load_words(vocab or os.path.join(ROOT, "vendor", "open-yonsei", "vol-01.csv"),
+    words = load_words(vocab or [os.path.join(ROOT, "vendor", "open-yonsei", "vol-%02d.csv" % v) for v in (1, 2)],
                        review or os.path.join(ROOT, "data", "zh-review.csv"))
     os.makedirs(out_dir, exist_ok=True)
     total = 0

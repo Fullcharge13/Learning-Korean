@@ -185,3 +185,8 @@ test("deterministic: 같은 씨앗 → 같은 결과", () => {
   const b = say("correct", {}, seeded(42), null);
   assert.deepEqual(a, b);
 });
+
+test("course_done mentions both volumes", () => {
+  assert.ok(LINES.course_done.some((l) => l.text.includes("第一、二册")));
+  assert.ok(!LINES.course_done.some((l) => /第一册的/.test(l.text)));
+});

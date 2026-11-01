@@ -55,7 +55,7 @@ export const LINES = {
     { text: "完成一课！下一课我也准备好了。", face: "cheer" },
   ],
   course_done: [
-    { text: "{name}，第一册的单词全部学完了！真为你骄傲！", face: "sparkle" },
+    { text: "{name}，第一、二册的单词全部学完了！真为你骄傲！", face: "sparkle" },
     { text: "全部课程完成！可以开始用韩语打招呼了。", face: "done" },
     { text: "坚持到最后了。你已经是韩语学习者啦！", face: "cheer" },
   ],
