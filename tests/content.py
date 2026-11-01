@@ -2,7 +2,8 @@
 """단어 레슨 표 점검: python3 tests/content.py [--lessons-dir DIR]
 
 - 레슨 칸 모양, 문제 종류는 choice·order·check만(입력 칸 write·blank 없음)
-- choice·check: 보기 4개, 보기 글자 중복 없음, 정답 번호가 범위 안
+- choice·check: 보기 4개, 보기 글자 중복 없음, 정답 번호가 범위 안,
+  오답 보기의 단어가 정답과 뜻(中→韩)이나 한국어(韩→中)가 같지 않음(정답이 둘로 보이지 않게)
 - order: 2~5개 한글 음절 카드
 - 보류(hold) 단어는 어디에도 없음
 - 성공 기준 1: 보류 아닌 1권 단어가 모두 한 번 이상 문제에 나옴
@@ -47,6 +48,12 @@ def rows(p):
 def check(mods, vocab, review):
     errs = []
     hold = {r["entry_id"] for r in review if r["verdict"] == "hold"}
+    fix = {r["entry_id"]: r["chinese_new"] for r in review if r["verdict"] == "fix"}
+    final = {r["entry_id"]: (r["korean"], fix.get(r["entry_id"], r["chinese"])) for r in vocab if r["entry_id"] not in hold}
+    zh_of, ko_of = {}, {}
+    for ko, zh in final.values():
+        zh_of.setdefault(ko, set()).add(zh)
+        ko_of.setdefault(zh, set()).add(ko)
     want = {r["entry_id"] for r in vocab} - hold
     seen = set()
     for fname, m in mods.items():
@@ -75,6 +82,11 @@ def check(mods, vocab, review):
                     if not (isinstance(it.get("answer"), int) and 0 <= it["answer"] < len(o)):
                         errs.append("%s: bad answer %r" % (at, it.get("answer")))
                     texts += o
+                    ans = final.get(it.get("concept"))
+                    z2k = it.get("q", "").endswith("用韩语怎么说？")
+                    for d in (o[:it["answer"]] + o[it["answer"] + 1:]) if ans else []:
+                        if (z2k and ans[1] in zh_of.get(d, ())) or (not z2k and ans[0] in ko_of.get(d, ())):
+                            errs.append("%s: distractor %r means the same as the answer %r" % (at, d, ans))
                 else:
                     ln = it.get("lines", [])
                     if not (2 <= len(ln) <= 5 and all(len(s) == 1 and "가" <= s <= "힣" for s in ln)):

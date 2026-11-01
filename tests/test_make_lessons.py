@@ -132,3 +132,25 @@ def test_check_is_not_a_repeat():
         *body, check = l["items"]
         assert check["type"] == "check"
         assert all(not (it["q"] == check["q"] and it.get("options") == check.get("options")) for it in body), l["id"]
+
+
+def test_no_same_meaning_distractor():
+    """뜻이 같은 단어(비가 오다·비가 내리다 = 下雨)는 서로의 오답 보기가 되지 않음 — 정답이 둘로 보임"""
+    words = load_words(VOCAB, REVIEW)
+    zh_of = {}
+    for w in words:
+        zh_of.setdefault(w["ko"], set()).add(w["zh"])
+    ko_of = {}
+    for w in words:
+        ko_of.setdefault(w["zh"], set()).add(w["ko"])
+    by_id = {w["entry_id"]: w for w in words}
+    for l in _ch(2)["LESSONS"]:
+        for it in l["items"]:
+            if it["type"] not in ("choice", "check"):
+                continue
+            w = by_id[it["concept"]]
+            for o in it["options"][1:]:
+                if it["q"].endswith("用韩语怎么说？"):
+                    assert w["zh"] not in zh_of[o], (it["q"], o)
+                else:
+                    assert w["ko"] not in ko_of[o], (it["q"], o)

@@ -319,3 +319,13 @@ test("save keeps ria key untouched", () => {
   store(st, save);
   assert.equal(st.data["ria-python.save"], ria);
 });
+
+import { isOwnSave } from "../../src/save.js";
+
+test("import guard: a 리아와 파이썬 export is not this app's save", () => {
+  const ria = { saveVer: 2, xp: 50, badges: ["fixer"], outfits: ["basic", "chef"], outfit: "chef", completed_lessons: ["1-5"] };
+  assert.equal(isOwnSave(ria), false);
+  assert.equal(isOwnSave({ xp: 3 }), false, "needs this app's own item fields");
+  assert.equal(isOwnSave(JSON.parse(JSON.stringify(newSave()))), true);
+  for (const bad of [null, [], "x", 3]) assert.equal(isOwnSave(bad), false);
+});

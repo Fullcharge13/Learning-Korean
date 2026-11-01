@@ -25,3 +25,7 @@ v01-c02-u01-003,1,2,1,3,3,빵,面包,x,lexeme,명사,,loanword,pão,,,0,,,0.9,hi
 v01-c02-u01-004,1,2,1,4,4,물,水,x,lexeme,명사,,native,,,,0,,,0.9,high,
 v01-c02-u01-005,1,2,1,5,5,커피,咖啡,x,lexeme,명사,,loanword,coffee,,,0,,,0.9,high,
 v01-c02-u01-006,1,2,1,6,6,주스,果汁,x,lexeme,명사,,loanword,juice,,,0,,,0.9,high,
+v01-c02-u01-007,1,2,1,7,7,비가 오다,下雨,x,lexeme,표현,,native,,,,0,,,0.9,high,
+v01-c02-u01-008,1,2,1,8,8,비가 내리다,下雨,x,lexeme,표현,,native,,,,0,,,0.9,high,
+v01-c02-u01-009,1,2,1,9,9,어제,昨天,x,lexeme,명사,,native,,,,0,,,0.9,high,
+v01-c02-u01-010,1,2,1,10,10,어저께,昨天,x,lexeme,명사,,native,,,,0,,,0.9,high,

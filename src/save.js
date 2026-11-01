@@ -146,6 +146,11 @@ export function loadEx(storage) {
   return { save: migrate(raw), readFailed: false };
 }
 
+/** 가져온 파일이 이 앱의 저장인지: 물건 칸(items·item)이 있고 리아와 파이썬의 의상 칸(outfits)이 없음 */
+export function isOwnSave(raw) {
+  return isPlainObject(raw) && Array.isArray(raw.items) && typeof raw.item === "string" && !("outfits" in raw);
+}
+
 export function load(storage) {
   return loadEx(storage).save;
 }

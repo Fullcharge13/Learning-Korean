@@ -787,6 +787,8 @@ def test_third_party_notices():
     assert os.path.exists(path), "dist/licenses.txt missing"
     txt = _read(path)
     assert "pyodide" not in txt.lower() and "codemirror" not in txt.lower(), "no code runner or editor is shipped"
+    assert txt.startswith("獬豸老师教韩语"), txt[:60]
+    assert not re.search("[\uac00-\ud7a3]", txt), "licenses page is shown to Chinese users"
     assert "esbuild" not in txt, "build tool is not shipped, keep it out"
     sw = _read(os.path.join(DIST, "sw.js"))
     assert '"licenses.txt"' in sw, "licenses.txt must be precached for offline"

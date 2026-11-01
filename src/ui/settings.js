@@ -4,7 +4,7 @@ import { esc, toast, dialog, celebrate, icon } from "./dom.js";
 import { collectOfflineStatus } from "../offline.js";
 import { curriculum, chapterWindow } from "../curriculum.js";
 import { applyGoalChange } from "../finish.js";
-import { newSave } from "../save.js";
+import { isOwnSave } from "../save.js";
 import { tabBar, bindTabs, statusBar } from "./nav.js";
 import { localDate } from "../today.js";
 
@@ -180,8 +180,7 @@ export function render(root, ctx) {
     if (!f) return;
     let raw;
     try { raw = JSON.parse(await f.text()); } catch { toast("读取存档失败。请确认是导出得到的 .json 文件。", "warn"); return; }
-    const known = Object.keys(newSave());
-    if (!raw || typeof raw !== "object" || Array.isArray(raw) || !Object.keys(raw).some((k) => known.includes(k))) {
+    if (!isOwnSave(raw)) {
       toast("这不是本应用的存档。请选择用「导出存档」得到的文件。", "warn");
       return;
     }

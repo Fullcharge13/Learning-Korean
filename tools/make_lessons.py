@@ -66,12 +66,16 @@ def _explain(w):
 
 
 def _options(w, pool, field, seed):
-    """정답 + 같은 품사 오답 3개(모자라면 같은 장 아무 품사). 표시 글자가 겹치는 후보는 뺀다. 못 채우면 None."""
+    """정답 + 같은 품사 오답 3개(모자라면 같은 장 아무 품사). 못 채우면 None.
+    표시 글자가 겹치는 후보, 정답과 뜻(zh)이나 한국어(ko)가 같은 단어(비가 오다·비가 내리다 = 下雨)는 뺀다 — 정답이 둘로 보임."""
     used = {w[field]}
     picked = []
     rng = random.Random(seed)
+    same_ko = {x["ko"] for x in pool if x["zh"] == w["zh"]} | {w["ko"]}
+    same_zh = {x["zh"] for x in pool if x["ko"] == w["ko"]} | {w["zh"]}
+    clash = lambda x: x["zh"] in same_zh or x["ko"] in same_ko
     for same_pos in (True, False):
-        cands = sorted({x[field] for x in pool if not same_pos or x["pos"] == w["pos"]} - used)
+        cands = sorted({x[field] for x in pool if (not same_pos or x["pos"] == w["pos"]) and not clash(x)} - used)
         rng.shuffle(cands)
         for c in cands:
             if len(picked) == 3:

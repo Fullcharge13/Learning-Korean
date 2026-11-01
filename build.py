@@ -116,8 +116,10 @@ def bundled_packages(inputs):
 
 def third_party_notices(inputs):
     """판정 C43: 묶어 넣은 꾸러미의 라이선스 전문."""
-    parts = ["리아와 파이썬! — 사용한 프로그램과 라이선스 (Third-party notices)", "",
-             "이 앱에는 아래 공개 소프트웨어가 들어 있습니다. 각 저작권자에게 감사드립니다.", ""]
+    parts = ["獬豸老师教韩语 — 使用的开源软件与许可 (Third-party notices)", "",
+             "本应用包含以下开源软件。感谢各位作者。", "",
+             "单词数据：Open Yonsei Korean Vocabulary（CC BY-SA 3.0）",
+             "https://github.com/Amulopapa67/open-yonsei-korean-vocabulary", ""]
     for pkg in bundled_packages(inputs):
         d = os.path.join(ROOT, "node_modules", *pkg.split("/"))
         with open(os.path.join(d, "package.json"), encoding="utf-8") as f:
