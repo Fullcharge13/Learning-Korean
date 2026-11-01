@@ -1,7 +1,7 @@
 // 홈(학습 길): 상태 줄, 리아 인사와 이어 하기, 복습, 오늘의 퀘스트, 뱀처럼 이어지는 레슨 길
 import { QUESTS } from "../../data/quests.js";
 import { CONCEPTS } from "../../data/concepts.js";
-import { riaSVG } from "../ria.js";
+import { haechiImg } from "../haechi.js";
 import { esc, icon, bar, riaSays, dialog, toast } from "./dom.js";
 import { tabBar, bindTabs, statusBar } from "./nav.js";
 import { pathEndText } from "../curriculum.js";
@@ -125,7 +125,7 @@ function pathSection(ctx, chapter, startIndex, currentId) {
       <button class="node ${st}${cur ? " current" : ""}" data-lesson="${esc(l.id)}" aria-label="${esc(`${l.id} ${l.title}, ${stateKo}${fresh ? `, ${NEW_LABEL}` : ""}`)}">${glyph}</button>
       ${fresh ? newDot(l.id) : ""}
       <span class="node-label">${l.isExam && !/평가/.test(l.title) ? '<em>장 평가</em>' : ""}${esc(l.title)}</span>
-      ${cur ? `<span class="node-ria ${side}" aria-hidden="true">${riaSVG({ outfit: ctx.save.outfit, face: "cheer", size: 58 })}</span>` : ""}
+      ${cur ? `<span class="node-ria ${side}" aria-hidden="true">${haechiImg({ face: "cheer", size: 58 })}</span>` : ""}
     </div>`;
   }).join("");
   const last = pts[pts.length - 1];

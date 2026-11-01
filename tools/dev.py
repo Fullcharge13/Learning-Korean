@@ -34,6 +34,8 @@ def build():
     with open(os.path.join(DEV, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
     shutil.copy(os.path.join(SRC, "style.css"), os.path.join(DEV, "style.css"))
+    shutil.rmtree(os.path.join(DEV, "img"), ignore_errors=True)
+    shutil.copytree(os.path.join(SRC, "img"), os.path.join(DEV, "img"))
     size = os.path.getsize(os.path.join(DEV, "app.js"))
     print("묶음 dev/app.js %.1f KB" % (size / 1024))
 

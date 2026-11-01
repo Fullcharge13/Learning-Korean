@@ -3,7 +3,7 @@ import { OUTFITS } from "../../data/outfits.js";
 import { buy } from "../shop.js";
 import { buyFreeze, FREEZE_PRICE, FREEZE_MAX } from "../rules.js";
 import { checkBadges } from "../badges.js";
-import { riaSVG } from "../ria.js";
+import { haechiImg } from "../haechi.js";
 import { esc, icon, toast } from "./dom.js";
 import { tabBar, bindTabs, statusBar } from "./nav.js";
 
@@ -27,7 +27,7 @@ export function render(root, ctx, params = {}) {
       <main>
         <h1 class="page-title">의상실</h1>
         <section class="stage">
-          <div class="ria-wrap big">${riaSVG({ outfit: o.id, face: wearing ? "smile" : "sparkle", size: 170 })}</div>
+          <div class="ria-wrap big">${haechiImg({ face: wearing ? "smile" : "sparkle", size: 170 })}</div>
           <div class="stage-info">
             <h2>${esc(o.name)}</h2>
             ${o.desc ? `<p class="muted outfit-desc">「${esc(o.desc)}」</p>` : ""}
@@ -40,7 +40,7 @@ export function render(root, ctx, params = {}) {
           const owned = s.outfits.includes(x.id);
           const tag = s.outfit === x.id ? "입는 중" : owned ? "보유" : x.price == null ? "30일 연속 기록 보상" : `${x.price}바이트`;
           return `<li><button class="outfit${x.id === sel ? " sel" : ""}${owned ? " owned" : ""}" data-o="${x.id}" aria-pressed="${x.id === sel}" aria-label="${esc(`${x.short}, ${tag}`)}">
-            ${riaSVG({ outfit: x.id, face: "smile", size: 74 })}
+            ${haechiImg({ face: "smile", size: 74 })}
             <span class="o-name">${esc(x.short)}</span>
             <span class="o-tag${owned ? " own" : ""}">${!owned && x.price == null ? icon("lock") : ""}${esc(tag)}</span>
           </button></li>`;

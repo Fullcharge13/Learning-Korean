@@ -100,7 +100,7 @@ process.stdout.write(JSON.stringify({ index, files, contents, tasks }));
 """
 
 
-OWNED = ("index.html", "manifest.webmanifest", "sw.js", "icons", "lessons", "licenses.txt")
+OWNED = ("index.html", "manifest.webmanifest", "sw.js", "icons", "img", "lessons", "licenses.txt")
 
 
 
@@ -296,10 +296,15 @@ def build(out, update_docs_icons=False, build_id="", lessons_dir=None):
     icon_files = sorted({i["src"] for i in manifest["icons"]} | {"icons/apple-touch-icon.png"})
     with open(os.path.join(out, "licenses.txt"), "w", encoding="utf-8") as f:
         f.write(third_party_notices(b["inputs"]))
-    game_files = ["./", "index.html", "manifest.webmanifest", "licenses.txt"] + icon_files
+    img_src = os.path.join(SRC, "img")
+    shutil.copytree(img_src, os.path.join(out, "img"))
+    img_files = sorted("img/%s/%s" % (d, f) for d in os.listdir(img_src) for f in os.listdir(os.path.join(img_src, d)) if f.endswith(".png"))
+    if not img_files:
+        raise SystemExit("build: no pictures in src/img (run tools/cut_sheets.py)")
+    game_files = ["./", "index.html", "manifest.webmanifest", "licenses.txt"] + icon_files + img_files
 
     h = hashlib.sha256(data)
-    for rel in icon_files + ["manifest.webmanifest", "licenses.txt"]:
+    for rel in icon_files + img_files + ["manifest.webmanifest", "licenses.txt"]:
         with open(os.path.join(out, rel), "rb") as f:
             h.update(f.read())
     with open(os.path.join(ROOT, "sw.js"), encoding="utf-8") as f:

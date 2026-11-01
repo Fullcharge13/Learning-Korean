@@ -1,7 +1,7 @@
 // 레슨 완료: 얻은 XP·바이트, 정확도, 연속 기록, 요약 3줄, 퀘스트·배지·이정표
 import { QUESTS } from "../../data/quests.js";
 import { BADGES } from "../../data/badges.js";
-import { riaSVG } from "../ria.js";
+import { haechiImg } from "../haechi.js";
 import { esc, icon, celebrate, MILESTONE_REWARD } from "./dom.js";
 import { badgeArt } from "./badges.js";
 import { courseJustFinished } from "../curriculum.js";
@@ -25,7 +25,7 @@ export function render(root, ctx, params = {}) {
   root.innerHTML = `<div class="screen done">
     <main>
       <div class="done-hero">
-        <div class="ria-wrap big jump">${riaSVG({ outfit: ctx.save.outfit, face: line.face, size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
+        <div class="ria-wrap big jump">${haechiImg({ face: "done", size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
         <h1>${review ? "복습 완료!" : finished ? "과정 완주!" : adv ? esc(`${lesson.id} 심화 완료!`) : esc(`${lesson.id} 레슨 완료!`)}</h1>
         <p class="bubble center">${esc(line.text)}</p>
       </div>
@@ -40,7 +40,7 @@ export function render(root, ctx, params = {}) {
       ${!r.firstTime && !review ? `<p class="muted center">다시 하기라서 레슨 바이트는 없지만, XP와 오늘의 퀘스트는 채워져요.</p>` : ""}
       ${r.firstTime && r.perfect ? `<p class="perk">${icon("star")}실수 없이 끝냈어요 (+5 XP, +5바이트)</p>` : ""}
       ${r.firstTime && r.hintFreeWrite ? `<p class="perk">${icon("bulb")}힌트 없이 코드를 통과했어요 (+5 XP)</p>` : ""}
-      ${streakLine ? `<div class="ria-row small"><div class="ria-wrap">${riaSVG({ outfit: ctx.save.outfit, face: streakLine.face, size: 56 })}</div><p class="bubble">${esc(streakLine.text)}</p></div>` : ""}
+      ${streakLine ? `<div class="ria-row small"><div class="ria-wrap">${haechiImg({ face: streakLine.face, size: 56 })}</div><p class="bubble">${esc(streakLine.text)}</p></div>` : ""}
       ${lesson && lesson.summary ? `<section class="panel summary"><h2>오늘 배운 것</h2><ol>${lesson.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : ""}
       ${quests.length || r.chest ? `<section class="panel"><h2>끝낸 퀘스트</h2><ul class="plain">${quests.map((q) => `<li>${icon("check")}${esc(q.name)} <b class="sun-text">+${q.reward}</b></li>`).join("")}
         ${r.chest ? `<li>${icon("chestOpen")}보물상자를 열었어요 <b class="sun-text">+10</b></li>` : ""}</ul></section>` : ""}

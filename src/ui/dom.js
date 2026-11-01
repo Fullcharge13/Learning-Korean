@@ -1,5 +1,5 @@
 // 화면 공용 도우미: 글자 이스케이프, 요소 만들기, 리아 말풍선, 아이콘, 창(modal)
-import { riaSVG } from "../ria.js";
+import { haechiImg } from "../haechi.js";
 
 export function esc(v) {
   return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -17,7 +17,7 @@ export const $$ = (root, sel) => Array.from(root.querySelectorAll(sel));
 /** 리아 + 말풍선. sfx: 효과음 말풍선 글자(딩동! 등) */
 export function riaSays({ outfit, face, text, size = 96, sfx = "", cls = "" }) {
   return `<div class="ria-row ${cls}">
-    <div class="ria-wrap">${riaSVG({ outfit, face, size })}${sfx ? `<span class="sfx" aria-hidden="true">${esc(sfx)}</span>` : ""}</div>
+    <div class="ria-wrap">${haechiImg({ face, size })}${sfx ? `<span class="sfx" aria-hidden="true">${esc(sfx)}</span>` : ""}</div>
     <p class="bubble">${esc(text)}</p>
   </div>`;
 }
@@ -121,7 +121,7 @@ export function celebrate({ outfit, milestone }) {
     const prev = document.activeElement;
     const wrap = el(`<div class="celebrate" role="dialog" aria-modal="true" aria-labelledby="cel-title">
       <div class="cel-card">
-        <div class="ria-wrap big jump">${riaSVG({ outfit, face: "sparkle", size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
+        <div class="ria-wrap big jump">${haechiImg({ face: "sparkle", size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
         <h2 id="cel-title" class="cel-title">${icon("flame")}연속 ${esc(milestone)}일!</h2>
         <p class="cel-reward">${esc(MILESTONE_REWARD[milestone] || "")}</p>
         <button class="btn sun wide" id="cel-ok">좋아요</button>
