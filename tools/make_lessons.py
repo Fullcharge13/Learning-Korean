@@ -113,9 +113,19 @@ def _items(words, pool, n, seed):
                     break
     if len(items) < MIN_ITEMS:
         raise ValueError("too few items for lesson %s: %d" % (seed, len(items)))
+    # 이해도 확인: 이 레슨에서 아직 안 낸 (단어, 종류) 중에서. 다 냈으면 이미 낸 것 중 하나
     check = None
-    for w in random.Random(seed + ":check").sample(words, len(words)):
-        check = _item(w, "k2z", pool)
+    order = random.Random(seed + ":check").sample(words, len(words))
+    for fresh in (True, False):
+        for w in order:
+            for kind in ("k2z", "z2k"):
+                if fresh and (w["entry_id"], kind) in done:
+                    continue
+                check = _item(w, kind, pool)
+                if check:
+                    break
+            if check:
+                break
         if check:
             break
     if check:

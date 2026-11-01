@@ -125,3 +125,10 @@ def test_main_writes_concept_names(tmp_path):
     assert '"id": "v01-c01-u01-001", "name": "친구 · 朋友", "chapter": 1' in text
     assert "v01-c01-u02-005" not in text  # 보류 단어
     assert (tmp_path / "lessons" / "ch1.js").exists()
+
+
+def test_check_is_not_a_repeat():
+    for l in _ch()["LESSONS"]:
+        *body, check = l["items"]
+        assert check["type"] == "check"
+        assert all(not (it["q"] == check["q"] and it.get("options") == check.get("options")) for it in body), l["id"]

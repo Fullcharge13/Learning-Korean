@@ -4,7 +4,7 @@
 // - 앱 안 브라우저(카카오톡·네이버·인스타그램·페이스북·라인): 사파리로 열라는 짧은 안내("inapp")
 // - iOS용 크롬·파이어폭스·엣지와 그 밖의 기기: 안내 없음
 
-export const INSTALL_HINT_KEY = "ria-python.installHint";
+export const INSTALL_HINT_KEY = "haechi-korean.installHint";
 
 const IN_APP = /KAKAOTALK|NAVER\(inapp|Instagram|FBAN|FBAV|\bLine\//;
 const OTHER_BROWSER = /CriOS|FxiOS|EdgiOS/;

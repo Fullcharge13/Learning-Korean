@@ -105,6 +105,8 @@ def test_html_static():
     assert '<link rel="manifest" href="manifest.webmanifest">' in html
     assert 'rel="apple-touch-icon"' in html
     assert 'name="apple-mobile-web-app-capable"' in html
+    # 단어 자료 출처(CC BY-SA 3.0)는 설정 화면에 표시
+    assert "github.com/Amulopapa67/open-yonsei-korean-vocabulary" in html and "CC BY-SA 3.0" in html
 
 
 def test_manifest_and_icons():

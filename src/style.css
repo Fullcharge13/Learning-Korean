@@ -625,3 +625,6 @@ input[type="text"]:focus { border-color: var(--teal-ink); outline: 3px solid var
 .word-list .zh { color: var(--ink-2); }
 .word-list .zh small { margin-left: 6px; color: var(--teal); font-weight: 700; }
 .item-thumb { display: block; margin: 0 auto; height: auto; }
+
+/* ---------- 아이패드: 아이폰과 같은 배치를 1.3배로 ---------- */
+@media (min-width: 700px) { html { zoom: 1.3; } }

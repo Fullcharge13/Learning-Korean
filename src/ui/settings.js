@@ -94,6 +94,7 @@ export function render(root, ctx) {
         <button class="btn ghost wide" id="install">如何添加到主屏幕</button>
       </section>
       <p class="ver center">獬豸老师教韩语 ${esc(ctx.version)} · <a class="lic-link" href="licenses.txt" target="_blank" rel="noopener">开源软件</a></p>
+      <p class="muted center credit">单词：<a href="https://github.com/Amulopapa67/open-yonsei-korean-vocabulary" target="_blank" rel="noopener">Open Yonsei Korean Vocabulary</a>（《延世韩国语》第一册，CC BY-SA 3.0，部分释义经过修改）<br>本应用与延世大学无关。</p>
     </main>
     ${tabBar("settings")}
   </div>`;
@@ -167,7 +168,7 @@ export function render(root, ctx) {
     const blob = new Blob([JSON.stringify(ctx.save, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `ria-python-save-${localDate()}.json`;
+    a.download = `haechi-korean-save-${localDate()}.json`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);

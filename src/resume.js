@@ -1,12 +1,12 @@
 // 하던 레슨 이어 하기 (v0.6.2 다, 판정 C44)
-// 본 저장(ria-python.save)과 따로 localStorage 한 칸(RESUME_KEY)에 둔다. 모든 읽기·쓰기는 try/catch.
+// 본 저장(haechi-korean.save)과 따로 localStorage 한 칸(RESUME_KEY)에 둔다. 모든 읽기·쓰기는 try/catch.
 // 기록: { v, lessonId, mode: "lesson", flow(레슨 내용 뺀 진행 상태), combo, marks, logs, marked, write,
 //        reviewCorrect, itemsSolved, item: 지금 write 문제 { index, code(초안), hintsShown, solutionSeen,
 //        submits, hadError } | null, savedAt(ms) }
 // 레슨을 끝냄·「처음부터」·「그만두기」·24시간 지남·없는 레슨이면 지운다.
 // 터치 문제 보기 순서는 이어 할 때 다시 섞여도 된다. 문제 차례와 결과는 그대로.
 
-export const RESUME_KEY = "ria-python.resume";
+export const RESUME_KEY = "haechi-korean.resume";
 export const RESUME_MAX_MS = 24 * 60 * 60 * 1000;
 const VER = 1;
 const FLOW_KEYS = ["cards", "cardPos", "main", "mainPos", "check", "checkPos", "attempts", "firstTry", "solved", "gaveUp", "perfect", "answered", "phase", "_items"];

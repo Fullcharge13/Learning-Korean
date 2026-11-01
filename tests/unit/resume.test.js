@@ -150,7 +150,7 @@ test("resume: 기록 모양 — 칸 이름·초안·저장 시각", () => {
   const L = lesson();
   const S = newSession(L); S.flow = nextCard(S.flow);
   const rec = packResume({ lessonId: L.id, S, item: { index: 3, code: "print(2)", hintsShown: 1, solutionSeen: false, submits: 0, hadError: false }, now: T0 });
-  assert.equal(RESUME_KEY, "ria-python.resume");
+  assert.equal(RESUME_KEY, "haechi-korean.resume");
   assert.equal(rec.lessonId, "1-2");
   assert.equal(rec.mode, "lesson");
   assert.equal(rec.savedAt, T0);

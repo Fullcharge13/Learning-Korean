@@ -1,30 +1,22 @@
-"""화면 순회 시험 (계획 작업 11).
+"""화면 순회 시험.
 
-실행: python3 tests/flow.py            (또는 python3 -m pytest tests/flow.py -q)
+실행: python3 tests/flow.py [시험 이름 …]
 
-- 배포와 같은 한 장짜리 HTML을 시험용으로 빌드한다
-  (python3 build.py --dev-pyodide --out tests/out/flow/dist, Pyodide는 /node_modules/pyodide/에서).
-- 실행 기록 C2: WebKit이 없어 Chromium에 Playwright 기기 설정("iPhone 17" 등)을 적용한다.
-  사파리 고유 동작(실제 키보드, 홈 화면 추가, 저장 7일 규칙)은 실기기 확인 목록에서 본다.
+- 배포와 같은 한 장짜리 HTML을 시험용으로 빌드한다(python3 build.py --out tests/out/flow/dist).
+- WebKit이 없어 Chromium에 Playwright 기기 설정(아이폰·아이패드)을 적용한다.
+  사파리 고유 동작(홈 화면 추가, 저장 7일 규칙)은 docs/device-checklist.md에서 실기기로 본다.
 - 캡처: tests/out/flow/*.png
 
 시험
-- test_no_overflow: 화면 9개 × 기기 4종 — 가로 스크롤 0, 화면 밖 버튼 0, 콘솔 오류 0
-- test_first_lesson: 새 저장 → 1-1 전부 정답 → 완료 화면 XP +20, completed_lessons ["1-1"]
-- test_run_button_visible_with_keyboard: 화면 높이 336px 줄임(키보드 흉내) → 실행·제출·기호 줄이 화면 안
-- test_touch_targets: 화면마다 보이는 버튼·입력 44×44 CSS px 이상
-- test_old_save: saveVer 없는 {xp: 30} → 홈 정상, XP 30
-- test_replay_and_exam: 1-1 다시 하기 XP +10·레슨 바이트 0 / 1-1~1-4 끝낸 저장에서 1-5 평가 XP 40
+- test_no_overflow: 화면 8개 × 기기 5종(아이폰 3·아이패드 세로/가로) — 가로 스크롤 0, 화면 밖 버튼 0, 콘솔 오류 0
+- test_touch_targets: 화면마다 보이는 버튼 44×44 CSS px 이상
+- test_ipad_zoomed: 아이패드(폭 700px 이상)는 html zoom 1.3, 아이폰은 1
+- test_no_text_inputs: 레슨 화면에 입력창(input·textarea·contenteditable)이 하나도 없음
+- test_longest_meaning_fits: 가장 긴 중국어 뜻이 보기 카드 안에서 줄바꿈되고 넘치지 않음
+- test_ria_save_coexists: 같은 주소의 리아와 파이썬 저장(ria-python.save)을 읽지도 바꾸지도 않음
+- test_first_lesson: 새 저장 → 1-1 전부 정답 → 완료 화면 XP +15, completed_lessons ["1-1"]
 - test_wrong_then_retry: 한 문제 틀림 → 본 문제 끝에 다시 나옴 → 완료 화면은 실수 없음 아님
-- test_timeout_recovery: while True: pass → 시간 초과 설명 → 다음 실행은 정상 출력
-- test_reduced_motion: 동작 줄이기에서 리아 .ria-body 움직임 없음
 - test_status_after_milestone: 연속 6일(어제 달성) → 레슨 완료로 7일 축하 창이 떠 있는 동안 상태 줄 7일
-- test_resume_lesson: 1-2 문제 2개 → 새로고침 → 「이어서 하기」 → 같은 문제 / write 초안 → 새로고침 → 초안 그대로
-                      → 끝까지: 보상·저장이 끊지 않은 판과 같음, 이어 하기 칸 지워짐 (v0.6.2 다)
-- test_resume_decline: 「처음부터」 → 카드 1부터, 칸 지워짐 / 「그만두기」도 칸을 지움
-- test_advanced_branch: 시험 심화(tests/fixtures/advanced.js)를 1·2장에 끼운 빌드. 1-5까지 끝낸 저장 → 1장 별 노드 3개 열림,
-                        2장은 잠김 → 1-A1 풀기 → XP 15(+보너스)·바이트 15, 배지 「심화 첫걸음」, 지금 레슨은 2-1 그대로
-                        → 설정 「심화 1/3」·펼친 목록 「심화」 (v0.7 작업 1). 캡처: adv-*.png
 """
 
 import atexit
@@ -42,13 +34,12 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "tests", "out", "flow")
 DIST = os.path.join(OUT, "dist")
-SAVE_KEY = "ria-python.save"
-RESUME_KEY = "ria-python.resume"
+SAVE_KEY = "haechi-korean.save"
+RIA_KEY = "ria-python.save"
 GUARD_WAIT = 450          # 결과 창 입력 보호(400ms)보다 조금 길게
-PY_READY_MS = 120_000
 
-DEVICES = ["iPhone 17", "iPhone 17e", "iPhone 17 Pro Max", "PC 1280x800"]
-SCREENS = ["splash", "home", "lesson-card", "touch-item", "write", "done", "badges", "closet", "settings"]
+DEVICES = ["iPhone 17", "iPhone 17e", "iPhone 17 Pro Max", "iPad Pro 11", "iPad Pro 11 landscape"]
+SCREENS = ["splash", "home", "lesson-card", "touch-item", "done", "badges", "closet", "settings"]
 
 # 터치 영역 예외(근거가 있는 것만). 비어 있으면 예외 없음.
 TOUCH_EXCEPTIONS = {}
@@ -64,12 +55,6 @@ class _Handler(http.server.SimpleHTTPRequestHandler):
         ".zip": "application/zip",
     }
 
-    def translate_path(self, path):
-        p = path.split("?")[0]
-        if p.startswith("/node_modules/"):
-            return os.path.join(ROOT, *p.lstrip("/").split("/"))
-        return super().translate_path(path)
-
     def log_message(self, *a):
         pass
 
@@ -79,7 +64,7 @@ class _Server(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
     def handle_error(self, request, client_address):
-        # 창을 닫을 때 끊긴 Pyodide 내려받기(ConnectionResetError 등)는 시험과 무관
+        # 창을 닫을 때 끊긴 내려받기(ConnectionResetError 등)는 시험과 무관
         if not isinstance(sys.exc_info()[1], (ConnectionError, BrokenPipeError)):
             super().handle_error(request, client_address)
 
@@ -92,11 +77,8 @@ def env():
     if _env:
         return _env
     os.makedirs(OUT, exist_ok=True)
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "build.py"), "--dev-pyodide", "--no-icons", "--out", DIST],
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "build.py"), "--out", DIST],
                        cwd=ROOT, capture_output=True, text=True)
-    if r.returncode != 0:  # 아이콘이 아직 없을 때 등
-        r = subprocess.run([sys.executable, os.path.join(ROOT, "build.py"), "--dev-pyodide", "--out", DIST],
-                           cwd=ROOT, capture_output=True, text=True)
     assert r.returncode == 0, "build.py failed:\n" + r.stdout + r.stderr
     httpd = _Server(("127.0.0.1", 0), functools.partial(_Handler, directory=DIST))
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
@@ -135,7 +117,7 @@ def today(n=0):
 class App:
     """기기 하나 + 새 저장소의 앱 한 판."""
 
-    def __init__(self, device="iPhone 17", save=None, reduced=False, url=None):
+    def __init__(self, device="iPhone 17", save=None, reduced=False, url=None, extra=None):
         e = env()
         opts = device_opts(device)
         if reduced:
@@ -151,6 +133,8 @@ class App:
             self.page.add_init_script(
                 "if (!sessionStorage.getItem('flow-seeded')) { localStorage.setItem(%s, %s); sessionStorage.setItem('flow-seeded', '1'); }"
                 % (json.dumps(SAVE_KEY), json.dumps(json.dumps(save))))
+        for k, v in (extra or {}).items():
+            self.page.add_init_script("if (!localStorage.getItem(%s)) localStorage.setItem(%s, %s);" % (json.dumps(k), json.dumps(k), json.dumps(v)))
         self.page.goto(url or e["url"])
         self.page.wait_for_selector(".screen.splash #go", timeout=20_000)
 
@@ -198,21 +182,8 @@ class App:
         # 레슨 목록(index.html)에는 문제가 없어 장 파일에서 받는다(v0.3 작업 1)
         return self.js("(id) => window.__ria.ctx.getLesson(id)", lid)
 
-    def wait_py(self):
-        self.page.wait_for_function("() => window.__ria.app.pyStatus === 'ready'", timeout=PY_READY_MS)
-
-    def set_code(self, code):
-        self.page.click(".cm-content")
-        self.page.keyboard.press("Control+a")
-        self.page.keyboard.press("Delete")
-        self.page.keyboard.insert_text(code)
-        got = self.js("() => [...document.querySelectorAll('.cm-content .cm-line')].map(e => e.textContent).join('\\n')")
-        assert got == code, "editor content %r != %r" % (got, code)
-
     def which_item(self, items):
         """지금 화면의 문제가 레슨 items의 몇 번인지 (보기 순서가 섞여 있어도 글자 묶음으로 찾음)"""
-        if self.page.query_selector(".item.write"):
-            return next(i for i, x in enumerate(items) if x["type"] == "write")
         norm = lambda v: " ".join(str(v or "").split())
         q = self.page.inner_text("h1.q")
         shown = sorted(t.strip() for t in self.page.eval_on_selector_all(
@@ -221,7 +192,7 @@ class App:
 
         def keyset(x):
             return sorted(str(v).strip() for v in (x.get("options") or x.get("chips") or x.get("lines") or []))
-        cands = [i for i, x in enumerate(items) if x["type"] != "write" and norm(x.get("q")) == norm(q) and keyset(x) == shown]
+        cands = [i for i, x in enumerate(items) if norm(x.get("q")) == norm(q) and keyset(x) == shown]
         if len(cands) > 1:
             cands = [i for i in cands if norm(items[i].get("code")) == norm(code)] or cands
         assert cands, "unknown item on screen: %r %r" % (q, shown)
@@ -236,31 +207,14 @@ class App:
                 if b.query_selector(".opt-text").inner_text().strip() == target:
                     b.click()
                     break
-        elif t == "blank":
-            right = it["chips"][it["answer"]]
-            target = right if correct else next(c for c in it["chips"] if c != right)
-            for b in self.page.query_selector_all(".chip"):
-                if b.inner_text().strip() == target:
-                    b.click()
-                    break
         elif t == "order":
-            lines = list(it["lines"]) if correct else list(reversed(it["lines"]))
+            lines = list(it["lines"]) if correct else list(it["lines"][1:]) + [it["lines"][0]]
             for line in lines:
                 for b in self.page.query_selector_all("#op .line:not([disabled])"):
                     if b.inner_text().strip() == line.strip():
                         b.click()
                         break
         self.page.click("#act")
-
-    def submit_write(self, code):
-        self.page.wait_for_selector(".cm-content")
-        self.wait_py()
-        self.set_code(code)
-        self.page.click("#submit")
-        try:
-            self.page.wait_for_selector("#result:not([hidden])", timeout=30_000)
-        except Exception:
-            raise AssertionError("write not accepted, console: " + self.page.inner_text("#console"))
 
     def cont(self):
         """결과 창의 「계속」 (입력 보호 시간 뒤)"""
@@ -293,19 +247,13 @@ class App:
             seq.append(str(idx) + ("r" if retry else ""))
             it = items[idx]
             bad = False
-            if it["type"] == "write":
-                self.page.wait_for_selector(".cm-content")
-                if hook:
-                    hook("write", self)
-                self.submit_write(it["solution"])
-            else:
-                if first_touch and hook:
-                    hook("touch-item", self)
-                first_touch = False
-                bad = idx in wrong_left
-                wrong_left.discard(idx)
-                self.answer_touch(it, correct=not bad)
-                self.page.wait_for_selector("#result:not([hidden])")
+            if first_touch and hook:
+                hook("touch-item", self)
+            first_touch = False
+            bad = idx in wrong_left
+            wrong_left.discard(idx)
+            self.answer_touch(it, correct=not bad)
+            self.page.wait_for_selector("#result:not([hidden])")
             ok = self.cont()
             assert ok == (not bad), "item %d (%s) judged ok=%s, expected %s" % (idx, it["type"], ok, not bad)
         self.page.wait_for_selector(".screen.done", timeout=10_000)
@@ -369,7 +317,7 @@ _traversals = {}
 
 
 def traverse(device):
-    """새 저장으로 9개 화면을 차례로 열어 측정하고 캡처한다(기기마다 한 번, 결과는 다시 씀)."""
+    """새 저장으로 화면을 차례로 열어 측정하고 캡처한다(기기마다 한 번, 결과는 다시 씀)."""
     if device in _traversals:
         return _traversals[device]
     res = {}
@@ -439,206 +387,27 @@ def test_touch_targets():
     assert not fails, "touch targets < 44x44:\n" + "\n".join(fails)
 
 
+def _n_items(a, lid):
+    return len(a.lesson(lid)["items"])
+
+
 def test_first_lesson():
     with App("iPhone 17") as a:
         a.start()
-        assert "첫 레슨 시작" in a.page.inner_text("#continue")
+        assert "开始第一课" in a.page.inner_text("#continue")
         a.page.click("#continue")
         seq = a.play("1-1")
-        assert seq == ["0", "1", "2", "3", "4", "5", "6"], seq
+        n = _n_items(a, "1-1")
+        assert seq == [str(i) for i in range(n)], seq
         xp_tile = a.page.inner_text(".tile.xp b")
         a.shot("first-lesson-done.png", full=True)
         r = a.result()
         s = a.save()
-        print("    done tiles: %s | result xp=%s bytes=%s perfect=%s hintfree=%s" % (
-            a.page.inner_text(".tiles").replace("\n", " "), r["xp"], r["totalBytes"], r["perfect"], r["hintFreeWrite"]))
-        assert xp_tile == "+20", xp_tile
-        assert r["xp"] == 20 and r["perfect"] and r["hintFreeWrite"] and r["firstTime"], r
+        print("    done tiles: %s | result xp=%s bytes=%s perfect=%s" % (
+            a.page.inner_text(".tiles").replace("\n", " "), r["xp"], r["totalBytes"], r["perfect"]))
+        assert xp_tile == "+15", xp_tile
+        assert r["xp"] == 15 and r["perfect"] and r["firstTime"], r
         assert s["completed_lessons"] == ["1-1"], s["completed_lessons"]
-        assert s["xp"] == 20, s["xp"]
-        a.dismiss()
-        assert not a.errors, a.errors
-
-
-def _to_write(a, lid="1-1"):
-    """lid 레슨을 직접 작성 문제까지 진행"""
-    items = a.lesson(lid)["items"]
-    for _ in range(40):
-        a.page.wait_for_timeout(80)
-        if a.page.query_selector(".item.write .cm-content"):
-            return
-        if a.page.query_selector(".card-view"):
-            a.page.click("#act")
-            continue
-        if a.page.query_selector("article.item"):
-            a.answer_touch(items[a.which_item(items)])
-            a.page.wait_for_selector("#result:not([hidden])")
-            a.cont()
-    raise AssertionError("write item not reached")
-
-
-def test_run_button_visible_with_keyboard():
-    fails = []
-    for dev in ("iPhone 17", "iPhone 17e"):
-        with App(dev) as a:
-            a.start()
-            a.page.click("#continue")
-            _to_write(a)
-            a.wait_py()
-            a.page.click(".cm-content")
-            a.page.keyboard.type("print(1)")
-            vp = a.page.viewport_size
-            a.page.set_viewport_size({"width": vp["width"], "height": vp["height"] - 336})
-            a.page.wait_for_timeout(400)
-            a.page.keyboard.type(" ")       # 입력하면 커서가 보이도록 스크롤되는지
-            a.page.wait_for_timeout(300)
-            v = a.js("""() => { const h = innerHeight, w = innerWidth;
-              const r = s => { const e = document.querySelector(s).getBoundingClientRect(); return [Math.round(e.left), Math.round(e.top), Math.round(e.right), Math.round(e.bottom)]; };
-              const caret = document.querySelector('.cm-activeLine') ? r('.cm-activeLine') : null;
-              const head = document.querySelector('.lesson-top').getBoundingClientRect().bottom;
-              return { w, h, run: r('#run'), submit: r('#submit'), sym: r('.symbols'), dockTop: Math.round(document.querySelector('#foot').getBoundingClientRect().top), headBottom: Math.round(head), caret, focused: !!document.activeElement.closest('.cm-editor') }; }""")
-            a.shot("keyboard-%s.png" % slug(dev))
-            print("    %s keyboard sim: %s" % (dev, v))
-            for k in ("run", "submit", "sym"):
-                l, t, r, b = v[k]
-                if t < 0 or b > v["h"] or l < 0 or r > v["w"]:
-                    fails.append("%s: %s outside viewport %s (viewport %dx%d)" % (dev, k, v[k], v["w"], v["h"]))
-            if not v["focused"]:
-                fails.append("%s: editor lost focus" % dev)
-            # 쓰고 있는 줄이 아래 줄(기호·실행)이나 머리 줄에 가려지지 않아야 함 (검토 중점 #5)
-            c = v["caret"]
-            if not c or c[1] < v["headBottom"] or c[3] > v["dockTop"]:
-                fails.append("%s: editing line %s hidden (visible band %d..%d, header bottom / dock top)" % (
-                    dev, c, v["headBottom"], v["dockTop"]))
-            a.page.keyboard.press("Backspace")
-            # 실행이 실제로 눌리는지
-            a.page.click("#run")
-            a.page.wait_for_selector(".console .out", timeout=20_000)
-            if a.page.inner_text(".console .out").strip() != "1":
-                fails.append("%s: run output %r" % (dev, a.page.inner_text(".console .out")))
-            if a.errors:
-                fails.append("%s: %s" % (dev, a.errors))
-    assert not fails, "\n".join(fails)
-
-
-def test_old_save():
-    with App("iPhone 17", save={"xp": 30}) as a:
-        a.start()
-        xp = a.page.inner_text(".status .stat.xp b")
-        s = a.save()
-        a.shot("old-save-home.png")
-        assert xp == "30", xp
-        assert s["saveVer"] == 2 and s["xp"] == 30 and s["bytes"] == 0, s
-        assert a.page.is_visible("#continue")
-        assert not a.errors, a.errors
-
-
-def test_v06_outfit_migration_and_closet():
-    """v0.6: 옛 의상(lab·detective·camping)을 입던 saveVer 1 저장 → 새 id·환불, 의상실 10벌 모두 그려짐(아이폰 17)."""
-    old = {"saveVer": 1, "xp": 40, "bytes": 5, "outfits": ["basic", "lab", "detective", "camping"], "outfit": "lab"}
-    with App("iPhone 17", save=old) as a:
-        a.start()
-        s = a.save()
-        assert s["saveVer"] == 2, s
-        assert s["outfits"] == ["basic", "whitecoat", "explorer"], s["outfits"]
-        assert s["outfit"] == "whitecoat" and s["bytes"] == 5 + 180, s
-        a.dismiss()
-        a.page.click('[data-go="closet"]')
-        a.page.wait_for_selector(".screen.closet")
-        tiles = a.page.query_selector_all(".outfit-grid [data-o]")
-        assert len(tiles) == 10, len(tiles)
-        ids = [x.get_attribute("data-o") for x in tiles]
-        a.shot("v06-closet-grid.png", full=True)
-        descs = {}
-        for oid in ids:
-            a.page.click('[data-o="%s"]' % oid)
-            a.page.wait_for_selector('[data-o="%s"][aria-pressed="true"]' % oid)
-            descs[oid] = a.page.inner_text(".stage-info")
-            assert a.page.query_selector(".stage .ria-wrap svg.ria"), oid
-            a.page.locator(".stage").screenshot(path=os.path.join(OUT, "v06-closet-%s.png" % oid))
-        assert "언제나 친절한 리아 교수!" in descs["basic"], descs["basic"]
-        assert "30일 연속 기록 보상" in descs["graduate"], descs["graduate"]
-        assert "입고 있어요" in descs["whitecoat"], descs["whitecoat"]
-        print("    closet ids %s" % ",".join(ids))
-        assert not a.errors, a.errors
-
-
-def test_refund_notice_once():
-    """판정 C42: detective를 가졌던 saveVer 1 저장 → 첫 홈에서 환불 안내 한 번, 새로 고침하면 다시 안 나옴."""
-    old = {"saveVer": 1, "xp": 10, "bytes": 3, "outfits": ["basic", "detective"], "outfit": "detective"}
-    msg = "없어진 옷 값 180바이트를 돌려 드렸어요. 새 옷도 구경해 보세요!"
-    with App("iPhone 17", save=old) as a:
-        a.start()
-        a.page.wait_for_selector(".hello .refund-notice .bubble")
-        assert a.page.inner_text(".hello .refund-notice .bubble").strip() == msg
-        a.shot("v06-refund-notice.png")
-        s = a.save()
-        assert s["pending_refund"] == 0 and s["bytes"] == 183 and s["outfit"] == "basic", s
-        a.page.reload()
-        a.page.wait_for_selector(".screen.splash #go", timeout=20_000)
-        a.start()
-        assert a.save()["saveVer"] == 2
-        assert not a.page.query_selector(".refund-notice"), "새로 고침 뒤 다시 나오면 안 됨"
-        assert msg not in a.page.inner_text(".screen.home")
-        assert a.save()["bytes"] == 183
-        assert not a.errors, a.errors
-    # 환불이 없던 v1 저장(lab만)은 안내 없음
-    with App("iPhone 17", save={"saveVer": 1, "outfits": ["basic", "lab"], "outfit": "lab"}) as a:
-        a.start()
-        assert not a.page.query_selector(".refund-notice")
-        assert not a.errors, a.errors
-
-
-def test_replay_and_exam():
-    # 1) 1-1 첫 완료 → 다시 하기
-    with App("iPhone 17") as a:
-        a.start()
-        a.page.click("#continue")
-        a.play("1-1")
-        first = a.result()
-        assert first["xp"] == 20, first
-        a.dismiss()
-        a.page.click("#home")
-        a.page.wait_for_selector(".screen.home")
-        a.dismiss()
-        before = a.save()
-        a.page.click('[data-lesson="1-1"]')
-        a.page.wait_for_selector(".modal .btn.primary")
-        a.page.click(".modal .btn.primary")
-        a.page.wait_for_selector(".screen.lesson")
-        a.play("1-1")
-        r = a.result()
-        after = a.save()
-        a.shot("replay-done.png", full=True)
-        print("    replay: xp +%s, lessonBytes %s, questBytes %s, total bytes +%s, tiles %s" % (
-            r["xp"], r["lessonBytes"], r["questBytes"], r["totalBytes"], a.page.inner_text(".tiles").replace("\n", " ")))
-        assert a.page.inner_text(".tile.xp b") == "+10"
-        assert r["xp"] == 10 and r["lessonBytes"] == 0 and not r["firstTime"], r
-        assert after["xp"] - before["xp"] == 10, (before["xp"], after["xp"])
-        assert after["completed_lessons"] == ["1-1"]
-        assert "다시 하기라서" in a.page.inner_text(".screen.done")
-        assert not a.errors, a.errors
-
-    # 2) 1-1~1-4를 끝낸 저장 → 1-5(장 평가)
-    seed = {"saveVer": 1, "xp": 80, "bytes": 60, "completed_lessons": ["1-1", "1-2", "1-3", "1-4"],
-            "current_lesson": "1-5", "current_chapter": 1,
-            "grading_results": {k: {"perfect": True, "attempts": 1} for k in ("1-1", "1-2", "1-3", "1-4")}}
-    with App("iPhone 17", save=seed) as a:
-        a.start()
-        node = a.page.query_selector('.node[data-lesson="1-5"]')
-        assert node and "current" in node.get_attribute("class"), node and node.get_attribute("class")
-        assert "1-5" in a.page.inner_text("#continue")
-        a.page.click("#continue")
-        a.play("1-5")
-        r = a.result()
-        s = a.save()
-        a.shot("exam-done.png", full=True)
-        print("    exam: xp +%s (perfect %s, hintfree %s), lessonBytes %s" % (r["xp"], r["perfect"], r["hintFreeWrite"], r["lessonBytes"]))
-        assert r["firstTime"] and r["perfect"] and r["hintFreeWrite"], r
-        assert r["xp"] == 30 + 5 + 5, r["xp"]
-        assert r["lessonBytes"] == 15, r["lessonBytes"]
-        assert a.page.inner_text(".tile.xp b") == "+40"
-        assert s["xp"] == 120 and "1-5" in s["completed_lessons"], s["xp"]
         a.dismiss()
         assert not a.errors, a.errors
 
@@ -652,68 +421,22 @@ def test_wrong_then_retry():
         a.shot("retry-done.png", full=True)
         acc = a.page.inner_text(".tile.acc b")
         print("    sequence %s, accuracy tile %s, perfect %s" % (seq, acc, r["perfect"]))
-        # 0번을 틀림 → 본 문제(0~5) 뒤에 0번을 다시, 그다음 이해도 확인(6)
-        assert seq == ["0", "1", "2", "3", "4", "5", "0r", "6"], seq
-        assert r["perfect"] is False and r["xp"] == 15, r     # 10 + 힌트 없이 5
+        n = _n_items(a, "1-1")
+        # 0번을 틀림 → 본 문제 뒤에 0번을 다시, 그다음 이해도 확인(마지막)
+        assert seq == [str(i) for i in range(n - 1)] + ["0r", str(n - 1)], seq
+        assert r["perfect"] is False and r["xp"] == 10, r
         assert acc != "100%", acc
-        assert "실수 없이 끝냈어요" not in a.page.inner_text(".screen.done")
+        assert "无失误完成" not in a.page.inner_text(".screen.done")
         s = a.save()
         assert s["grading_results"]["1-1"]["perfect"] is False, s["grading_results"]
         a.dismiss()
         assert not a.errors, a.errors
 
 
-def test_timeout_recovery():
-    with App("iPhone 17") as a:
-        a.start()
-        a.page.click("#continue")
-        _to_write(a)
-        a.wait_py()
-        a.set_code("while True:\n    pass")
-        t0 = time.time()
-        a.page.click("#run")
-        a.page.wait_for_selector(".err-panel", timeout=30_000)
-        took = time.time() - t0
-        title = a.page.inner_text(".err-panel h3")
-        a.shot("timeout.png")
-        print("    timeout after %.1fs: %r; chip: %r" % (took, title, a.page.inner_text("#pychip") if a.page.is_visible("#pychip") else ""))
-        assert "시간 초과" in title, title
-        assert "Timeout" in a.page.inner_text(".err-orig")
-        a.set_code('print("다시")')
-        a.page.click("#run")
-        a.page.wait_for_selector(".console .out", timeout=60_000)
-        out = a.page.inner_text(".console .out").strip()
-        a.shot("timeout-recovered.png")
-        assert out == "다시", out
-        assert not a.errors, a.errors
-
-
-def test_reduced_motion():
-    q = """() => [...document.querySelectorAll('.ria-body')].map(e => ({
-        name: getComputedStyle(e).animationName,
-        running: e.getAnimations().filter(x => x.playState === 'running').length }))"""
-    with App("iPhone 17", reduced=True) as a:
-        seen = {}
-        seen["splash"] = a.js(q)
-        a.start()
-        seen["home"] = a.js(q)
-        a.page.click("#continue")
-        a.page.wait_for_selector(".card-view")
-        seen["card"] = a.js(q)
-        print("    %s" % {k: len(v) for k, v in seen.items()})
-        bad = {k: v for k, v in seen.items() if any(x["running"] or x["name"] != "none" for x in v)}
-        assert all(seen.values()), "no Ria found on some screen: %s" % seen
-        assert not bad, bad
-    # 대조: 동작 줄이기가 없으면 숨쉬기 움직임이 돈다(측정 방법이 맞는지)
-    with App("iPhone 17") as a:
-        v = a.js(q)
-        assert any(x["running"] for x in v), v
-
-
 def test_status_after_milestone():
     seed = {"saveVer": 1, "xp": 100, "bytes": 0, "completed_lessons": [],
             "streak": {"days": 6, "best": 6, "lastGoalDate": today(1), "todayDate": today(), "todayXp": 0},
-            "settings": {"sound": True, "dailyGoal": 20, "name": ""}}
+            "settings": {"sound": True, "dailyGoal": 10, "name": ""}}
     fails = []
     # 가) 레슨 완료로 7일 → 축하 창
     with App("iPhone 17", save=seed) as a:
@@ -744,7 +467,7 @@ def test_status_after_milestone():
         if a.errors:
             fails.append("lesson path errors: %s" % a.errors)
     # 나) 설정에서 목표를 낮춰 7일 → 축하 창 (상태 줄이 같은 화면에 있음; 실행 기록 작업 9 남은 경미)
-    seed2 = dict(seed, streak=dict(seed["streak"], todayXp=12))
+    seed2 = dict(seed, streak=dict(seed["streak"], todayXp=12), settings=dict(seed["settings"], dailyGoal=20))
     with App("iPhone 17", save=seed2) as a:
         a.start()
         a.page.click('[data-go="settings"]')
@@ -768,332 +491,87 @@ def test_status_after_milestone():
     assert not fails, "\n".join(fails)
 
 
-# ---------------------------------------------------------------- 이어 하기 (v0.6.2 다)
+# ---------------------------------------------------------------- 해치와 한국어 v0.1
 
-SEED_AFTER_11 = {"saveVer": 2, "xp": 20, "bytes": 15, "completed_lessons": ["1-1"], "current_lesson": "1-2",
-                 "current_chapter": 1, "grading_results": {"1-1": {"perfect": True, "attempts": 1}}}
+def test_ipad_zoomed():
+    zoom = "() => getComputedStyle(document.documentElement).zoom"
+    for dev, want in (("iPad Pro 11", "1.3"), ("iPad Pro 11 landscape", "1.3"), ("iPhone 17", "1")):
+        with App(dev) as a:
+            got = a.js(zoom)
+            print("    %s: zoom %s" % (dev, got))
+            assert got == want, (dev, got)
 
 
-def _resume_rec(a):
-    return a.js("() => JSON.parse(localStorage.getItem(%s))" % json.dumps(RESUME_KEY))
+def test_no_text_inputs():
+    q = "() => document.querySelectorAll('input:not([type=hidden]):not([type=file]), textarea, [contenteditable]').length"
+    with App("iPhone 17") as a:
+        a.start()
+        a.page.click("#continue")
+        seen = []
+        a.play("1-1", hook=lambda n, app: seen.append((n, app.js(q))))
+        seen.append(("done", a.js(q)))
+        print("    inputs per screen: %s" % seen)
+        assert all(n == 0 for _, n in seen), seen
 
 
-def _answer_items(a, items, n):
-    """카드를 넘기고 터치 문제 n개를 맞힌다. 푼 문제 번호 목록"""
-    done = []
-    for _ in range(40):
-        if len(done) >= n:
-            return done
-        a.page.wait_for_timeout(80)
-        if a.page.query_selector(".card-view"):
-            a.page.click("#act")
-            continue
-        if a.page.query_selector("article.item"):
-            idx = a.which_item(items)
-            a.answer_touch(items[idx])
+def _longest_meaning_lesson():
+    """가장 긴 중국어 보기가 든 레슨 id와 그 보기"""
+    best = (0, None, None)
+    for f in sorted(os.listdir(os.path.join(ROOT, "data", "lessons"))):
+        text = open(os.path.join(ROOT, "data", "lessons", f), encoding="utf-8").read()
+        data = json.loads(text.split("export const LESSONS = ", 1)[1].rstrip().rstrip(";"))
+        for l in data:
+            for it in l["items"]:
+                for o in it.get("options", []):
+                    if len(o) > best[0]:
+                        best = (len(o), l["id"], o)
+    return best[1], best[2]
+
+
+def test_longest_meaning_fits():
+    lid, text = _longest_meaning_lesson()
+    fits = """(t) => [...document.querySelectorAll('.opt')].filter(b => b.innerText.includes(t))
+        .map(b => ({ sw: b.scrollWidth, cw: b.clientWidth, right: b.getBoundingClientRect().right, vw: innerWidth }))"""
+    with App("iPhone 17e") as a:
+        a.start()
+        a.js("(id) => window.__ria.ctx.show('lesson', { id })", lid)
+        found = []
+        items = a.lesson(lid)["items"]
+        for _ in range(40):
+            a.page.wait_for_timeout(80)
+            if a.page.query_selector(".screen.done"):
+                break
+            if a.page.query_selector(".card-view"):
+                a.page.click("#act")
+                continue
+            if not a.page.query_selector("article.item"):
+                continue
+            found += a.js(fits, text)
+            if found:
+                a.shot("longest-meaning.png")
+                break
+            a.answer_touch(items[a.which_item(items)])
             a.page.wait_for_selector("#result:not([hidden])")
             a.cont()
-            done.append(idx)
-    raise AssertionError("items not answered: %s" % done)
-
-
-def _reload_to_prompt(a, lid):
-    a.page.reload()
-    a.page.wait_for_selector(".screen.splash #go", timeout=20_000)
-    a.start()
-    assert lid in a.page.inner_text("#continue")
-    a.page.click("#continue")
-    a.page.wait_for_selector(".modal .resume-ask", timeout=10_000)
-    assert "하던 곳부터 이어서 할까요?" in a.page.inner_text(".modal")
-
-
-def _strip_times(save):
-    s = dict(save)
-    s.pop("last_active_at", None)
-    s["submission_logs"] = [{k: v for k, v in e.items() if k != "at"} for e in s.get("submission_logs", [])]
-    return s
-
-
-def test_resume_lesson():
-    # 끊지 않은 판(같은 답: 전부 정답, write는 첫 제출에 정답)
-    with App("iPhone 17", save=SEED_AFTER_11) as a:
-        a.start()
-        a.page.click("#continue")
-        a.play("1-2")
-        whole_r, whole_s = a.result(), a.save()
-        a.dismiss()
-    with App("iPhone 17", save=SEED_AFTER_11) as a:
-        a.start()
-        a.page.click("#continue")
-        items = a.lesson("1-2")["items"]
-        done = _answer_items(a, items, 2)
-        a.page.wait_for_selector("article.item")
-        on_screen = a.which_item(items)
-        rec = _resume_rec(a)
-        assert rec and rec["lessonId"] == "1-2" and rec["flow"]["answered"] == 2, rec
-        # 새로고침 → 묻기 → 이어서 하기 → 같은 문제
-        _reload_to_prompt(a, "1-2")
-        path = a.shot("resume-prompt-iphone-17.png")
-        a.page.wait_for_timeout(GUARD_WAIT)
-        a.page.click(".modal .btn.primary")
-        a.page.wait_for_selector("article.item")
-        assert a.which_item(items) == on_screen, (done, on_screen)
-        assert a.page.inner_text(".lesson-tag") == "1-2"
-        # write까지 가서 초안을 쓰고 새로고침 → 초안 그대로
-        _to_write(a, "1-2")
-        draft = 'print("리아 카페")\n# 초안 메모'
-        a.set_code(draft)
-        a.page.wait_for_timeout(800)   # 초안은 0.5초 뒤 저장
-        rec = _resume_rec(a)
-        assert rec["item"] and rec["item"]["code"] == draft, rec and rec["item"]
-        _reload_to_prompt(a, "1-2")
-        a.page.click(".modal .btn.primary")
-        a.page.wait_for_selector(".item.write .cm-content")
-        got = a.js("() => [...document.querySelectorAll('.cm-content .cm-line')].map(e => e.textContent).join('\\n')")
-        assert got == draft, got
-        # 끝까지 → 보상이 끊지 않은 판과 같음
-        a.play("1-2")
-        r, s = a.result(), a.save()
-        print("    resumed: xp +%s bytes +%s perfect %s | whole: xp +%s bytes +%s perfect %s | prompt %s" % (
-            r["xp"], r["totalBytes"], r["perfect"], whole_r["xp"], whole_r["totalBytes"], whole_r["perfect"], path))
-        assert r == whole_r, (r, whole_r)
-        assert _strip_times(s) == _strip_times(whole_s)
-        assert _resume_rec(a) is None
-        a.dismiss()
+        print("    %s %r: %s" % (lid, text, found))
+        assert found, "longest meaning not shown as an option in " + lid
+        assert all(f["sw"] <= f["cw"] + 1 and f["right"] <= f["vw"] + 1 for f in found), found
         assert not a.errors, a.errors
 
 
-def test_resume_decline():
-    with App("iPhone 17", save=SEED_AFTER_11) as a:
+def test_ria_save_coexists():
+    ria = json.dumps({"saveVer": 2, "xp": 777, "completed_lessons": ["1-1", "1-2"]})
+    with App("iPhone 17", extra={RIA_KEY: ria}) as a:
         a.start()
+        assert a.page.inner_text(".status .stat.xp b") == "0", "Ria XP leaked into haechi app"
         a.page.click("#continue")
-        items = a.lesson("1-2")["items"]
-        _answer_items(a, items, 2)
-        assert _resume_rec(a) is not None
-        _reload_to_prompt(a, "1-2")
-        a.page.click(".modal .btn:not(.primary)")       # 처음부터
-        a.page.wait_for_selector(".card-view")
-        assert "오늘의 목표" in a.page.inner_text(".card-view")   # 첫 카드
-        assert _resume_rec(a) is None
-        # 카드 하나 넘기면 다시 기록 → 그만두기로 지움
-        a.page.click("#act")
-        a.page.wait_for_timeout(150)
-        assert _resume_rec(a) is not None
-        a.page.click("#quit")
-        a.page.wait_for_selector(".modal")
-        a.page.click(".modal .btn:not(.primary)")       # 그만두기
-        a.page.wait_for_selector(".screen.home")
-        assert _resume_rec(a) is None
-        # 다시 들어가도 묻지 않음
-        a.page.click("#continue")
-        a.page.wait_for_selector(".card-view")
-        assert not a.page.query_selector(".modal")
-        assert not a.errors, a.errors
-
-
-# ---------------------------------------------------------------- 실행
-
-# ---------------------------------------------------------------- 심화 (v0.7 작업 1)
-
-_adv_env = {}
-
-
-def adv_url():
-    """시험 심화를 1·2장에 끼운 빌드를 따로 띄운다(실제 심화 내용이 없어도 엔진·화면을 시험)."""
-    if _adv_env:
-        return _adv_env["url"]
-    env()
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from fixtures.advanced_dir import make
-    lessons = make(os.path.join(ROOT, "data", "lessons"), os.path.join(OUT, "lessons-adv"), chapters=(1, 2))
-    dist = os.path.join(OUT, "dist-adv")
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "build.py"), "--dev-pyodide", "--out", dist, "--lessons-dir", lessons],
-                       cwd=ROOT, capture_output=True, text=True)
-    assert r.returncode == 0, "build.py (advanced fixture) failed:\n" + r.stdout + r.stderr
-    httpd = _Server(("127.0.0.1", 0), functools.partial(_Handler, directory=dist))
-    threading.Thread(target=httpd.serve_forever, daemon=True).start()
-    atexit.register(httpd.shutdown)
-    _adv_env["url"] = "http://127.0.0.1:%d/" % httpd.server_address[1]
-    return _adv_env["url"]
-
-
-def _adv_classes(a, chapter):
-    return a.js("(n) => [1, 2, 3].map((k) => document.querySelector(`.star-node[data-lesson='${n}-A${k}']`)?.className || null)", chapter)
-
-
-def test_advanced_branch():
-    url = adv_url()
-    ch1 = ["1-%d" % k for k in range(1, 6)]
-    seed = {"saveVer": 2, "xp": 120, "bytes": 0, "completed_lessons": ch1, "current_lesson": "2-1", "current_chapter": 2,
-            "grading_results": {k: {"perfect": True, "attempts": 1} for k in ch1}, "outfits": ["basic"], "outfit": "basic"}
-    with App("iPhone 17", save=seed, url=url) as a:
-        a.start()
-        # 학습 길: 1장 별 3개 열림, 2장 별 3개 잠김, 지금 레슨 2-1
-        c1, c2 = _adv_classes(a, 1), _adv_classes(a, 2)
-        assert all(c and "open" in c for c in c1), c1
-        assert all(c and "locked" in c for c in c2), c2
-        assert "current" in a.page.get_attribute('.node[data-lesson="2-1"]', "class")
-        assert "2-1" in a.page.inner_text("#continue")
-        a.js("() => document.querySelector(`.star-node[data-lesson='1-A1']`).scrollIntoView({ block: 'center' })")
-        a.page.wait_for_timeout(200)
-        a.shot("adv-home.png")
-        m = measure(a, "home-adv")
-        assert not m["problems"] and not m["small"], m
-        # 잠긴 별: 열리지 않음
-        a.page.click(".star-node[data-lesson='2-A1']")
-        a.page.wait_for_timeout(300)
-        assert a.page.query_selector(".screen.home"), "locked advanced star must not open"
-        # 1-A1 풀기(첫 문제 한 번 틀림 → 실수 없음 아님, 힌트 없이 통과)
-        a.page.click(".star-node[data-lesson='1-A1']")
-        a.page.wait_for_selector(".screen.lesson")
-        a.play("1-A1", wrong=(0,))
-        r = a.result()
-        s = a.save()
-        title = a.page.inner_text(".done-hero h1")
-        print("    advanced: %s xp +%s, lessonBytes %s, perfect %s, hintfree %s, badges %s" % (
-            title, r["xp"], r["lessonBytes"], r["perfect"], r["hintFreeWrite"], r["newBadges"]))
-        assert title == "1-A1 심화 완료!", title
-        assert r["firstTime"] and not r["perfect"] and r["hintFreeWrite"], r
-        assert r["xp"] == 15 + 5 and r["lessonBytes"] == 15, r
-        assert "advanced1" in r["newBadges"], r["newBadges"]
-        assert "심화 첫걸음" in a.page.inner_text(".screen.done")
-        assert "1-A1" in s["completed_lessons"] and s["current_lesson"] == "2-1" and s["current_chapter"] == 2, s
-        a.shot("adv-done.png")
+        a.play("1-1")
         a.dismiss()
         a.page.click("#home")
         a.page.wait_for_selector(".screen.home")
-        a.dismiss()
-        c1 = _adv_classes(a, 1)
-        assert "done" in c1[0] and "open" in c1[1] and "open" in c1[2], c1
-        assert "2-1" in a.page.inner_text("#continue"), "current lesson stays 2-1"
-        # 설정: 「심화 1/3」, 펼치면 「심화」 아래 3개
-        a.page.click('[data-go="settings"]')
-        a.page.wait_for_selector(".screen.settings")
-        row = a.page.query_selector('.ch-row[aria-controls="ch-1"]')
-        assert "심화 1/3" in row.inner_text(), row.inner_text()
-        plain = a.js("() => (window.__ria.app.chapters.find((c) => !(c.advanced || []).length) || {}).id")
-        assert plain, "need a chapter without ADVANCED"
-        assert a.page.query_selector('.ch-row[aria-controls="ch-%d"] .ch-adv' % plain) is None, "chapter without ADVANCED shows no 심화 count"
-        assert "심화 0/3" in a.page.inner_text('.ch-row[aria-controls="ch-2"]')
-        assert "레슨 중 5개 완료" in a.page.inner_text(".course-sum"), a.page.inner_text(".course-sum")
-        row.click()
-        a.page.wait_for_selector("#ch-1:not([hidden])")
-        assert a.page.inner_text("#ch-1 .ch-adv-head").startswith("심화")
-        assert a.page.eval_on_selector_all("#ch-1 .ls.adv", "es => es.map(e => e.className)") == ["ls adv done", "ls adv open", "ls adv open"]
-        a.js("() => document.querySelector('#ch-1').scrollIntoView({ block: 'start' })")
-        a.page.wait_for_timeout(150)
-        a.shot("adv-settings.png")
-        m = measure(a, "settings-adv")
-        assert not m["problems"] and not m["small"], m
-        # 배지: 15개
-        a.page.click('[data-go="badges"]')
-        a.page.wait_for_selector(".screen.badges")
-        assert "/15" in a.page.inner_text(".page-title"), a.page.inner_text(".page-title")
-        assert "끝낸 심화" in a.page.inner_text(".stat-grid")
-        a.shot("adv-badges.png", full=True)
-        m = measure(a, "badges-adv")
-        assert not m["problems"] and not m["small"], m
-        assert not a.errors, a.errors
-
-
-# ---------------------------------------------------------------- 「새 내용」 점 (v0.7.1 작업 1)
-
-_upd_env = {}
-
-
-def upd_url():
-    """1-2에 updated: "v0.7.1"을 단 빌드를 따로 띄운다(실제 보강 내용이 없어도 점·기록을 시험)."""
-    if _upd_env:
-        return _upd_env["url"]
-    env()
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from fixtures.advanced_dir import make
-    lessons = make(os.path.join(ROOT, "data", "lessons"), os.path.join(OUT, "lessons-upd"), chapters=(),
-                   updated={"1-2": "v0.7.1"})
-    dist = os.path.join(OUT, "dist-upd")
-    r = subprocess.run([sys.executable, os.path.join(ROOT, "build.py"), "--dev-pyodide", "--out", dist, "--lessons-dir", lessons],
-                       cwd=ROOT, capture_output=True, text=True)
-    assert r.returncode == 0, "build.py (updated fixture) failed:\n" + r.stdout + r.stderr
-    httpd = _Server(("127.0.0.1", 0), functools.partial(_Handler, directory=dist))
-    threading.Thread(target=httpd.serve_forever, daemon=True).start()
-    atexit.register(httpd.shutdown)
-    _upd_env["url"] = "http://127.0.0.1:%d/" % httpd.server_address[1]
-    return _upd_env["url"]
-
-
-def _dots(a):
-    return a.js("() => [...document.querySelectorAll('.screen.home .new-dot')].map((d) => d.dataset.for)")
-
-
-def test_new_content_dot():
-    url = upd_url()
-    done = ["1-1", "1-2"]
-    seed = {"saveVer": 2, "xp": 40, "bytes": 30, "completed_lessons": done, "current_lesson": "1-3", "current_chapter": 1,
-            "grading_results": {k: {"perfect": True, "attempts": 1} for k in done}}
-    with App("iPhone 17", save=seed, url=url) as a:
-        a.start()
-        assert _dots(a) == ["1-2"], _dots(a)
-        dot = a.page.query_selector('.new-dot[data-for="1-2"]')
-        assert dot.get_attribute("aria-label") == "새 내용 있음" and dot.get_attribute("role") == "img"
-        assert "새 내용 있음" in a.page.get_attribute('.node[data-lesson="1-2"]', "aria-label")
-        assert "새 내용" not in (a.page.get_attribute('.node[data-lesson="1-1"]', "aria-label") or "")
-        a.js("() => document.querySelector('.node[data-lesson=\"1-2\"]').scrollIntoView({ block: 'center' })")
-        a.page.wait_for_timeout(200)
-        # 점이 노드 누르기를 가리지 않음: 노드 가운데·점 자리를 누르면 노드가 받는다, 노드 크기 그대로
-        box = a.page.query_selector('.node[data-lesson="1-2"]').bounding_box()
-        assert round(box["width"]) == 68 and round(box["height"]) == 68, box
-        hit = a.js("([x, y]) => document.elementFromPoint(x, y)?.closest('.node')?.dataset.lesson || null",
-                   [box["x"] + box["width"] / 2, box["y"] + box["height"] / 2])
-        assert hit == "1-2", hit
-        db = dot.bounding_box()
-        under = a.js("([x, y]) => document.elementFromPoint(x, y)?.closest('.new-dot') ? 'dot' : 'other'",
-                     [db["x"] + db["width"] / 2, db["y"] + db["height"] / 2])
-        assert under == "other", "dot must not take taps (pointer-events: none)"
-        a.shot("v071-new-dot-home.png")
-        m = measure(a, "home-new-dot")
-        assert not m["problems"] and not m["small"], m
-        # 설정 학습 내용: 1장을 펼치면 1-2 줄에 점
-        a.page.click('[data-go="settings"]')
-        a.page.wait_for_selector(".screen.settings")
-        a.page.click('.ch-row[aria-controls="ch-1"]')
-        a.page.wait_for_selector("#ch-1:not([hidden])")
-        rows = a.page.eval_on_selector_all("#ch-1 .ls", "es => es.map(e => !!e.querySelector('.new-dot'))")
-        assert rows[:3] == [False, True, False], rows
-        a.js("() => document.querySelector('#ch-1 .new-dot').scrollIntoView({ block: 'center' })")
-        a.page.wait_for_timeout(150)
-        a.shot("v071-new-dot-settings.png")
-        m = measure(a, "settings-new-dot")
-        assert not m["problems"] and not m["small"], m
-        # 다시 하기 → 끝까지 → 점 사라짐, 완료 화면은 평소 다시 하기와 같음
-        a.page.click('[data-go="home"]')
-        a.page.wait_for_selector(".screen.home")
-        a.page.click('[data-lesson="1-2"]')
-        a.page.wait_for_selector(".modal .btn.primary")
-        a.page.click(".modal .btn.primary")
-        a.page.wait_for_selector(".screen.lesson")
-        a.play("1-2")
-        r = a.result()
-        s = a.save()
-        assert r["xp"] == 10 and r["lessonBytes"] == 0 and not r["firstTime"], r
-        assert s["seen_updates"] == {"1-2": "v0.7.1"}, s.get("seen_updates")
-        assert s["completed_lessons"] == done and s["saveVer"] == 2, s
-        text = a.page.inner_text(".screen.done")
-        assert "다시 하기라서" in text and "새 내용" not in text, text
-        a.dismiss()
-        a.page.click("#home")
-        a.page.wait_for_selector(".screen.home")
-        a.dismiss()
-        assert _dots(a) == [], _dots(a)
-        assert "새 내용" not in a.page.get_attribute('.node[data-lesson="1-2"]', "aria-label")
-        a.js("() => document.querySelector('.node[data-lesson=\"1-2\"]').scrollIntoView({ block: 'center' })")
-        a.page.wait_for_timeout(200)
-        a.shot("v071-new-dot-after-replay.png")
-        # 새로 불러도 그대로(저장됨)
-        a.page.reload()
-        a.page.wait_for_selector(".screen.splash #go", timeout=20_000)
-        a.start()
-        assert _dots(a) == [], _dots(a)
-        assert not a.errors, a.errors
+        after = a.js("(k) => localStorage.getItem(k)", RIA_KEY)
+        assert after == ria, after
+        assert a.save()["completed_lessons"] == ["1-1"]
 
 
 def main():

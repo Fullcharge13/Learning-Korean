@@ -24,14 +24,14 @@ import * as badges from "./ui/badges.js";
 import * as closet from "./ui/closet.js";
 import * as settings from "./ui/settings.js";
 
-export const VERSION = "v0.7.2";
+export const VERSION = "v0.1.0";
 const SCREENS = { splash, home, lesson, done, badges, closet, settings };
 
 // ---- 저장소 (사파리 사생활 보호 모드 등에서 localStorage 접근이 막혀도 앱은 돈다) ----
 function pickStorage() {
   try {
     const s = window.localStorage;
-    s.getItem("ria-python.probe");
+    s.getItem("haechi-korean.probe");
     return s;
   } catch {
     const m = new Map();
