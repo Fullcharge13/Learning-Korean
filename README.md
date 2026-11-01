@@ -18,6 +18,7 @@
 |---|---|
 | 개발하면서 열어 보기 | `python3 tools/dev.py` → `http://127.0.0.1:8765/dev/` |
 | 배포 파일 만들기 | `python3 build.py` → `dist/` 폴더를 그대로 웹(GitHub Pages 등)에 올림 |
+| 자동 배포 | `main`에 올리면 GitHub Actions가 시험·빌드 후 GitHub Pages에 배포(`.github/workflows/deploy.yml`). 처음 한 번 Settings → Pages → Source를 「GitHub Actions」로 |
 | 단어 표에서 레슨 다시 만들기 | `python3 tools/make_lessons.py` (단어 뜻을 고친 뒤) |
 | 그림 시트에서 그림 다시 자르기 | `python3 tools/cut_sheets.py` |
 
