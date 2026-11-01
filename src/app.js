@@ -75,7 +75,7 @@ function dayStart() {
   const away = daysSince(app.save.last_active_at);
   if (away != null && away >= 3) app.greetOverride = "welcome_back";
   else if (r.broke) app.greetOverride = "streak_broken";
-  if (r.usedFreezes > 0) toast(`기록 보호권 ${r.usedFreezes}개로 연속 기록을 지켰어요.`);
+  if (r.usedFreezes > 0) toast(`用了 ${r.usedFreezes} 张保护券，连续记录保住了。`);
   s = ensureQuests(s, today);
   if (JSON.stringify(s) !== before) commit(s);
   else app.save = s;
@@ -87,7 +87,7 @@ function commit(next) {
   const ok = store(storage, next);
   if (!ok && !app.storeFailedShown) {
     app.storeFailedShown = true;
-    toast("저장하지 못했어요. 브라우저 저장 공간이 꽉 찼거나 막혀 있어요. 설정에서 저장 내보내기를 해 두면 안전해요.", "warn");
+    toast("保存失败。浏览器存储空间已满或被禁用。在设置里导出存档会更安全。", "warn");
   }
   if (ok) app.storeFailedShown = false;
   // 화면에 있는 상태 줄(연속 기록·바이트·XP)을 새 값으로
@@ -228,7 +228,7 @@ async function boot() {
   const root = document.getElementById("app");
   const { save, readFailed } = loadEx(storage);
   app.save = save;
-  if (readFailed) toast("저장을 읽지 못해 새로 시작해요. 이 브라우저의 저장 공간 설정을 확인해 주세요.", "warn");
+  if (readFailed) toast("读取存档失败，将重新开始。请检查浏览器的存储设置。", "warn");
   requestPersist();
   try {
     // 처음 설치(작업자 없음 → 생김)는 새 판이 아님. 다루던 작업자가 바뀔 때만
@@ -262,5 +262,5 @@ async function boot() {
 boot().catch((e) => {
   console.error(e);
   const root = document.getElementById("app");
-  if (root) root.innerHTML = `<p class="fatal">앱을 시작하지 못했어요. 새로고침해 주세요.</p>`;
+  if (root) root.innerHTML = `<p class="fatal">应用启动失败，请刷新页面。</p>`;
 });

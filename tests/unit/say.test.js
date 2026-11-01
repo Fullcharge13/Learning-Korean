@@ -9,7 +9,7 @@ const SITUATIONS = [
   "greet", "correct", "combo", "wrong", "running", "error", "hint",
   "lesson_done", "streak_up", "streak_broken", "item_bought", "welcome_back",
 ];
-const FACES = ["smile", "joy", "sparkle", "think", "surprise", "worry", "cheer", "wink"];
+import { FACE_IDS as FACES } from "../../src/haechi.js";
 
 // 씨앗 고정 난수(mulberry32) — 시험 결과가 매번 같도록
 function seeded(seed) {
@@ -76,30 +76,29 @@ test("name_blank: 이름 없음 → {name}이나 빈 호칭이 남지 않음", (
         const r = say(s, { streak: 2, xp: 10, item: "장구 · 长鼓", ...vars }, rng, null);
         assert.equal(r.index, i);
         assert.ok(!/\{\w*\}/.test(r.text), `자리 표시 남음: ${r.text}`);
-        assert.ok(!/(^|[\s,.!?])님[,\s!?.]/.test(r.text) && !/^님/.test(r.text), `빈 호칭 남음: ${r.text}`);
-        assert.ok(!/^[\s,]/.test(r.text) && !/\s{2,}/.test(r.text), `공백 어긋남: ${r.text}`);
+        assert.ok(!/^[\s,，]/.test(r.text) && !/\s{2,}/.test(r.text), `빈 호칭·공백 어긋남: ${r.text}`);
       }
     });
   }
   assert.ok(sawNameLine, "{name}을 쓰는 줄이 하나 이상 있어야 함");
 });
 
-test("name_form: {name}은 줄 맨 앞 「{name}님, 」 꼴로 한 번만 (빼도 조사가 남지 않게)", () => {
+test("name_form: {name}은 줄 맨 앞 「{name}，」 꼴로 한 번만", () => {
   for (const s of SITUATIONS) {
     for (const l of LINES[s]) {
       if (!l.text.includes("{name}")) continue;
-      assert.match(l.text, /^\{name\}님, /, `${s}: ${l.text}`);
+      assert.match(l.text, /^\{name\}，/, `${s}: ${l.text}`);
       assert.equal(l.text.split("{name}").length, 2, `${s}: {name} 두 번 이상`);
     }
   }
 });
 
-test("name_filled: 이름이 있으면 「이름님」으로 들어감", () => {
+test("name_filled: 이름이 있으면 「이름，」으로 들어감", () => {
   const s = "greet";
   const i = LINES[s].findIndex((l) => l.text.includes("{name}"));
   assert.ok(i >= 0);
   const r = say(s, { name: "민지" }, () => (i + 0.5) / LINES[s].length, null);
-  assert.ok(r.text.includes("민지님"), r.text);
+  assert.ok(r.text.startsWith("민지，"), r.text);
 });
 
 test("placeholders: {streak}·{xp} 채움", () => {
@@ -135,9 +134,8 @@ test("vars_missing: vars {} → 자리 표시가 빠진 줄은 건너뜀, 남는
       for (const vars of [{}, undefined, null]) {
         const r = say(s, vars, rng, null);
         assert.ok(!/[{}]/.test(r.text), `${s}: ${r.text}`);
-        assert.ok(!/^[\s,.!?…·]/.test(r.text), `${s}: ${r.text}`);
-        assert.ok(!/^일/.test(r.text), `${s}: ${r.text}`);
-        assert.ok(!/(^|\s)(XP|일)[\s.!,]/.test(r.text.replace(/\d+ ?(XP|일)/g, "")), `${s}: 숫자 없는 단위 ${r.text}`);
+        assert.ok(!/^[\s,，.。!！?？…·]/.test(r.text), `${s}: ${r.text}`);
+        assert.ok(!/(^|\s)(XP|天)/.test(r.text.replace(/\d+ ?(XP|天)/g, "")), `${s}: 숫자 없는 단위 ${r.text}`);
       }
     }
   }
@@ -152,7 +150,7 @@ test("one_pass: 이름 속 $&·{xp}는 그대로 글자로 들어감 (다시 바
   const s = "greet";
   const i = LINES[s].findIndex((l) => l.text.includes("{name}"));
   const r = say(s, { name: "$&{xp}", xp: 5 }, () => (i + 0.5) / LINES[s].length, null);
-  assert.ok(r.text.startsWith("$&{xp}님, "), r.text);
+  assert.ok(r.text.startsWith("$&{xp}，"), r.text);
 });
 
 test("rng_guard: NaN·음수·1 이상 → 범위 안 줄", () => {
@@ -166,17 +164,10 @@ test("rng_guard: NaN·음수·1 이상 → 범위 안 줄", () => {
   }
 });
 
-test("banned: 고친 문구와 피할 표현이 남지 않음", () => {
-  const all = Object.values(LINES).flat().map((l) => l.text).join("\n");
-  for (const bad of ["오늘부터 1일", "입고", "고마워요", "힌트예요", "한 끗", "충분할 거예요", "빨간 줄", "금방 끝나요", "비워 뒀어요", "조건을 먼저", "갱신"]) {
-    assert.ok(!all.includes(bad), `남은 표현: ${bad}`);
-  }
-});
-
-test("streak_one: {streak}=1이어도 자연스러움 (「1일 연속」 꼴 없음)", () => {
+test("streak_one: {streak}=1이어도 자연스러움", () => {
   LINES.streak_up.forEach((l, i) => {
     const r = say("streak_up", { streak: 1 }, () => (i + 0.5) / LINES.streak_up.length, null);
-    assert.ok(!/1일 연속/.test(r.text), r.text);
+    assert.ok(!/\{streak\}/.test(r.text), r.text);
   });
 });
 

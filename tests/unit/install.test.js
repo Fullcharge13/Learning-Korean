@@ -59,5 +59,5 @@ test("install_hint_show: 예전 이름도 같은 판정", () => {
 
 import { INSTALL_AFTER_TEXT } from "../../src/install.js";
 test("install_after_text: 추가한 뒤 인터넷이 될 때 한 번 열기 안내 (C32)", () => {
-  assert.equal(INSTALL_AFTER_TEXT, "추가한 뒤, 인터넷이 될 때 아이콘으로 한 번 열어 주세요. 그래야 비행기 모드에서도 열려요.");
+  assert.equal(INSTALL_AFTER_TEXT, "添加后，请在有网络时从图标打开一次，这样飞行模式下也能用。");
 });

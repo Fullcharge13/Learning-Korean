@@ -7,11 +7,11 @@ export function render(root, ctx) {
   root.innerHTML = `<main class="screen splash">
     <div class="splash-hero">
       <div class="ria-wrap big">${haechiImg({ face: "hello", item: ctx.save.item, size: 200 })}</div>
-      <h1 class="logo">리아와 파이썬<span class="bang">!</span></h1>
-      <p class="tagline">하루 10분, 문리아 교수와 첫 코드부터</p>
+      <h1 class="logo">獬豸老师教韩语<span class="bang">!</span></h1>
+      <p class="tagline">每天 10 分钟，跟着《延世韩国语》学单词</p>
     </div>
     <p class="bubble center">${esc(line.text)}</p>
-    <button class="btn primary wide" id="go">시작하기</button>
+    <button class="btn primary wide" id="go">开始</button>
     <p class="ver">${esc(ctx.version)}</p>
   </main>`;
   root.querySelector("#go").addEventListener("click", () => ctx.show("home"));

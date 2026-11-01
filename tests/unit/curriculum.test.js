@@ -28,23 +28,15 @@ test("cur_unlocked_not_current: 열렸지만 지금이 아닌 레슨은 open", (
   assert.equal(c.current, null);
 });
 
-test("cur_upcoming: 4장부터, 이미 있는 장은 숨김", () => {
-  assert.equal(UPCOMING.length, 14);
-  const up = upcomingChapters(CH);
-  assert.deepEqual(up[0], { no: 4, title: "함수" });
-  assert.equal(up.length, 14);
-  const up2 = upcomingChapters([...CH, mk(4, "함수")]);
-  assert.deepEqual(up2[0], { no: 5, title: "반복문" });
-  assert.equal(up2.length, 13);
+test("cur_upcoming: 1권만이라 예정된 과가 없음", () => {
+  assert.equal(UPCOMING.length, 0);
+  assert.deepEqual(upcomingChapters(CH), []);
 });
 
 test("path_end_text: 남은 레슨이 있을 때와 모두 끝냈을 때", () => {
-  assert.equal(pathEndText({ chapters: CH, completed: ["1-1"] }),
-    "3장까지가 지금 판의 전부예요. 4장(함수)부터는 다음 업데이트에서 열려요");
+  assert.equal(pathEndText({ chapters: CH, completed: ["1-1"] }), "第3课是最后一课，一起坚持到底吧");
   const all = CH.flatMap((c) => c.lessons.map((l) => l.id));
-  assert.equal(pathEndText({ chapters: CH, completed: all }), "지금 판의 레슨을 모두 끝냈어요! 복습으로 실력을 다져요");
-  assert.equal(pathEndText({ chapters: [...CH, mk(4, "함수")], completed: [] }),
-    "4장까지가 지금 판의 전부예요. 5장(반복문)부터는 다음 업데이트에서 열려요");
+  assert.equal(pathEndText({ chapters: CH, completed: all }), "全部课程都学完了！用复习巩固一下吧");
 });
 
 import { chapterWindow } from "../../src/curriculum.js";
@@ -72,17 +64,17 @@ test("window_few: 장이 3개 이하면 모두 보이고 숨김 없음", () => {
 });
 
 import { courseJustFinished } from "../../src/curriculum.js";
-const FULL = Array.from({ length: 17 }, (_, i) => mk(i + 1, i + 4 <= 17 && i >= 3 ? UPCOMING[i - 3] : `장${i + 1}`));
+const FULL = Array.from({ length: 17 }, (_, i) => mk(i + 1, `장${i + 1}`));
 const FULL_IDS = FULL.flatMap((c) => c.lessons.map((l) => l.id));
 
 test("course_end_path: 17장 전부 끝내면 과정 완주 문구(다음 업데이트 말 없음)", () => {
-  assert.equal(pathEndText({ chapters: FULL, completed: FULL_IDS }), "과정을 모두 끝냈어요! 복습으로 실력을 다져요");
-  assert.equal(pathEndText({ chapters: FULL, completed: [] }), "17장이 마지막 장이에요. 끝까지 함께 가 봐요");
+  assert.equal(pathEndText({ chapters: FULL, completed: FULL_IDS }), "全部课程都学完了！用复习巩固一下吧");
+  assert.equal(pathEndText({ chapters: FULL, completed: [] }), "第17课是最后一课，一起坚持到底吧");
 });
 
 test("course_just_finished: 처음으로 마지막 레슨까지 끝낸 순간만 참", () => {
   assert.equal(courseJustFinished({ chapters: FULL, completed: FULL_IDS, firstTime: true }), true);
   assert.equal(courseJustFinished({ chapters: FULL, completed: FULL_IDS, firstTime: false }), false); // 다시 하기·복습
   assert.equal(courseJustFinished({ chapters: FULL, completed: FULL_IDS.slice(1), firstTime: true }), false); // 빠진 레슨
-  assert.equal(courseJustFinished({ chapters: CH, completed: CH.flatMap((c) => c.lessons.map((l) => l.id)), firstTime: true }), false); // 다음 장이 남은 판
+  assert.equal(courseJustFinished({ chapters: CH, completed: CH.flatMap((c) => c.lessons.map((l) => l.id)), firstTime: true }), true); // 예정된 다음 과 없음
 });

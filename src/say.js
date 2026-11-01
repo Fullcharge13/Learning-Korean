@@ -1,4 +1,4 @@
-// 리아 교수 대사 고르기 (설계서 6-3)
+// 해치 선생님 대사 고르기
 import { LINES, FALLBACK_LINE } from "../data/lines.js";
 
 const VALUE_KEYS = ["streak", "xp", "item"];
@@ -10,11 +10,11 @@ function usable(text, vars) {
 }
 
 // 자리 표시를 한 번에 채운다(바꿔 넣은 글자를 다시 바꾸지 않음, $ 패턴 해석 없음).
-// 이름이 비면 줄 맨 앞 「{name}님, 」 덩어리를 통째로 뺀다(대사 표는 이 꼴로만 씀 — 시험 name_form).
+// 이름이 비면 줄 맨 앞 「{name}，」 덩어리를 통째로 뺀다(대사 표는 이 꼴로만 씀 — 시험 name_form).
 function fill(text, vars) {
   const name = has(vars.name) ? String(vars.name).trim() : "";
-  const out = text.replace(/\{name\}님, ?|\{(name|streak|xp|item)\}/g, (m, key) => {
-    if (key === undefined) return name ? `${name}님, ` : ""; // 「{name}님, 」 덩어리
+  const out = text.replace(/\{name\}，|\{(name|streak|xp|item)\}/g, (m, key) => {
+    if (key === undefined) return name ? `${name}，` : ""; // 「{name}，」 덩어리
     if (key === "name") return name;
     return has(vars[key]) ? String(vars[key]) : "";
   });
@@ -29,7 +29,7 @@ function unit(rng) {
 }
 
 /**
- * 상황에 맞는 리아 교수 대사 한 줄을 고른다.
+ * 상황에 맞는 해치 선생님 대사 한 줄을 고른다.
  * @param {string} situation  ledger 「대사 상황 id」(greet, correct, …)
  * @param {{name?:string, streak?:number, xp?:number, item?:string}} [vars]
  *   자리 표시 값. item은 물건 표의 이름(「장구 · 长鼓」). 값이 없는 자리 표시를 쓰는 줄은 건너뛴다.

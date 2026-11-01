@@ -39,4 +39,4 @@ export function shouldShowInstallHint(o) {
 }
 
 // 홈 화면 앱은 사파리와 저장 공간이 따로라서, 처음 한 번은 인터넷이 될 때 열어야 파일을 받아 둔다(판정 C32)
-export const INSTALL_AFTER_TEXT = "추가한 뒤, 인터넷이 될 때 아이콘으로 한 번 열어 주세요. 그래야 비행기 모드에서도 열려요.";
+export const INSTALL_AFTER_TEXT = "添加后，请在有网络时从图标打开一次，这样飞行模式下也能用。";

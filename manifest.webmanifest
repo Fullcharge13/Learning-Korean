@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "리아와 파이썬!",
-  "short_name": "리아와 파이썬",
-  "description": "문리아 교수와 하루 10분, 휴대폰으로 배우는 Python 첫걸음",
+  "name": "獬豸老师教韩语",
+  "short_name": "獬豸韩语",
+  "description": "和獬豸老师一起，每天 10 分钟，用手机学韩语单词",
   "lang": "ko",
   "dir": "ltr",
   "start_url": "./",

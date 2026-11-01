@@ -5,10 +5,10 @@ import { esc } from "./dom.js";
 import { tabBar, bindTabs, statusBar } from "./nav.js";
 
 const ART = {
-  first_print: ["teal", ">_"], ch1: ["teal", "1장"], ch2: ["teal", "2장"], ch3: ["teal", "3장"],
-  streak7: ["coral", "7일"], streak30: ["coral", "30일"], streak100: ["coral", "100"],
+  first_print: ["teal", ">_"], ch1: ["teal", "1课"], ch2: ["teal", "2课"], ch3: ["teal", "3课"],
+  streak7: ["coral", "7天"], streak30: ["coral", "30天"], streak100: ["coral", "100"],
   perfectionist: ["sun", "★"],
-  reviewer: ["navy", "30"], collector: ["sun", "3벌"], night_owl: ["navy", "☾"],
+  reviewer: ["navy", "30"], collector: ["sun", "3件"], night_owl: ["navy", "☾"],
   advanced1: ["teal", "A+"], advancedAll: ["sun", "A★"],   // v0.7 심화
 };
 const COL = { teal: ["#1F9E93", "#12756D"], coral: ["#F08A5D", "#C4512F"], navy: ["#3C5170", "#1F2B3D"], sun: ["#FFD43B", "#C99A00"] };
@@ -42,29 +42,29 @@ export function render(root, ctx) {
   root.innerHTML = `<div class="screen badges with-tabs">
     ${statusBar(s)}
     <main>
-      <h1 class="page-title">배지 <small>${have.size}/${BADGES.length}</small></h1>
+      <h1 class="page-title">徽章 <small>${have.size}/${BADGES.length}</small></h1>
       <ul class="badge-grid">${BADGES.map((b) => {
         const e = have.has(b.id);
         return `<li class="badge${e ? " earned" : ""}">
           ${badgeArt(b.id, e)}
           <span class="b-name">${esc(b.name)}</span>
-          <span class="b-desc">${e ? "얻었어요" : esc(b.desc)}</span>
+          <span class="b-desc">${e ? "已获得" : esc(b.desc)}</span>
         </li>`;
       }).join("")}</ul>
       <section class="panel">
-        <h2>학습 기록</h2>
+        <h2>学习记录</h2>
         <dl class="stat-grid">
-          <div><dt>끝낸 레슨</dt><dd>${n(mainDone)}<small>/${ctx.lessons.length}</small></dd></div>
-          ${advTotal ? `<div><dt>끝낸 심화</dt><dd>${n(advDone)}<small>/${advTotal}</small></dd></div>` : ""}
-          <div><dt>맞힌 문제</dt><dd>${n(st.items)}</dd></div>
-          <div><dt>실수 없는 레슨</dt><dd>${n(st.perfect)}</dd></div>
-          <div><dt>복습 문제</dt><dd>${n(st.review_items)}</dd></div>
-          <div><dt>최고 연속 기록</dt><dd>${n(s.streak.best)}<small>일</small></dd></div>
-          <div><dt>모은 XP</dt><dd>${n(s.xp)}</dd></div>
+          <div><dt>完成的课</dt><dd>${n(mainDone)}<small>/${ctx.lessons.length}</small></dd></div>
+          ${advTotal ? `<div><dt>完成的进阶</dt><dd>${n(advDone)}<small>/${advTotal}</small></dd></div>` : ""}
+          <div><dt>答对的题</dt><dd>${n(st.items)}</dd></div>
+          <div><dt>无失误的课</dt><dd>${n(st.perfect)}</dd></div>
+          <div><dt>复习题</dt><dd>${n(st.review_items)}</dd></div>
+          <div><dt>最长连续记录</dt><dd>${n(s.streak.best)}<small>天</small></dd></div>
+          <div><dt>累计 XP</dt><dd>${n(s.xp)}</dd></div>
         </dl>
-        <h3>자주 틀린 개념</h3>
+        <h3>常错的单词</h3>
         ${weak.length ? `<ol class="weak">${weak.map(([id]) => `<li>${esc((CONCEPTS.find((c) => c.id === id) || { name: id }).name)}</li>`).join("")}</ol>`
-          : `<p class="muted">아직 없어요. 틀린 문제가 생기면 여기에 모여요.</p>`}
+          : `<p class="muted">还没有。答错的单词会出现在这里。</p>`}
       </section>
     </main>
     ${tabBar("badges")}

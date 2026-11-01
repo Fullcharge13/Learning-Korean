@@ -4,8 +4,7 @@ import { advancedOpen, isAdvancedId } from "./advanced.js";
 import { hasNewContent } from "./newcontent.js";
 
 // 다음 판에 열릴 장 제목. UPCOMING[i]는 (i + 4)장. 이미 불러온 장 번호는 자동으로 숨긴다.
-export const UPCOMING = ["함수", "반복문", "문자열 다루기", "리스트", "딕셔너리", "튜플과 집합", "예외 처리", "파일",
-  "정규표현식", "네트워크 기초", "웹 API와 JSON", "객체지향", "데이터베이스와 SQL", "데이터 시각화"];
+export const UPCOMING = []; // 1권만. 2권을 넣으면 여기에 예정 과 제목
 const UPCOMING_FROM = 4;
 
 /** 아직 없는 다음 장들: [{ no, title }] */
@@ -68,10 +67,10 @@ export function pathEndText({ chapters, completed }) {
   const last = (chapters || []).reduce((m, c) => Math.max(m, c.id), 0);
   const next = upcomingChapters(chapters)[0];
   if (all.length && all.every((l) => doneSet.has(l.id))) {
-    return next ? "지금 판의 레슨을 모두 끝냈어요! 복습으로 실력을 다져요" : "과정을 모두 끝냈어요! 복습으로 실력을 다져요";
+    return next ? "这一版的课都学完了！用复习巩固一下吧" : "全部课程都学完了！用复习巩固一下吧";
   }
-  if (!next) return `${last}장이 마지막 장이에요. 끝까지 함께 가 봐요`;
-  return `${last}장까지가 지금 판의 전부예요. ${next.no}장(${next.title})부터는 다음 업데이트에서 열려요`;
+  if (!next) return `第${last}课是最后一课，一起坚持到底吧`;
+  return `目前到第${last}课为止。第${next.no}课（${next.title}）会在下次更新开放`;
 }
 
 /**

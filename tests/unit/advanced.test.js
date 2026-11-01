@@ -147,7 +147,7 @@ test("adv_course_done: 완주(C39)는 본 과정만 — 심화 안 해도 완주
   assert.equal(courseJustFinished({ chapters: idx, completed: main.slice(0, -1).concat("1-A1"), firstTime: true, lessonId: "1-A1" }), false);
   assert.equal(courseJustFinished({ chapters: idx, completed: [...main, "1-A1"], firstTime: true, lessonId: "1-A1" }), false,
     "본 과정을 다 끝낸 뒤 심화를 처음 끝내도 「과정 완주!」가 다시 나오지 않음");
-  assert.equal(pathEndText({ chapters: idx, completed: main }), "과정을 모두 끝냈어요! 복습으로 실력을 다져요");
+  assert.equal(pathEndText({ chapters: idx, completed: main }), "全部课程都学完了！用复习巩固一下吧");
 });
 
 // ---- 보상 ----

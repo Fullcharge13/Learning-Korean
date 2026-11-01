@@ -111,8 +111,8 @@ def test_manifest_and_icons():
     _build()
     with open(os.path.join(DIST, "manifest.webmanifest"), encoding="utf-8") as f:
         m = json.load(f)
-    assert m["name"] == "리아와 파이썬!"
-    assert m["short_name"] == "리아와 파이썬"
+    assert m["name"] == "獬豸老师教韩语"
+    assert m["short_name"] == "獬豸韩语"
     assert m["lang"] == "ko"
     assert m["display"] == "standalone"
     assert m["start_url"] and m["scope"]
@@ -533,7 +533,7 @@ def test_chapter_blocked_retry():
         pg.evaluate("() => window.__ria.ctx.show('lesson', { id: '2-1' })")
         pg.wait_for_selector(".lesson-wait[data-state=error]", timeout=15_000)
         txt = pg.inner_text(".lesson-wait")
-        assert "이 장은 인터넷이 될 때 한 번 열어 주세요" in txt, txt
+        assert "这一课需要在有网络时打开一次" in txt, txt
         assert pg.is_visible("#retry") and pg.is_visible("#to-home")
         pg.screenshot(path=os.path.join(OUT, "build_chapter_blocked.png"))
         pg.click("#to-home")
@@ -551,7 +551,7 @@ def test_chapter_blocked_retry():
         # 느린 장 파일: 0.3초 넘으면 「준비 중」
         _Handler.STATE["slow_chapter_s"] = 1.5
         pg.evaluate("() => window.__ria.ctx.show('lesson', { id: '3-1' })")
-        pg.wait_for_selector(".lesson-wait[data-state=wait]:has-text('준비 중')", timeout=5_000)
+        pg.wait_for_selector(".lesson-wait[data-state=wait]:has-text('准备中')", timeout=5_000)
         pg.wait_for_selector(".card-view", timeout=15_000)
         _Handler.STATE["slow_chapter_s"] = 0
         assert not [e for e in b.errors if e.startswith("pageerror")], b.errors
@@ -625,7 +625,7 @@ def test_review_lazy():
         want = sorted(table[str(k)].rsplit("/", 1)[-1] for k in need)
         assert sorted(asked) == want, (asked, want)
         tag = pg.inner_text(".tag")
-        m = re.match(r"^(\d+)-\d+ 복습$", tag.strip())
+        m = re.match(r"^(\d+)-\d+ 复习$", tag.strip())
         assert m and int(m.group(1)) in need, tag
         n = pg.evaluate("() => document.querySelectorAll('.lesson-tag').length")
         assert n == 1
@@ -693,7 +693,7 @@ def test_chapter_wait_timeout():
         _Handler.STATE["slow_chapter_s"] = 60
         t0 = time.monotonic()
         pg.evaluate("() => window.__ria.ctx.show('lesson', { id: '2-1' })")
-        pg.wait_for_selector(".lesson-wait[data-state=wait]:has-text('준비 중')", timeout=5_000)
+        pg.wait_for_selector(".lesson-wait[data-state=wait]:has-text('准备中')", timeout=5_000)
         assert pg.is_visible("#to-home"), "waiting screen needs a way back"
         pg.wait_for_selector(".lesson-wait[data-state=error]", timeout=20_000)
         dt = time.monotonic() - t0
@@ -725,7 +725,7 @@ def test_chapter_404_reload():
         pg.evaluate("() => { window.__marker = 1; window.__ria.ctx.show('lesson', { id: '2-1' }); }")
         pg.wait_for_selector(".lesson-wait[data-state=error]", timeout=15_000)
         txt = pg.inner_text(".lesson-wait")
-        assert "새 판이 나왔어요. 눌러서 새로 고쳐요" in txt, txt
+        assert "有新版本了，点一下刷新" in txt, txt
         _Handler.STATE["chapter_404"] = False
         with pg.expect_navigation(timeout=15_000):
             pg.click("#retry")

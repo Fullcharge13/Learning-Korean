@@ -3,14 +3,14 @@ import { icon, esc, bar } from "./dom.js";
 import { localDate } from "../today.js";
 
 const TABS = [
-  ["home", "학습", "path"],
-  ["badges", "배지", "badge"],
-  ["closet", "의상실", "hanger"],
-  ["settings", "설정", "gear"],
+  ["home", "学习", "path"],
+  ["badges", "徽章", "badge"],
+  ["closet", "收藏室", "hanger"],
+  ["settings", "设置", "gear"],
 ];
 
 export function tabBar(active) {
-  return `<nav class="tabbar" aria-label="화면 이동">${TABS.map(([id, label, ic]) =>
+  return `<nav class="tabbar" aria-label="导航">${TABS.map(([id, label, ic]) =>
     `<button class="tab${id === active ? " on" : ""}" data-go="${id}"${id === active ? ' aria-current="page"' : ""}>${icon(ic)}<span>${esc(label)}</span></button>`).join("")}</nav>`;
 }
 
@@ -28,13 +28,13 @@ export function statusBar(save) {
   const met = todayXp >= goal;
   return `<header class="status">
     <div class="stats-row">
-      <span class="stat flame${save.streak.days > 0 ? " lit" : ""}"><span aria-hidden="true" class="stat-in">${icon("flame")}<b>${save.streak.days}</b><small>일</small></span><span class="sr">연속 기록 ${save.streak.days}일</span></span>
-      <span class="stat byte"><span aria-hidden="true" class="stat-in">${icon("byte")}<b>${Math.max(0, save.bytes)}</b><small>바이트</small></span><span class="sr">바이트 ${Math.max(0, save.bytes)}</span></span>
+      <span class="stat flame${save.streak.days > 0 ? " lit" : ""}"><span aria-hidden="true" class="stat-in">${icon("flame")}<b>${save.streak.days}</b><small>天</small></span><span class="sr">连续记录 ${save.streak.days} 天</span></span>
+      <span class="stat byte"><span aria-hidden="true" class="stat-in">${icon("byte")}<b>${Math.max(0, save.bytes)}</b><small>字节</small></span><span class="sr">字节 ${Math.max(0, save.bytes)}</span></span>
       <span class="stat xp"><span aria-hidden="true" class="stat-in">${icon("xp")}<b>${Math.max(0, save.xp)}</b><small>XP</small></span><span class="sr">XP ${Math.max(0, save.xp)}</span></span>
     </div>
     <div class="goal${met ? " met" : ""}">
-      <span class="goal-label">${met ? "오늘 목표 달성" : "오늘 목표"} <b>${Math.min(todayXp, 999)}/${goal} XP</b></span>
-      ${bar(todayXp, goal, "goal-bar", "오늘 목표 XP")}
+      <span class="goal-label">${met ? "今日目标完成" : "今日目标"} <b>${Math.min(todayXp, 999)}/${goal} XP</b></span>
+      ${bar(todayXp, goal, "goal-bar", "今日目标 XP")}
     </div>
   </header>`;
 }

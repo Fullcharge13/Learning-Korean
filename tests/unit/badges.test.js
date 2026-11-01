@@ -75,8 +75,8 @@ test("streak100: already granted (by Task 2 milestone) -> not returned again", (
   const s = mkSave({ streak: { days: 100, best: 100 }, badges: ["streak7", "streak30", "streak100"] });
   assert.deepEqual(checkBadges(s, { hour: 12 }), []);
   const b = BADGES.find((x) => x.id === "streak100");
-  assert.equal(b.name, "연속 100일");
-  assert.equal(b.desc, "100일 연속으로 하루 목표를 채워요");
+  assert.equal(b.name, "连续 100 天");
+  assert.equal(b.desc, "连续 100 天完成每日目标");
 });
 
 test("stat thresholds: perfect 10, review_items 30", () => {

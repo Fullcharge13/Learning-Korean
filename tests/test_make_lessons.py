@@ -115,3 +115,13 @@ def test_every_word_asked_in_its_lesson():
         asked = {it["concept"] for it in l["items"]}
         n_words = sum(len(c["words"]) for c in l["cards"])
         assert len(asked) == n_words, l["id"]
+
+
+def test_main_writes_concept_names(tmp_path):
+    from make_lessons import main
+    concepts = tmp_path / "concepts.js"
+    main(str(tmp_path / "lessons"), VOCAB, REVIEW, str(concepts))
+    text = concepts.read_text(encoding="utf-8")
+    assert '"id": "v01-c01-u01-001", "name": "친구 · 朋友", "chapter": 1' in text
+    assert "v01-c01-u02-005" not in text  # 보류 단어
+    assert (tmp_path / "lessons" / "ch1.js").exists()

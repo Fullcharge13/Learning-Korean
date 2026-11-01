@@ -27,7 +27,7 @@ export function isDate(s) {
   return fromDayNum(dayNum(s)) === s;
 }
 function requireDate(today) {
-  if (!isDate(today)) throw new Error(`날짜 형식이 잘못됨: ${String(today)}`);
+  if (!isDate(today)) throw new Error(`bad date: ${String(today)}`);
 }
 function cleanXp(xp) {
   return typeof xp === "number" && Number.isFinite(xp) && xp > 0 ? xp : 0;
@@ -137,8 +137,8 @@ export function earnXp(save, xp, today) {
 
 // ---- 보호권 구매 ----
 export function buyFreeze(save) {
-  if (save.freezes >= FREEZE_MAX) return new Error("보호권은 최대 2개까지 가질 수 있어요");
-  if (save.bytes < FREEZE_PRICE) return new Error("바이트가 모자라요");
+  if (save.freezes >= FREEZE_MAX) return new Error("保护券最多只能有 2 张");
+  if (save.bytes < FREEZE_PRICE) return new Error("字节不够");
   return { ...save, bytes: save.bytes - FREEZE_PRICE, freezes: save.freezes + 1 };
 }
 
@@ -147,7 +147,7 @@ const DELTA = { wrong: 2, hint: 1, right: -1 };
 
 export function markConcept(save, concept, outcome) {
   if (typeof outcome !== "string" || !Object.hasOwn(DELTA, outcome)) {
-    throw new Error(`알 수 없는 결과: ${String(outcome)}`);
+    throw new Error(`unknown outcome: ${String(outcome)}`);
   }
   const prev = Object.hasOwn(save.weak_concepts, concept) ? save.weak_concepts[concept] : 0;
   const score = Math.max(0, prev + DELTA[outcome]);

@@ -17,7 +17,7 @@ export function render(root, ctx, params = {}) {
   const line = ctx.say(finished ? "course_done" : "lesson_done", { xp: r.xp });
   const streakLine = r.streakUp || r.milestone ? ctx.say("streak_up", { streak: r.streak }) : null;
   const bytes = r.totalBytes ?? (r.lessonBytes + r.questBytes + (r.milestoneBytes || 0));
-  const parts = [["레슨", r.lessonBytes], ["퀘스트", r.questBytes], ["연속 기록", r.milestoneBytes || 0]].filter(([, v]) => v > 0);
+  const parts = [["课程", r.lessonBytes], ["任务", r.questBytes], ["连续记录", r.milestoneBytes || 0]].filter(([, v]) => v > 0);
   const acc = Math.round((r.accuracy ?? 1) * 100);
   const quests = r.finished.map((id) => QUESTS.find((q) => q.id === id)).filter(Boolean);
   const badges = r.newBadges.map((id) => BADGES.find((b) => b.id === id)).filter(Boolean);
@@ -25,28 +25,27 @@ export function render(root, ctx, params = {}) {
   root.innerHTML = `<div class="screen done">
     <main>
       <div class="done-hero">
-        <div class="ria-wrap big jump">${haechiImg({ face: "done", item: ctx.save.item, size: 150 })}<span class="sfx" aria-hidden="true">짠!</span></div>
-        <h1>${review ? "복습 완료!" : finished ? "과정 완주!" : adv ? esc(`${lesson.id} 심화 완료!`) : esc(`${lesson.id} 레슨 완료!`)}</h1>
+        <div class="ria-wrap big jump">${haechiImg({ face: "done", item: ctx.save.item, size: 150 })}<span class="sfx" aria-hidden="true">锵！</span></div>
+        <h1>${review ? "复习完成！" : finished ? "全部完成！" : adv ? esc(`${lesson.id} 进阶完成！`) : esc(`${lesson.id} 完成！`)}</h1>
         <p class="bubble center">${esc(line.text)}</p>
       </div>
-      ${r.milestone ? `<p class="milestone">${icon("flame")}<span>${esc(`연속 ${r.milestone}일! ${MILESTONE_REWARD[r.milestone] || ""}`)}</span></p>` : ""}
-      <ul class="tiles" aria-label="받은 보상">
+      ${r.milestone ? `<p class="milestone">${icon("flame")}<span>${esc(`连续 ${r.milestone} 天！${MILESTONE_REWARD[r.milestone] || ""}`)}</span></p>` : ""}
+      <ul class="tiles" aria-label="获得的奖励">
         <li class="tile xp">${icon("xp")}<b>+${r.xp}</b><span>XP</span></li>
-        <li class="tile byte">${icon("byte")}<b>+${bytes}</b><span>바이트</span></li>
-        <li class="tile acc">${icon("check")}<b>${acc}%</b><span>첫 시도 정답</span></li>
-        <li class="tile flame${r.streakUp ? " lit" : ""}">${icon("flame")}<b>${r.streak}</b><span>일 연속</span></li>
+        <li class="tile byte">${icon("byte")}<b>+${bytes}</b><span>字节</span></li>
+        <li class="tile acc">${icon("check")}<b>${acc}%</b><span>首次答对</span></li>
+        <li class="tile flame${r.streakUp ? " lit" : ""}">${icon("flame")}<b>${r.streak}</b><span>天连续</span></li>
       </ul>
-      ${parts.length > 1 ? `<p class="muted center">바이트: ${parts.map(([k, v]) => `${k} ${v}`).join(" + ")}</p>` : ""}
-      ${!r.firstTime && !review ? `<p class="muted center">다시 하기라서 레슨 바이트는 없지만, XP와 오늘의 퀘스트는 채워져요.</p>` : ""}
-      ${r.firstTime && r.perfect ? `<p class="perk">${icon("star")}실수 없이 끝냈어요 (+5 XP, +5바이트)</p>` : ""}
-      ${r.firstTime && r.hintFreeWrite ? `<p class="perk">${icon("bulb")}힌트 없이 코드를 통과했어요 (+5 XP)</p>` : ""}
+      ${parts.length > 1 ? `<p class="muted center">字节：${parts.map(([k, v]) => `${k} ${v}`).join(" + ")}</p>` : ""}
+      ${!r.firstTime && !review ? `<p class="muted center">重做没有课程字节，但 XP 和今日任务照样计算。</p>` : ""}
+      ${r.firstTime && r.perfect ? `<p class="perk">${icon("star")}无失误完成（+5 XP，+5 字节）</p>` : ""}
       ${streakLine ? `<div class="ria-row small"><div class="ria-wrap">${haechiImg({ face: streakLine.face, size: 56 })}</div><p class="bubble">${esc(streakLine.text)}</p></div>` : ""}
-      ${lesson && lesson.summary ? `<section class="panel summary"><h2>오늘 배운 것</h2><ol>${lesson.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : ""}
-      ${quests.length || r.chest ? `<section class="panel"><h2>끝낸 퀘스트</h2><ul class="plain">${quests.map((q) => `<li>${icon("check")}${esc(q.name)} <b class="sun-text">+${q.reward}</b></li>`).join("")}
-        ${r.chest ? `<li>${icon("chestOpen")}보물상자를 열었어요 <b class="sun-text">+10</b></li>` : ""}</ul></section>` : ""}
-      ${badges.length ? `<section class="panel"><h2>새 배지</h2><ul class="new-badges">${badges.map((b) => `<li>${badgeArt(b.id, true, 56)}<span>${esc(b.name)}</span></li>`).join("")}</ul></section>` : ""}
+      ${lesson && lesson.summary ? `<section class="panel summary"><h2>今天学到的</h2><ol>${lesson.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ol></section>` : ""}
+      ${quests.length || r.chest ? `<section class="panel"><h2>完成的任务</h2><ul class="plain">${quests.map((q) => `<li>${icon("check")}${esc(q.name)} <b class="sun-text">+${q.reward}</b></li>`).join("")}
+        ${r.chest ? `<li>${icon("chestOpen")}打开了宝箱 <b class="sun-text">+10</b></li>` : ""}</ul></section>` : ""}
+      ${badges.length ? `<section class="panel"><h2>新徽章</h2><ul class="new-badges">${badges.map((b) => `<li>${badgeArt(b.id, true, 56)}<span>${esc(b.name)}</span></li>`).join("")}</ul></section>` : ""}
     </main>
-    <footer class="lesson-foot"><button class="btn primary wide" id="home">계속</button></footer>
+    <footer class="lesson-foot"><button class="btn primary wide" id="home">继续</button></footer>
   </div>`;
   root.querySelector("#home").addEventListener("click", () => ctx.show("home"));
   (async () => {

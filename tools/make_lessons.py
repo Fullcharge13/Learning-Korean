@@ -147,8 +147,9 @@ def build_chapter(words, chapter):
     return {"CHAPTER": {"id": chapter, "title": "第%d课" % chapter}, "LESSONS": lessons}
 
 
-def main(out_dir=None, vocab=None, review=None):
+def main(out_dir=None, vocab=None, review=None, concepts_file=None):
     out_dir = out_dir or os.path.join(ROOT, "data", "lessons")
+    concepts_file = concepts_file or os.path.join(ROOT, "data", "concepts.js")
     words = load_words(vocab or os.path.join(ROOT, "vendor", "open-yonsei", "vol-01.csv"),
                        review or os.path.join(ROOT, "data", "zh-review.csv"))
     os.makedirs(out_dir, exist_ok=True)
@@ -160,6 +161,12 @@ def main(out_dir=None, vocab=None, review=None):
             f.write("// 자동 생성: tools/make_lessons.py — 고치지 말고 다시 만드세요. 데이터 라이선스 CC BY-SA 3.0 (data/LICENSE-data.md)\n")
             f.write("export const CHAPTER = %s;\n\n" % json.dumps(data["CHAPTER"], ensure_ascii=False))
             f.write("export const LESSONS = %s;\n" % json.dumps(data["LESSONS"], ensure_ascii=False, indent=1))
+    # 복습·취약 단어 이름표(홈·배지 화면): concept id = entry_id
+    with open(concepts_file, "w", encoding="utf-8") as f:
+        f.write("// 자동 생성: tools/make_lessons.py — 단어 이름표(복습·취약 단어 표시). CC BY-SA 3.0 (data/LICENSE-data.md)\n")
+        f.write("export const CONCEPTS = [\n%s\n];\n" % ",\n".join(
+            "  " + json.dumps({"id": w["entry_id"], "name": "%s · %s" % (w["ko"], w["zh"]), "chapter": w["chapter"]}, ensure_ascii=False)
+            for w in words))
     print("%d words, %d lessons" % (len(words), total))
 
 
