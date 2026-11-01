@@ -84,7 +84,7 @@ export function finishLesson(save, info, now = new Date()) {
   s.last_active_at = now.toISOString();
 
   // 배지 (이정표 100일 배지는 earnXp가 이미 넣음)
-  const got = checkBadges(s, { hour: now.getHours(), lessonDone: !isReview, advancedIds: info.advancedIds || [] });
+  const got = checkBadges(s, { hour: now.getHours(), lessonDone: !isReview, advancedIds: info.advancedIds || [], examIds: info.examIds || {} });
   s.badges = [...s.badges, ...got];
   const had = new Set(save.badges || []);
   const newBadges = s.badges.filter((b) => !had.has(b));

@@ -161,7 +161,8 @@ function finish(info) {
     nextChapter = next.chapter;
   }
   const firstEver = info.mode !== "review" && app.save.completed_lessons.length === 0;
-  const { save, result } = finishLesson(app.save, { ...info, nextLessonId, nextChapter, advancedIds: advancedIds(app.chapters) }, new Date());
+  const { save, result } = finishLesson(app.save, { ...info, nextLessonId, nextChapter, advancedIds: advancedIds(app.chapters),
+    examIds: Object.fromEntries(app.chapters.map((c) => [c.id, (c.lessons.find((l) => l.isExam) || {}).id]).filter(([, id]) => id)) }, new Date());
   commit(save);
   if (firstEver) {
     requestPersist();

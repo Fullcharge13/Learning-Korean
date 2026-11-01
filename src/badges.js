@@ -3,15 +3,17 @@ import { BADGES } from "../data/badges.js";
 
 const done = (s, id) => (s.completed_lessons || []).includes(id);
 const stat = (s, k) => (s.stats && s.stats[k]) || 0;
+// 장 완료 = 그 장의 장 평가 레슨을 끝냄(장 평가 id는 레슨 목록에서: ctx.examIds { 장 번호: id })
+const chapterDone = (s, ctx, n) => !!(ctx.examIds && ctx.examIds[n]) && done(s, ctx.examIds[n]);
 
-// ctx = { hour, lessonDone, advancedIds }: 밤 공부는 이번 검사에서 레슨을 끝냈고 22시~새벽 3시 59분일 때만.
+// ctx = { hour, lessonDone, advancedIds, examIds }: 밤 공부는 이번 검사에서 레슨을 끝냈고 22시~새벽 3시 59분일 때만.
 // 「깊이 파는 사람」(advancedAll)은 지금 과정에 있는 심화 전부(레슨 목록의 심화 id = ctx.advancedIds)를 끝냈을 때.
 //   v0.7에는 1~6장 심화 18개뿐이라 그 18개로 받을 수 있다. 한 번 받은 배지는 뒤 판에서 심화가 늘어도 그대로 남는다.
 export const RULES = {
   first_print: (s) => done(s, "1-1"),
-  ch1: (s) => done(s, "1-5"),
-  ch2: (s) => done(s, "2-5"),
-  ch3: (s) => done(s, "3-5"),
+  ch1: (s, ctx) => chapterDone(s, ctx, 1),
+  ch2: (s, ctx) => chapterDone(s, ctx, 2),
+  ch3: (s, ctx) => chapterDone(s, ctx, 3),
   streak7: (s) => ((s.streak && s.streak.best) || 0) >= 7,
   streak30: (s) => ((s.streak && s.streak.best) || 0) >= 30,
   streak100: (s) => ((s.streak && s.streak.best) || 0) >= 100,

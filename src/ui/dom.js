@@ -102,11 +102,11 @@ export function codeBlock(code, cls = "") {
   return `<pre class="code ${cls}"><code>${esc(code)}</code></pre>`;
 }
 
-/** 개념 카드의 예제 칸(코드와 저장된 결과). */
+/** 새 단어 카드: 「한국어 — 中文 (汉字)」 줄 목록 */
 export function cardExample(c) {
-  if (!c || !c.code) return "";
-  return `<div class="example"><p class="ex-label">예제</p>${codeBlock(c.code)}
-        ${c.out != null ? `<p class="ex-label">실행 결과</p><pre class="out">${esc(c.out)}</pre>` : ""}</div>`;
+  if (!c || !Array.isArray(c.words) || !c.words.length) return "";
+  return `<ul class="word-list">${c.words.map((w) => `<li><span class="ko" lang="ko">${esc(w.ko)}</span>`
+    + `<span class="zh">${esc(w.zh)}${w.hanja ? ` <small>${esc(w.hanja)}</small>` : ""}</span></li>`).join("")}</ul>`;
 }
 
 export const MILESTONE_REWARD = {

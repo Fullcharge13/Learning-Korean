@@ -4,7 +4,8 @@
     python3 tools/make_lessons.py            # vendor/open-yonsei/vol-01.csv + data/zh-review.csv → data/lessons/
 
 - 장 = 1권 과(chapter), 레슨 = 단원 단어를 sequence 순 8개씩(남는 4개 이하는 앞 레슨에 붙임), 장 끝에 장 평가.
-- 문제: 韩→中, 中→韩(choice), 음절 카드(order). 일반 레슨 터치 6 + check 1, 장 평가 터치 8 + check 1.
+- 문제: 韩→中, 中→韩(choice), 음절 카드(order). 일반 레슨 터치 max(6, 단어 수) + check 1(단어마다 한 문제 이상),
+  장 평가 터치 8 + check 1.
 - 무작위는 random.Random(문자열 시드)만 써서 같은 입력이면 같은 출력.
 - 결과물은 CC BY-SA 3.0 (data/LICENSE-data.md).
 """
@@ -138,7 +139,7 @@ def build_chapter(words, chapter):
             title = "第%d单元" % u + (" (%d)" % k if len(parts) > 1 else "")
             lessons.append({"id": lid, "chapter": chapter, "title": title, "goal": "认识 %d 个新单词" % len(part),
                             "summary": ["%s = %s" % (w["ko"], w["zh"]) for w in part[:4]],
-                            "cards": _cards(part), "items": _items(part, pool, TOUCH, lid)})
+                            "cards": _cards(part), "items": _items(part, pool, max(TOUCH, len(part)), lid)})
     eid = "%d-%d" % (chapter, len(lessons) + 1)
     exam_words = random.Random("exam:%d" % chapter).sample(pool, min(len(pool), EXAM_TOUCH))
     lessons.append({"id": eid, "chapter": chapter, "title": "第%d课 测验" % chapter, "goal": "复习本课单词",

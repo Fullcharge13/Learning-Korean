@@ -62,7 +62,7 @@ test("night_owl requires a lesson completed in this check (ruling)", () => {
 
 test("chapter badges from completed exam lessons", () => {
   const s = mkSave({ completed_lessons: ["1-1", "1-5", "2-5", "3-5"] });
-  assert.deepEqual(checkBadges(s, { hour: 12 }), ["first_print", "ch1", "ch2", "ch3"]);
+  assert.deepEqual(checkBadges(s, { hour: 12, examIds: { 1: "1-5", 2: "2-5", 3: "3-5" } }), ["first_print", "ch1", "ch2", "ch3"]);
   assert.deepEqual(checkBadges(mkSave({ completed_lessons: ["1-4"] }), { hour: 12 }), []);
 });
 
@@ -112,4 +112,11 @@ test("every badge has its own art (no '?' fallback), incl. v0.7 심화 2개", as
     const svg = badgeArt(b.id, true);
     assert.ok(!/>\?<\/text>/.test(svg), `${b.id} uses fallback art`);
   }
+});
+
+test("chapter badges follow each chapter's exam lesson id (ctx.examIds)", () => {
+  const s = mkSave({ completed_lessons: ["1-12"] });
+  assert.ok(checkBadges(s, { examIds: { 1: "1-12", 2: "2-9" } }).includes("ch1"));
+  assert.ok(!checkBadges(mkSave({ completed_lessons: ["1-5"] }), { examIds: { 1: "1-12" } }).includes("ch1"));
+  assert.ok(!checkBadges(s, {}).includes("ch1"), "unknown exam id → no badge");
 });

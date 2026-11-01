@@ -72,8 +72,9 @@ def test_item_counts_and_exam_last():
     assert exam["isExam"] is True
     assert exam["id"] == "1-%d" % len(ch["LESSONS"])
     for l in normal:
+        n_words = sum(len(c["words"]) for c in l["cards"])
         assert [it["type"] for it in l["items"]][-1] == "check"
-        assert len([it for it in l["items"] if it["type"] != "check"]) == 6
+        assert len([it for it in l["items"] if it["type"] != "check"]) == max(6, n_words)
     assert len([it for it in exam["items"] if it["type"] != "check"]) == 8
     assert ch["CHAPTER"] == {"id": 1, "title": "第1课"}
 
@@ -105,3 +106,12 @@ def test_too_few_items_fails():
     words = [w for w in load_words(VOCAB, REVIEW) if w["chapter"] == 2][:1]
     with pytest.raises(ValueError, match="too few"):
         build_chapter(words, 2)
+
+
+def test_every_word_asked_in_its_lesson():
+    for l in _ch()["LESSONS"]:
+        if l.get("isExam"):
+            continue
+        asked = {it["concept"] for it in l["items"]}
+        n_words = sum(len(c["words"]) for c in l["cards"])
+        assert len(asked) == n_words, l["id"]

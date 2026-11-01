@@ -410,16 +410,18 @@ def _snapshot():
 
 def _lesson_texts():
     """index.html에 있으면 안 되는 글: 직접 작성 문제 문장, 카드 설명, 문제 해설"""
-    texts = set()
+    texts, summaries = set(), set()
     for mod in _source_lessons(_snapshot()).values():
         for l in mod["LESSONS"]:
+            summaries.update(l.get("summary", []))  # 요약은 레슨 목록(index.html)에 들어가는 칸이라 같은 글이 있어도 됨
             for c in l.get("cards", []):
                 texts.add(c["say"])
             for it in l.get("items", []):
                 for k in ("task", "explain"):
                     if it.get(k):
                         texts.add(it[k])
-    return sorted(t for t in texts if len(t) >= 8)  # 아주 짧은 글은 앱 글자와 우연히 겹칠 수 있어 뺀다
+    # 짧은 해설(「기다리다 = 等」)은 다른 레슨 요약(「기다리다 = 等待」)의 일부와 우연히 겹칠 수 있어 뺀다
+    return sorted(t for t in texts if len(t) >= 8 and not any(t in sm for sm in summaries))  # 아주 짧은 글은 앱 글자와 우연히 겹칠 수 있어 뺀다
 
 
 DEV_SPLIT = os.path.join(OUT, "dist-dev-split")
@@ -565,7 +567,7 @@ def test_chapter_cache_rotation():
     shutil.copytree(_snapshot(), alt)
     p = os.path.join(alt, "ch1.js")
     src = _read(p)
-    changed = re.sub(r'(export const CHAPTER = \{[^}]*title: ")', r"\1(시험판) ", src, count=1)
+    changed = re.sub(r'(export const CHAPTER = \{[^}]*"?title"?: ")', r"\1(시험판) ", src, count=1)
     assert changed != src
     with open(p, "w", encoding="utf-8") as f:
         f.write(changed)
@@ -606,7 +608,7 @@ def test_chapter_cache_rotation():
 
 def test_review_lazy():
     folder = _dev_split()
-    seed = {"saveVer": 1, "review_queue": ["slice", "def"], "completed_lessons": ["1-1"]}
+    seed = {"saveVer": 1, "review_queue": ["v01-c02-u01-001", "v01-c05-u01-001"], "completed_lessons": ["1-1"]}
     b = _Browser(folder, service_workers="block", init_save=seed)
     try:
         pg = b.page
@@ -618,7 +620,7 @@ def test_review_lazy():
         assert asked == [], "home must not load chapter files: %r" % asked
         pg.click("#review")
         pg.wait_for_selector("article.item", timeout=15_000)
-        need = pg.evaluate("() => window.__ria.ctx.chaptersForConcepts(['slice', 'def'])")
+        need = pg.evaluate("() => window.__ria.ctx.chaptersForConcepts(['v01-c02-u01-001', 'v01-c05-u01-001'])")
         assert 0 < len(need) < len(table), need
         want = sorted(table[str(k)].rsplit("/", 1)[-1] for k in need)
         assert sorted(asked) == want, (asked, want)
@@ -641,7 +643,7 @@ def _rotate_alt():
     p = os.path.join(alt, "ch1.js")
     src = _read(p)
     with open(p, "w", encoding="utf-8") as f:
-        f.write(re.sub(r'(export const CHAPTER = \{[^}]*title: ")', r"\1(시험판) ", src, count=1))
+        f.write(re.sub(r'(export const CHAPTER = \{[^}]*"?title"?: ")', r"\1(시험판) ", src, count=1))
     return alt
 
 
