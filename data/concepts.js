@@ -894,6 +894,7 @@ export const CONCEPTS = [
   {"id": "v01-c09-u03-005", "name": "선선하다 · 凉爽", "chapter": 9},
   {"id": "v01-c09-u03-006", "name": "쌀쌀하다 · 凉飕飕", "chapter": 9},
   {"id": "v01-c09-u03-007", "name": "춥다 · 冷", "chapter": 9},
+  {"id": "v01-c09-u03-008", "name": "눈 · 雪", "chapter": 9},
   {"id": "v01-c09-u03-009", "name": "귀걸이 · 耳环，耳饰", "chapter": 9},
   {"id": "v01-c09-u03-010", "name": "키 · 身高，个子", "chapter": 9},
   {"id": "v01-c09-u03-011", "name": "습하다 · 潮湿", "chapter": 9},

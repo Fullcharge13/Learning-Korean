@@ -42,3 +42,9 @@ def test_all_final_meanings_simplified():
 
 def test_hold_note_present():
     assert not [r["entry_id"] for r in _rows(REVIEW) if r["verdict"] == "hold" and not r["note"].strip()]
+
+
+def test_snow_in_weather_unit():
+    """9과 날씨 단원의 눈은 '雪'(사용자 확인)"""
+    r = next(r for r in _rows(REVIEW) if r["entry_id"] == "v01-c09-u03-008")
+    assert (r["verdict"], r["chinese_new"]) == ("fix", "雪")
