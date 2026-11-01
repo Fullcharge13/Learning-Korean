@@ -598,6 +598,31 @@ def test_exam_done_has_no_empty_summary():
         assert n == 0
 
 
+def _lesson_ids(chapters):
+    ids = []
+    for n in chapters:
+        text = open(os.path.join(ROOT, "data", "lessons", "ch%d.js" % n), encoding="utf-8").read()
+        ids += [l["id"] for l in json.loads(text.split("export const LESSONS = ", 1)[1].rstrip().rstrip(";"))]
+    return ids
+
+
+def test_vol2_opens_after_vol1():
+    done = _lesson_ids(range(1, 11))
+    seed = {"saveVer": 2, "xp": 3000, "completed_lessons": done, "current_lesson": "11-1", "current_chapter": 11}
+    with App("iPhone 17", save=seed) as a:
+        a.start()
+        btn = a.page.inner_text("#continue")
+        titles = a.js("() => [...document.querySelectorAll('.chapter-title')].map(e => e.innerText)")
+        print("    continue %r, chapter titles shown %s" % (btn, titles))
+        assert "11-1" in btn and "继续学习" in btn, btn
+        assert any("第二册 第1课" in t for t in titles), titles
+        a.page.click("#continue")
+        a.play("11-1")
+        assert "11-1" in a.save()["completed_lessons"]
+        a.dismiss()
+        assert not a.errors, a.errors
+
+
 def test_ria_save_coexists():
     ria = json.dumps({"saveVer": 2, "xp": 777, "completed_lessons": ["1-1", "1-2"]})
     with App("iPhone 17", extra={RIA_KEY: ria}) as a:
