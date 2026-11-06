@@ -50,12 +50,15 @@ def load_words(vocab_csvs, review_csv):
         if rv and rv["verdict"] == "hold":
             continue
         zh = rv["chinese_new"] if rv and rv["verdict"] == "fix" else r["chinese"]
-        ko, od = r["korean"], r["origin_detail"].strip()
+        # 원본 오타·품사 오류는 검토 표의 korean_new·pos_new로 고친다(비어 있으면 원본)
+        ko = (rv or {}).get("korean_new") or r["korean"]
+        pos = (rv or {}).get("pos_new") or r["pos"]
+        od = r["origin_detail"].strip()
         # 한자 대응은 순한자어이고 한자 수 = 음절 수일 때만(혼종어·표현은 대응 해설 없음)
         hanja = to_simplified(od) if r["origin_type"] == "hanja" and _cjk(od) and _hangul(ko) and len(od) == len(ko) else None
         vol, book_ch = int(r["volume"]), int(r["chapter"])
         out.append({"entry_id": r["entry_id"], "volume": vol, "book_chapter": book_ch, "chapter": (vol - 1) * 10 + book_ch,
-                    "unit": int(r["unit"]), "sequence": int(r["sequence"]), "ko": ko, "zh": zh, "pos": r["pos"], "hanja": hanja})
+                    "unit": int(r["unit"]), "sequence": int(r["sequence"]), "ko": ko, "zh": zh, "pos": pos, "hanja": hanja})
     return out
 
 
