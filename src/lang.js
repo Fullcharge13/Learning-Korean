@@ -23,12 +23,16 @@
     return /^zh-hant/i.test(String((doc && doc.documentElement && doc.documentElement.lang) || "")) ? "hant" : "hans";
   }
 
-  function other(cur) { return cur === "hans" ? "zh-hant/" : "../"; }
+  // 주소로 본 판과 그 판의 주소(절대 경로). 상대 주소(zh-hant/, ../)는 잘못 받은 페이지에서 zh-hant/zh-hant/… 고리를 만든다.
+  function pathLang(path) { return /\/zh-hant\//.test(path) ? "hant" : "hans"; }
+  function target(to) {
+    var base = String(window.location.pathname).replace(/zh-hant\/.*$|[^\/]*$/, "");
+    return to === "hant" ? base + "zh-hant/" : base;
+  }
 
   function switchLang(to) {
     try { window.localStorage.setItem(KEY, to); } catch (e) { /* 기억 못 해도 이번엔 넘어감 */ }
-    var cur = currentLang(document);
-    if (to !== cur) window.location.href = other(cur);
+    if (to !== currentLang(document)) window.location.href = target(to);
   }
 
   window.haechiLang = { pickLang: pickLang, currentLang: currentLang, switchLang: switchLang };
@@ -36,7 +40,7 @@
   // 배포판(ria-version 표시가 있는 빌드)에서만 넘어간다. 개발 서버엔 다른 판이 없다.
   if (document.querySelector('meta[name="ria-version"]')) {
     var want = pickLang({ saved: readSaved(), languages: window.navigator.languages });
-    var cur = currentLang(document);
-    if (want !== cur) window.location.replace(other(cur));
+    // 주소가 이미 원하는 판인데 글자판이 다르면 저장본이 다른 판 페이지를 준 것: 넘어가도 소용없으니 그대로 둔다
+    if (want !== currentLang(document) && want !== pathLang(window.location.pathname)) window.location.replace(target(want));
   }
 })();

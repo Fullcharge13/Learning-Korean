@@ -88,6 +88,10 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // 간체판 작업자(범위 /…/)는 번체판(/…/zh-hant/) 요청을 건드리지 않는다. 번체판 작업자가 설치되기 전,
+  // 간체 저장본을 /zh-hant/ 주소에 주면 글자판이 섞이고 넘어가기 고리가 생긴다.
+  const scope = new URL(self.registration.scope).pathname;
+  if (!scope.endsWith("/zh-hant/") && url.pathname.startsWith(scope + "zh-hant/")) return;
   if (CHAPTER_RE.test(url.pathname)) {
     event.respondWith(chapterFirst(req));
     return;

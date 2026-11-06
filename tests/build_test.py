@@ -812,7 +812,8 @@ def test_hant_files():
         assert os.path.isfile(os.path.join(HANT, f)), f
     m = json.loads(_read(os.path.join(HANT, "manifest.webmanifest")))
     assert m["name"] == "獬豸老師教韓語" and m["lang"] == "zh-Hant", m
-    assert sorted(os.listdir(os.path.join(HANT, "lessons"))) == sorted(os.listdir(os.path.join(DIST, "lessons")))
+    chs = lambda d: sorted(CHAPTER_FILE.match(f).group(1) for f in os.listdir(os.path.join(d, "lessons")))
+    assert chs(HANT) == chs(DIST)  # 이름의 지문은 판마다 자기 내용(test_hant_own_hashes)
     assert len(os.listdir(os.path.join(HANT, "lessons"))) == 20
     for d in ("img", "icons"):
         assert sorted(os.listdir(os.path.join(HANT, d))) == sorted(os.listdir(os.path.join(DIST, d))), d
@@ -821,8 +822,10 @@ def test_hant_files():
 
 def _hant_texts():
     yield "index.html", _read(os.path.join(HANT, "index.html")), _read(os.path.join(DIST, "index.html"))
-    for f in sorted(os.listdir(os.path.join(HANT, "lessons"))):
-        yield f, _read(os.path.join(HANT, "lessons", f)), _read(os.path.join(DIST, "lessons", f))
+    by_ch = lambda d: {CHAPTER_FILE.match(f).group(1): f for f in os.listdir(os.path.join(d, "lessons"))}
+    hant, hans = by_ch(HANT), by_ch(DIST)
+    for n in sorted(hant, key=int):
+        yield hant[n], _read(os.path.join(HANT, "lessons", hant[n])), _read(os.path.join(DIST, "lessons", hans[n]))
 
 
 def test_hant_is_traditional():
@@ -843,8 +846,9 @@ def test_hant_is_traditional():
 def test_hant_only_cjk_changed():
     _build()
     for name, hant, hans in _hant_texts():
-        back = CJK.sub("", hant).replace("haechi-hant-game-", "haechi-game-").replace("zh-Hant", "zh-Hans")
-        assert back == CJK.sub("", hans), name
+        names = lambda s: re.sub(r"(ch\d+)-[0-9a-f]{8}\.json", r"\1.json", s)  # 장 파일 지문은 판마다 다름
+        back = names(CJK.sub("", hant)).replace("haechi-hant-game-", "haechi-game-").replace("zh-Hant", "zh-Hans")
+        assert back == names(CJK.sub("", hans)), name
 
 
 def test_hant_cache_prefix():
@@ -894,6 +898,60 @@ def test_hant_offline_and_caches_coexist():
         assert b.errors == [], b.errors
     finally:
         b.close()
+
+
+def test_hant_manifest_scope():
+    """번체판 홈 화면 앱이 간체판(../)으로 바꿔도 앱 범위 안에 있게"""
+    _build()
+    m = json.loads(_read(os.path.join(HANT, "manifest.webmanifest")))
+    assert (m["scope"], m["start_url"]) == ("../", "./"), m
+
+
+def test_hant_own_hashes():
+    """번체판 장 파일 이름·저장본 이름은 번체 내용으로 정해짐(고칠 말 표만 바뀌어도 새 판이 퍼짐)"""
+    _build()
+    for f in os.listdir(os.path.join(HANT, "lessons")):
+        m = CHAPTER_FILE.match(f)
+        body = open(os.path.join(HANT, "lessons", f), "rb").read()
+        assert m and hashlib.sha256(body).hexdigest()[:8] == m.group(2), f
+    hant_idx = _read(os.path.join(HANT, "index.html"))
+    for f in os.listdir(os.path.join(HANT, "lessons")):
+        assert "lessons/" + f in hant_idx, f
+    cache = lambda d: re.search(r'GAME_PREFIX \+ "([^"]+)"', _read(os.path.join(d, "sw.js"))).group(1)
+    assert cache(HANT) != cache(DIST), "hant cache name must hash hant content"
+
+
+def test_hant_offline_no_loop():
+    """간체판만 설치된 채 오프라인에서 번체판을 열어도 /zh-hant/zh-hant/… 고리가 없음"""
+    _build("--out", DEV_OUT)
+    b = _Browser(DEV_OUT)
+    try:
+        pg = b.page
+        pg.goto(b.url)
+        b.home()
+        b.wait_controlled()
+        pg.evaluate("localStorage.setItem('haechi-korean.lang', 'hant')")
+        navs = []
+        pg.on("framenavigated", lambda fr: navs.append(fr.url) if fr == pg.main_frame else None)
+        b.context.set_offline(True)
+        try:
+            pg.goto(b.url + "zh-hant/", timeout=10_000)
+        except Exception:  # noqa: BLE001  오프라인이라 열리지 않는 것은 괜찮음(설계서 3.3)
+            pass
+        pg.wait_for_timeout(3000)
+        b.context.set_offline(False)
+        print("    navigations: %d, last %s" % (len(navs), navs[-1:] if navs else None))
+        assert not any("zh-hant/zh-hant" in u for u in navs), navs[:5]
+        assert len(navs) <= 3, len(navs)
+    finally:
+        b.close()
+
+
+def test_ci_checks_hant():
+    ci = _read(os.path.join(ROOT, ".github", "workflows", "deploy.yml"))
+    assert "opencc-python-reimplemented==0.1.7" in ci
+    for name in ("test_hant_files", "test_hant_is_traditional", "test_hant_only_cjk_changed", "test_hant_cache_prefix"):
+        assert name in ci, name
 
 
 def main():

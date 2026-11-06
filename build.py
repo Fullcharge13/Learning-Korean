@@ -356,6 +356,33 @@ def _hant_overrides():
         return [(r["from"], r["to"]) for r in csv.DictReader(f) if r["from"]]
 
 
+def _hant_rename(dst):
+    """번체판 장 파일 이름·저장본 이름의 지문을 번체 내용으로 다시 만든다(고칠 말 표만 바뀌어도 새 판이 퍼지게)."""
+    lessons = os.path.join(dst, "lessons")
+    names = {}
+    for old in sorted(os.listdir(lessons)):
+        with open(os.path.join(lessons, old), "rb") as f:
+            digest = hashlib.sha256(f.read()).hexdigest()
+        new = re.sub(r"-[0-9a-f]{8}\.json$", "-%s.json" % digest[:8], old)
+        os.rename(os.path.join(lessons, old), os.path.join(lessons, new))
+        names["lessons/" + old] = "lessons/" + new
+    texts = {}
+    for rel in ("index.html", "sw.js"):
+        with open(os.path.join(dst, rel), encoding="utf-8") as f:
+            text = f.read()
+        for a, b in names.items():
+            text = text.replace(a, b)
+        texts[rel] = text
+    h = hashlib.sha256(texts["index.html"].encode("utf-8"))
+    for rel in ["manifest.webmanifest", "licenses.txt"] + sorted(names.values()):
+        with open(os.path.join(dst, rel), "rb") as f:
+            h.update(f.read())
+    texts["sw.js"] = re.sub(r'(GAME_PREFIX \+ "[^"]*-)[0-9a-f]{10}(")', lambda m: m.group(1) + h.hexdigest()[:10] + m.group(2), texts["sw.js"], count=1)
+    for rel, text in texts.items():
+        with open(os.path.join(dst, rel), "w", encoding="utf-8") as f:
+            f.write(text)
+
+
 def build_hant(out):
     """간체판 결과(out/)를 변환해 out/zh-hant/에 번체판을 쓴다. 그림·아이콘은 복사(묶음 JS 경로를 고치지 않게)."""
     dst = os.path.join(out, HANT_DIR)
@@ -364,10 +391,15 @@ def build_hant(out):
     for rel in HANT_TEXT + tuple("lessons/" + n for n in sorted(os.listdir(os.path.join(out, "lessons")))):
         with open(os.path.join(out, rel), encoding="utf-8") as f:
             text = to_hant(f.read(), ov)
+        if rel == "manifest.webmanifest":  # 번체판 홈 화면 앱이 간체판(../)으로 바꿔도 앱 범위 안에 있게
+            m = json.loads(text)
+            m["scope"] = "../"
+            text = json.dumps(m, ensure_ascii=False, indent=2) + "\n"
         with open(os.path.join(dst, rel), "w", encoding="utf-8") as f:
             f.write(text)
     for d in ("img", "icons"):
         shutil.copytree(os.path.join(out, d), os.path.join(dst, d))
+    _hant_rename(dst)
     raw = os.path.getsize(os.path.join(dst, "index.html"))
     print("zh-hant/index.html raw %.1f KB" % (raw / 1024))
     if raw > MAX_RAW:
