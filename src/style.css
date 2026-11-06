@@ -332,6 +332,11 @@ main { padding: 16px calc(16px + var(--sar)) 0 calc(16px + var(--sal)); }
 .tag.check { background: var(--sun-soft); color: var(--sun-ink); }
 .tag.code-tag { background: var(--navy); color: #fff; }
 .q { font-size: 1.2rem; margin: 2px 0 14px; white-space: pre-line; }
+.sent { background: var(--sun-soft); border-radius: 16px; padding: 12px 14px; margin: -4px 0 14px; display: grid; gap: 4px; min-width: 0; }
+.sent p { margin: 0; overflow-wrap: anywhere; }
+.sent-ko { font-size: 1.25rem; font-weight: 700; line-height: 1.5; word-break: keep-all; }
+.sent-zh { font-size: .95rem; color: var(--ink-2); }
+.blank { color: var(--sun-ink); border-bottom: 3px solid var(--sun-deep); padding: 0 2px; }
 .options { display: grid; gap: 10px; }
 .opt {
   display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; text-align: left;
