@@ -119,7 +119,9 @@ def third_party_notices(inputs):
     parts = ["獬豸老师教韩语 — 使用的开源软件与许可 (Third-party notices)", "",
              "本应用包含以下开源软件。感谢各位作者。", "",
              "单词数据：Open Yonsei Korean Vocabulary（CC BY-SA 3.0）",
-             "https://github.com/Amulopapa67/open-yonsei-korean-vocabulary", ""]
+             "https://github.com/Amulopapa67/open-yonsei-korean-vocabulary", "",
+             "词典资料（词性、汉字词来源等）：韩国国立国语院《韩国语基础词典》（CC BY-SA 2.0 KR）",
+             "https://krdict.korean.go.kr/  ·  https://creativecommons.org/licenses/by-sa/2.0/kr/", ""]
     for pkg in bundled_packages(inputs):
         d = os.path.join(ROOT, "node_modules", *pkg.split("/"))
         with open(os.path.join(d, "package.json"), encoding="utf-8") as f:

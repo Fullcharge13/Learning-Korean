@@ -107,7 +107,7 @@ export function render(root, ctx) {
         <button class="btn ghost wide" id="install">如何添加到主屏幕</button>
       </section>
       <p class="ver center">獬豸老师教韩语 ${esc(ctx.version)} · <a class="lic-link" href="licenses.txt" target="_blank" rel="noopener">开源软件</a></p>
-      <p class="muted center credit">单词：<a class="lic-link" href="https://github.com/Amulopapa67/open-yonsei-korean-vocabulary" target="_blank" rel="noopener">Open Yonsei Korean Vocabulary</a>（《延世韩国语》第一、二册，CC BY-SA 3.0，部分释义经过修改）<br>本应用与延世大学无关。</p>
+      <p class="muted center credit">单词：<a class="lic-link" href="https://github.com/Amulopapa67/open-yonsei-korean-vocabulary" target="_blank" rel="noopener">Open Yonsei Korean Vocabulary</a>（《延世韩国语》第一、二册，CC BY-SA 3.0，部分释义经过修改）<br>词典资料：韩国国立国语院《<a class="lic-link" href="https://krdict.korean.go.kr/" target="_blank" rel="noopener">韩国语基础词典</a>》（CC BY-SA 2.0 KR）<br>本应用与延世大学无关。</p>
     </main>
     ${tabBar("settings")}
   </div>`;
