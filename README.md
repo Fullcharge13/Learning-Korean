@@ -45,7 +45,7 @@
 ```
 src/                화면·규칙 코드, src/img/ 해치·물건 그림(PNG)
 data/lessons/       1~20장 레슨 표(자동 생성, 2권은 11~20장)
-data/zh-review.csv  단어 뜻 검토 결과(고침 90, 보류 0)
+data/zh-review.csv  단어 뜻 검토 결과(고침 칸·한국어·품사 고침 칸, 보류 0)
 data/items.js       전통 물건 표
 vendor/open-yonsei/ 원본 단어 자료(고치지 않음)
 tools/              레슨 생성, 그림 자르기, 개발 서버, 아이콘

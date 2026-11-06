@@ -8,10 +8,10 @@ export const LESSONS = [
   "title": "第1单元 (1)",
   "goal": "认识 8 个新单词",
   "summary": [
-   "설렁탕 = 牛杂碎汤",
+   "설렁탕 = 雪浓汤（牛骨汤）",
    "파 = 葱",
    "말다 = 泡",
-   "반찬 = 菜"
+   "반찬 = 小菜，配菜"
   ],
   "cards": [
    {
@@ -19,7 +19,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "설렁탕",
-      "zh": "牛杂碎汤"
+      "zh": "雪浓汤（牛骨汤）"
      },
      {
       "ko": "파",
@@ -31,7 +31,7 @@ export const LESSONS = [
      },
      {
       "ko": "반찬",
-      "zh": "菜",
+      "zh": "小菜，配菜",
       "hanja": "饭馔"
      }
     ]
@@ -64,13 +64,13 @@ export const LESSONS = [
     "concept": "v02-c02-u01-001",
     "q": "「설렁탕」是什么意思？",
     "options": [
-     "牛杂碎汤",
-     "沙拉",
+     "雪浓汤（牛骨汤）",
+     "汤碗",
      "鸡肉",
      "面条"
     ],
     "answer": 0,
-    "explain": "설렁탕 = 牛杂碎汤"
+    "explain": "설렁탕 = 雪浓汤（牛骨汤）"
    },
    {
     "type": "choice",
@@ -100,13 +100,13 @@ export const LESSONS = [
     "concept": "v02-c02-u01-004",
     "q": "「반찬」是什么意思？",
     "options": [
-     "菜",
-     "健康",
+     "小菜，配菜",
+     "勺子",
      "肉",
      "皮"
     ],
     "answer": 0,
-    "explain": "반찬 = 菜 · 饭馔 = 반·찬"
+    "explain": "반찬 = 小菜，配菜 · 饭馔 = 반·찬"
    },
    {
     "type": "choice",
@@ -137,9 +137,9 @@ export const LESSONS = [
     "q": "「넣다」是什么意思？",
     "options": [
      "放",
-     "提 拿",
-     "炒",
-     "炸"
+     "搅拌",
+     "消除，去掉",
+     "炒"
     ],
     "answer": 0,
     "explain": "넣다 = 放"
@@ -163,9 +163,9 @@ export const LESSONS = [
     "q": "「뿌리다」是什么意思？",
     "options": [
      "撒",
-     "煮 水或汤",
+     "烤",
      "停车",
-     "明亮"
+     "水煮（鸡蛋、面条等）"
     ],
     "answer": 0,
     "explain": "뿌리다 = 撒"
@@ -256,8 +256,8 @@ export const LESSONS = [
     "q": "「비비다」是什么意思？",
     "options": [
      "拌",
-     "说明",
-     "煮 炖食物",
+     "蒸",
+     "煮，烧开",
      "切"
     ],
     "answer": 0,
@@ -293,7 +293,7 @@ export const LESSONS = [
     "options": [
      "野菜",
      "乌冬面",
-     "炒粉丝",
+     "海鲜辣汤面",
      "葱"
     ],
     "answer": 0,
@@ -331,7 +331,7 @@ export const LESSONS = [
     "q": "「참기름」是什么意思？",
     "options": [
      "香油",
-     "生鱼片 生肉片",
+     "理由",
      "鸭子",
      "鸡肉"
     ],
@@ -370,8 +370,8 @@ export const LESSONS = [
     "options": [
      "韩服",
      "酱缸",
-     "牛杂碎汤",
-     "沙拉"
+     "烹饪方法",
+     "汤碗"
     ],
     "answer": 0,
     "explain": "한복 = 韩服 · 韩服 = 한·복"
@@ -405,9 +405,9 @@ export const LESSONS = [
     "q": "「고추장」是什么意思？",
     "options": [
      "辣椒酱",
-     "拌饭",
+     "披萨",
      "鼻子",
-     "猪肉"
+     "煎饼"
     ],
     "answer": 0,
     "explain": "고추장 = 辣椒酱"
@@ -457,7 +457,7 @@ export const LESSONS = [
      },
      {
       "ko": "회",
-      "zh": "生鱼片 生肉片",
+      "zh": "生鱼片",
       "hanja": "脍"
      },
      {
@@ -515,9 +515,9 @@ export const LESSONS = [
     "q": "「좀」是什么意思？",
     "options": [
      "一点儿",
-     "锅",
-     "印象深刻的",
-     "大豆"
+     "野菜",
+     "双手",
+     "大酱"
     ],
     "answer": 0,
     "explain": "좀 = 一点儿"
@@ -540,13 +540,13 @@ export const LESSONS = [
     "concept": "v02-c02-u02-006",
     "q": "「회」是什么意思？",
     "options": [
-     "生鱼片 生肉片",
-     "墙",
-     "披萨",
-     "咸淡"
+     "生鱼片",
+     "声音",
+     "意大利面",
+     "地方，场所"
     ],
     "answer": 0,
-    "explain": "회 = 生鱼片 生肉片 · 脍 = 회"
+    "explain": "회 = 生鱼片 · 脍 = 회"
    },
    {
     "type": "choice",
@@ -554,9 +554,9 @@ export const LESSONS = [
     "q": "「탕수육」是什么意思？",
     "options": [
      "糖醋肉",
-     "墙",
+     "声音",
      "酸奶",
-     "错误 失误"
+     "长辈"
     ],
     "answer": 0,
     "explain": "탕수육 = 糖醋肉 · 糖水肉 = 탕·수·육"
@@ -595,7 +595,7 @@ export const LESSONS = [
   "title": "第2单元 (2)",
   "goal": "认识 11 个新单词",
   "summary": [
-   "짬뽕 = 什锦面",
+   "짬뽕 = 海鲜辣汤面",
    "샐러드 = 沙拉",
    "우동 = 乌冬面",
    "피자 = 披萨"
@@ -606,7 +606,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "짬뽕",
-      "zh": "什锦面"
+      "zh": "海鲜辣汤面"
      },
      {
       "ko": "샐러드",
@@ -670,13 +670,13 @@ export const LESSONS = [
     "concept": "v02-c02-u02-009",
     "q": "「짬뽕」是什么意思？",
     "options": [
-     "什锦面",
+     "海鲜辣汤面",
      "饭桌",
-     "炖排骨",
+     "火，灯光",
      "印象深刻的"
     ],
     "answer": 0,
-    "explain": "짬뽕 = 什锦面"
+    "explain": "짬뽕 = 海鲜辣汤面"
    },
    {
     "type": "choice",
@@ -707,7 +707,7 @@ export const LESSONS = [
     "q": "「피자」是什么意思？",
     "options": [
      "披萨",
-     "煎饼",
+     "炸猪排",
      "首先",
      "面条"
     ],
@@ -807,7 +807,7 @@ export const LESSONS = [
      "大豆",
      "葱",
      "首先",
-     "肉"
+     "糖醋肉"
     ],
     "answer": 0,
     "explain": "콩 = 大豆"
@@ -821,7 +821,7 @@ export const LESSONS = [
   "goal": "认识 8 个新单词",
   "summary": [
    "우선 = 首先",
-   "끓이다 = 煮 水或汤",
+   "끓이다 = 煮，烧开",
    "돼지고기 = 猪肉",
    "썰다 = 切"
   ],
@@ -836,7 +836,7 @@ export const LESSONS = [
      },
      {
       "ko": "끓이다",
-      "zh": "煮 水或汤"
+      "zh": "煮，烧开"
      },
      {
       "ko": "돼지고기",
@@ -877,9 +877,9 @@ export const LESSONS = [
     "q": "「우선」是什么意思？",
     "options": [
      "首先",
-     "错误 失误",
+     "长辈",
      "面条",
-     "理由"
+     "猪肉"
     ],
     "answer": 0,
     "explain": "우선 = 首先 · 优先 = 우·선"
@@ -887,7 +887,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c02-u03-002",
-    "q": "「煮 水或汤」用韩语怎么说？",
+    "q": "「煮，烧开」用韩语怎么说？",
     "options": [
      "끓이다",
      "비비다",
@@ -895,7 +895,7 @@ export const LESSONS = [
      "볶다"
     ],
     "answer": 0,
-    "explain": "끓이다 = 煮 水或汤"
+    "explain": "끓이다 = 煮，烧开"
    },
    {
     "type": "order",
@@ -916,8 +916,8 @@ export const LESSONS = [
     "options": [
      "切",
      "出",
-     "搅拌",
-     "放下"
+     "撒",
+     "明亮"
     ],
     "answer": 0,
     "explain": "썰다 = 切"
@@ -953,7 +953,7 @@ export const LESSONS = [
     "options": [
      "烤",
      "吸",
-     "调配，配合",
+     "蘸",
      "剁"
     ],
     "answer": 0,
@@ -994,7 +994,7 @@ export const LESSONS = [
   "goal": "认识 8 个新单词",
   "summary": [
    "볶다 = 炒",
-   "삶다 = 煮 炖食物",
+   "삶다 = 水煮（鸡蛋、面条等）",
    "찌다 = 蒸",
    "다지다 = 剁"
   ],
@@ -1008,7 +1008,7 @@ export const LESSONS = [
      },
      {
       "ko": "삶다",
-      "zh": "煮 炖食物"
+      "zh": "水煮（鸡蛋、面条等）"
      },
      {
       "ko": "찌다",
@@ -1050,8 +1050,8 @@ export const LESSONS = [
     "q": "「볶다」是什么意思？",
     "options": [
      "炒",
-     "提 拿",
-     "蘸",
+     "搅拌",
+     "结束，完成",
      "泡"
     ],
     "answer": 0,
@@ -1060,7 +1060,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c02-u03-010",
-    "q": "「煮 炖食物」用韩语怎么说？",
+    "q": "「水煮（鸡蛋、面条等）」用韩语怎么说？",
     "options": [
      "삶다",
      "주차하다",
@@ -1068,7 +1068,7 @@ export const LESSONS = [
      "피우다"
     ],
     "answer": 0,
-    "explain": "삶다 = 煮 炖食物"
+    "explain": "삶다 = 水煮（鸡蛋、面条等）"
    },
    {
     "type": "order",
@@ -1086,8 +1086,8 @@ export const LESSONS = [
     "q": "「다지다」是什么意思？",
     "options": [
      "剁",
-     "炒",
-     "除去 消除",
+     "消除，去掉",
+     "调配，配合",
      "吸"
     ],
     "answer": 0,
@@ -1123,9 +1123,9 @@ export const LESSONS = [
     "q": "「설명하다」是什么意思？",
     "options": [
      "说明",
-     "煮 炖食物",
-     "除去 消除",
-     "烤"
+     "煮，烧开",
+     "调配，配合",
+     "炸"
     ],
     "answer": 0,
     "explain": "설명하다 = 说明"
@@ -1222,9 +1222,9 @@ export const LESSONS = [
     "q": "「카레」是什么意思？",
     "options": [
      "咖喱",
-     "健康",
      "勺子",
-     "烹饪方法"
+     "印象深刻的",
+     "炖排骨"
     ],
     "answer": 0,
     "explain": "카레 = 咖喱"
@@ -1260,9 +1260,9 @@ export const LESSONS = [
     "q": "「면」是什么意思？",
     "options": [
      "面条",
-     "烹饪方法",
-     "菜",
-     "健康"
+     "炖排骨",
+     "舞蹈",
+     "勺子"
     ],
     "answer": 0,
     "explain": "면 = 面条 · 面 = 면"
@@ -1298,9 +1298,9 @@ export const LESSONS = [
     "q": "「오리」是什么意思？",
     "options": [
      "鸭子",
+     "筷子",
      "糖醋肉",
-     "肉",
-     "咖喱"
+     "咸淡"
     ],
     "answer": 0,
     "explain": "오리 = 鸭子"
@@ -1325,8 +1325,8 @@ export const LESSONS = [
     "options": [
      "酸奶",
      "酱缸",
-     "肉",
-     "生鱼片 生肉片"
+     "糖醋肉",
+     "理由"
     ],
     "answer": 0,
     "explain": "요구르트 = 酸奶"
@@ -1385,9 +1385,9 @@ export const LESSONS = [
     "q": "「껍질」是什么意思？",
     "options": [
      "皮",
-     "肉",
-     "煎饼",
-     "传统"
+     "糖醋肉",
+     "炸猪排",
+     "健康"
     ],
     "answer": 0,
     "explain": "껍질 = 皮"
@@ -1422,8 +1422,8 @@ export const LESSONS = [
     "options": [
      "墙",
      "酱缸",
-     "咖喱",
-     "意大利面"
+     "咸淡",
+     "小菜，配菜"
     ],
     "answer": 0,
     "explain": "벽 = 墙 · 壁 = 벽"
@@ -1476,9 +1476,9 @@ export const LESSONS = [
   "goal": "认识 8 个新单词",
   "summary": [
    "윗사람 = 长辈",
-   "다른 = 别的 其他的",
+   "다른 = 别的，其他的",
    "예절 = 礼节",
-   "들다 = 提 拿"
+   "들다 = 拿，拿起"
   ],
   "cards": [
    {
@@ -1490,7 +1490,7 @@ export const LESSONS = [
      },
      {
       "ko": "다른",
-      "zh": "别的 其他的"
+      "zh": "别的，其他的"
      },
      {
       "ko": "예절",
@@ -1499,7 +1499,7 @@ export const LESSONS = [
      },
      {
       "ko": "들다",
-      "zh": "提 拿"
+      "zh": "拿，拿起"
      }
     ]
    },
@@ -1533,9 +1533,9 @@ export const LESSONS = [
     "q": "「윗사람」是什么意思？",
     "options": [
      "长辈",
-     "糖醋肉",
-     "意大利面",
-     "大酱"
+     "筷子",
+     "小菜，配菜",
+     "失误，差错"
     ],
     "answer": 0,
     "explain": "윗사람 = 长辈"
@@ -1543,7 +1543,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c02-u04-002",
-    "q": "「别的 其他的」用韩语怎么说？",
+    "q": "「别的，其他的」用韩语怎么说？",
     "options": [
      "다른",
      "불",
@@ -1551,7 +1551,7 @@ export const LESSONS = [
      "참기름"
     ],
     "answer": 0,
-    "explain": "다른 = 别的 其他的"
+    "explain": "다른 = 别的，其他的"
    },
    {
     "type": "order",
@@ -1568,13 +1568,13 @@ export const LESSONS = [
     "concept": "v02-c02-u04-004",
     "q": "「들다」是什么意思？",
     "options": [
-     "提 拿",
+     "拿，拿起",
      "出",
-     "过",
-     "除去 消除"
+     "说明",
+     "调配，配合"
     ],
     "answer": 0,
-    "explain": "들다 = 提 拿"
+    "explain": "들다 = 拿，拿起"
    },
    {
     "type": "choice",
@@ -1607,9 +1607,9 @@ export const LESSONS = [
     "q": "「냄비」是什么意思？",
     "options": [
      "锅",
-     "生鱼片 生肉片",
-     "肉",
-     "大豆"
+     "理由",
+     "糖醋肉",
+     "大酱"
     ],
     "answer": 0,
     "explain": "냄비 = 锅"
@@ -1634,7 +1634,7 @@ export const LESSONS = [
     "options": [
      "放下",
      "盛出，减少",
-     "蒸",
+     "结束",
      "泡"
     ],
     "answer": 0,
@@ -1692,7 +1692,7 @@ export const LESSONS = [
      },
      {
       "ko": "마치다",
-      "zh": "完 结束"
+      "zh": "结束，完成"
      }
     ]
    },
@@ -1701,7 +1701,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "실수",
-      "zh": "错误 失误",
+      "zh": "失误，差错",
       "hanja": "失手"
      },
      {
@@ -1714,7 +1714,7 @@ export const LESSONS = [
      },
      {
       "ko": "지나다",
-      "zh": "过"
+      "zh": "经过，过"
      }
     ]
    }
@@ -1727,8 +1727,8 @@ export const LESSONS = [
     "options": [
      "勺子",
      "饭桌",
-     "理由",
-     "大酱"
+     "猪肉",
+     "失误，差错"
     ],
     "answer": 0,
     "explain": "숟가락 = 勺子"
@@ -1763,9 +1763,9 @@ export const LESSONS = [
     "q": "「코」是什么意思？",
     "options": [
      "鼻子",
-     "炖排骨",
-     "汤碗",
-     "油炸食物"
+     "火，灯光",
+     "拌饭",
+     "沙拉"
     ],
     "answer": 0,
     "explain": "코 = 鼻子"
@@ -1799,9 +1799,9 @@ export const LESSONS = [
     "q": "「내다」是什么意思？",
     "options": [
      "出",
-     "除去 消除",
-     "拌",
-     "炒"
+     "调配，配合",
+     "拿，拿起",
+     "消除，去掉"
     ],
     "answer": 0,
     "explain": "내다 = 出"
@@ -1809,7 +1809,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c02-u04-016",
-    "q": "「完 结束」用韩语怎么说？",
+    "q": "「结束，完成」用韩语怎么说？",
     "options": [
      "마치다",
      "말다",
@@ -1817,17 +1817,17 @@ export const LESSONS = [
      "뿌리다"
     ],
     "answer": 0,
-    "explain": "마치다 = 完 结束"
+    "explain": "마치다 = 结束，完成"
    },
    {
     "type": "order",
     "concept": "v02-c02-u04-017",
-    "q": "按顺序点音节：「错误 失误」",
+    "q": "按顺序点音节：「失误，差错」",
     "lines": [
      "실",
      "수"
     ],
-    "explain": "실수 = 错误 失误 · 失手 = 실·수"
+    "explain": "실수 = 失误，差错 · 失手 = 실·수"
    },
    {
     "type": "choice",
@@ -1835,8 +1835,8 @@ export const LESSONS = [
     "q": "「피우다」是什么意思？",
     "options": [
      "吸",
-     "明亮",
-     "结束",
+     "水煮（鸡蛋、面条等）",
+     "经过，过",
      "停车"
     ],
     "answer": 0,
@@ -1858,26 +1858,26 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v02-c02-u04-020",
-    "q": "按顺序点音节：「过」",
+    "q": "按顺序点音节：「经过，过」",
     "lines": [
      "지",
      "나",
      "다"
     ],
-    "explain": "지나다 = 过"
+    "explain": "지나다 = 经过，过"
    },
    {
     "type": "check",
     "concept": "v02-c02-u04-016",
     "q": "「마치다」是什么意思？",
     "options": [
-     "完 结束",
-     "蒸",
-     "烤",
+     "结束，完成",
+     "经过，过",
+     "炒",
      "剁"
     ],
     "answer": 0,
-    "explain": "마치다 = 完 结束"
+    "explain": "마치다 = 结束，完成"
    }
   ]
  },
@@ -1942,7 +1942,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "없애다",
-      "zh": "除去 消除"
+      "zh": "消除，去掉"
      },
      {
       "ko": "찹쌀가루",
@@ -1966,9 +1966,9 @@ export const LESSONS = [
     "q": "「불」是什么意思？",
     "options": [
      "火，灯光",
-     "炒粉丝",
-     "理由",
-     "菜"
+     "油炸食物",
+     "猪肉",
+     "舞蹈"
     ],
     "answer": 0,
     "explain": "불 = 火，灯光"
@@ -1992,9 +1992,9 @@ export const LESSONS = [
     "q": "「곳」是什么意思？",
     "options": [
      "地方，场所",
-     "双手",
-     "声音",
-     "胡椒"
+     "味儿",
+     "大豆",
+     "肉"
     ],
     "answer": 0,
     "explain": "곳 = 地方，场所"
@@ -2005,9 +2005,9 @@ export const LESSONS = [
     "q": "「이유」是什么意思？",
     "options": [
      "理由",
-     "胡椒",
-     "烹饪方法",
-     "错误 失误"
+     "肉",
+     "炖排骨",
+     "长辈"
     ],
     "answer": 0,
     "explain": "이유 = 理由 · 理由 = 이·유"
@@ -2041,9 +2041,9 @@ export const LESSONS = [
     "q": "「장독」是什么意思？",
     "options": [
      "酱缸",
-     "拌饭",
-     "油炸食物",
-     "胡椒"
+     "披萨",
+     "沙拉",
+     "肉"
     ],
     "answer": 0,
     "explain": "장독 = 酱缸"
@@ -2064,13 +2064,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v02-c02-u05-009",
-    "q": "按顺序点音节：「除去 消除」",
+    "q": "按顺序点音节：「消除，去掉」",
     "lines": [
      "없",
      "애",
      "다"
     ],
-    "explain": "없애다 = 除去 消除"
+    "explain": "없애다 = 消除，去掉"
    },
    {
     "type": "choice",
@@ -2151,7 +2151,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c02-u04-016",
-    "q": "「完 结束」用韩语怎么说？",
+    "q": "「结束，完成」用韩语怎么说？",
     "options": [
      "마치다",
      "말다",
@@ -2159,7 +2159,7 @@ export const LESSONS = [
      "뿌리다"
     ],
     "answer": 0,
-    "explain": "마치다 = 完 结束"
+    "explain": "마치다 = 结束，完成"
    },
    {
     "type": "choice",
@@ -2169,7 +2169,7 @@ export const LESSONS = [
      "大豆",
      "葱",
      "首先",
-     "肉"
+     "糖醋肉"
     ],
     "answer": 0,
     "explain": "콩 = 大豆"
@@ -2180,9 +2180,9 @@ export const LESSONS = [
     "q": "「끝내다」是什么意思？",
     "options": [
      "结束",
-     "明亮",
-     "炒",
-     "煮 炖食物"
+     "水煮（鸡蛋、面条等）",
+     "消除，去掉",
+     "煮，烧开"
     ],
     "answer": 0,
     "explain": "끝내다 = 结束"
@@ -2216,8 +2216,8 @@ export const LESSONS = [
     "q": "「다지다」是什么意思？",
     "options": [
      "剁",
-     "炒",
-     "除去 消除",
+     "消除，去掉",
+     "调配，配合",
      "吸"
     ],
     "answer": 0,
@@ -2241,13 +2241,13 @@ export const LESSONS = [
     "concept": "v02-c02-u04-016",
     "q": "「마치다」是什么意思？",
     "options": [
-     "完 结束",
-     "蒸",
-     "烤",
+     "结束，完成",
+     "经过，过",
+     "炒",
      "剁"
     ],
     "answer": 0,
-    "explain": "마치다 = 完 结束"
+    "explain": "마치다 = 结束，完成"
    }
   ]
  }

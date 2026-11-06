@@ -68,3 +68,42 @@ def test_no_hangul_or_broken_brackets_in_meanings():
         if re.search("[가-힣]", outside) or final.count("（") != final.count("）") or "(" in final or ")" in final:
             bad.append((r["entry_id"], final))
     assert not bad, bad
+
+
+RECHECK = os.path.join(ROOT, "docs", "review", "2026-11-06-재검수-고칠목록.csv")
+
+
+def _final():
+    from make_lessons import load_words
+    return {w["entry_id"]: w for w in load_words(VOCABS, REVIEW)}
+
+
+def test_recheck_list_applied():
+    """2026-11-06 1~20장 재검수 236개가 최종 뜻에 들어감"""
+    with open(RECHECK, encoding="utf-8-sig", newline="") as f:
+        want = {r["entry_id"]: r["고칠 뜻(최종)"] for r in csv.DictReader(f)}
+    assert len(want) == 236
+    final = _final()
+    bad = [(k, final[k]["zh"], v) for k, v in want.items() if final[k]["zh"] != v]
+    assert not bad, bad[:10]
+
+
+def test_recheck_samples():
+    final = _final()
+    by_ko = {w["ko"]: w for w in final.values()}
+    assert by_ko["환전"]["zh"] == "换钱；兑换外币"
+    assert by_ko["대출하다"]["zh"] == "借（书），借阅"
+    assert final["v01-c07-u04-018"]["zh"] == "车，汽车"
+    assert (final["v01-c03-u02-046"]["zh"], final["v01-c03-u02-046"]["pos"]) == ("不，没（否定）", "부사")
+    assert final["v01-c02-u03-016"]["zh"] == "里面"
+
+
+def test_korean_typos_fixed():
+    final = _final()
+    assert final["v02-c08-u01-008"]["ko"] == "배탈이 나다"
+    assert final["v02-c09-u02-007"]["ko"] == "여행 경비"
+
+
+def test_no_space_separated_senses():
+    bad = [(k, w["zh"]) for k, w in _final().items() if re.search(r"[一-鿿] +[一-鿿]", w["zh"])]
+    assert not bad, bad[:10]
