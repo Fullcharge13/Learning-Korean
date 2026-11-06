@@ -5,7 +5,7 @@
     python3 tools/dev.py --port 9000
     python3 tools/dev.py --build-only  # 묶기만 (시험 도구가 씀)
 
-dev/ 구성: index.html · style.css · app.js(묶음)
+dev/ 구성: index.html · style.css · lang.js · app.js(묶음)
 """
 import argparse
 import functools
@@ -34,6 +34,7 @@ def build():
     with open(os.path.join(DEV, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
     shutil.copy(os.path.join(SRC, "style.css"), os.path.join(DEV, "style.css"))
+    shutil.copy(os.path.join(SRC, "lang.js"), os.path.join(DEV, "lang.js"))
     shutil.rmtree(os.path.join(DEV, "img"), ignore_errors=True)
     shutil.copytree(os.path.join(SRC, "img"), os.path.join(DEV, "img"))
     size = os.path.getsize(os.path.join(DEV, "app.js"))

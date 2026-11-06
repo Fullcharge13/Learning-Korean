@@ -260,6 +260,8 @@ def build(out, update_docs_icons=False, build_id="", lessons_dir=None):
     with open(os.path.join(SRC, "index.html"), encoding="utf-8") as f:
         html = f.read()
 
+    with open(os.path.join(SRC, "lang.js"), encoding="utf-8") as f:
+        html = replace_block(html, "LANG", "<script>" + inline_script(f.read()) + "</script>")
     html = replace_block(html, "STYLE", "<style>" + b["css"].replace("</", "<\\/") + "</style>")
     html = html.replace("</title>\n", "</title>\n" + HEAD_LINKS.format(
         version=version, build_meta=('\n<meta name="ria-build" content="%s">' % html_attr(build_id)) if build_id else ""), 1)
