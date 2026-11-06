@@ -248,7 +248,7 @@ class _Server(socketserver.ThreadingMixIn, http.server.HTTPServer):
 class _Browser:
     """빌드 폴더 하나를 새 서버·새 브라우저 문맥으로 연다(서비스 작업자가 시험끼리 섞이지 않게)."""
 
-    def __init__(self, folder, service_workers="allow", init_save=None):
+    def __init__(self, folder, service_workers="allow", init_save=None, locale=None):
         from playwright.sync_api import sync_playwright
         _Handler.STATE.update(block_pyodide=False, slow_s=0, block_chapters=False, slow_chapter_s=0,
                               chapter_404=False, block_names=(), block_sw=False)
@@ -258,6 +258,8 @@ class _Browser:
         self.pw = sync_playwright().start()
         self.browser = self.pw.chromium.launch()
         device = {k: v for k, v in self.pw.devices["iPhone 17"].items() if k != "default_browser_type"}
+        if locale:
+            device["locale"] = locale
         self.context = self.browser.new_context(service_workers=service_workers, **device)
         if init_save is not None:
             self.context.add_init_script("if (!sessionStorage.getItem('seeded')) { localStorage.setItem('haechi-korean.save', %s); sessionStorage.setItem('seeded', '1'); }"
@@ -794,6 +796,100 @@ def test_third_party_notices():
     assert '"licenses.txt"' in sw, "licenses.txt must be precached for offline"
     html = _read(os.path.join(DIST, "index.html"))
     assert "licenses.txt" in html, "settings must link to licenses.txt"
+
+HANT = os.path.join(DIST, "zh-hant")
+CJK = re.compile(r"[㐀-鿿豈-﫿]")
+
+
+def _opencc(cfg):
+    import opencc
+    return opencc.OpenCC(cfg)
+
+
+def test_hant_files():
+    _build()
+    for f in ("index.html", "manifest.webmanifest", "sw.js", "licenses.txt"):
+        assert os.path.isfile(os.path.join(HANT, f)), f
+    m = json.loads(_read(os.path.join(HANT, "manifest.webmanifest")))
+    assert m["name"] == "獬豸老師教韓語" and m["lang"] == "zh-Hant", m
+    assert sorted(os.listdir(os.path.join(HANT, "lessons"))) == sorted(os.listdir(os.path.join(DIST, "lessons")))
+    assert len(os.listdir(os.path.join(HANT, "lessons"))) == 20
+    for d in ("img", "icons"):
+        assert sorted(os.listdir(os.path.join(HANT, d))) == sorted(os.listdir(os.path.join(DIST, d))), d
+    assert len(_read(os.path.join(HANT, "index.html")).encode()) <= MAX_RAW
+
+
+def _hant_texts():
+    yield "index.html", _read(os.path.join(HANT, "index.html")), _read(os.path.join(DIST, "index.html"))
+    for f in sorted(os.listdir(os.path.join(HANT, "lessons"))):
+        yield f, _read(os.path.join(HANT, "lessons", f)), _read(os.path.join(DIST, "lessons", f))
+
+
+def test_hant_is_traditional():
+    _build()
+    # 간체 전용 글자가 남았으면 한 번 더 s2twp 했을 때 바뀜. (s2t는 吃→喫 같은 옛 글자를 골라 대만 기준과 다름)
+    s2twp = _opencc("s2twp")
+    for name, hant, _ in _hant_texts():
+        runs = re.findall(r"[\u3400-\u9fff\uf900-\ufaff]+", hant)  # 한자 덩어리마다(덩어리끼리 이어 붙이면 없는 낱말이 생김)
+        bad = [r for r in runs if s2twp.convert(r) != r]
+        assert not bad, (name, bad[:5])
+
+
+def test_hant_only_cjk_changed():
+    _build()
+    for name, hant, hans in _hant_texts():
+        back = CJK.sub("", hant).replace("haechi-hant-game-", "haechi-game-").replace("zh-Hant", "zh-Hans")
+        assert back == CJK.sub("", hans), name
+
+
+def test_hant_cache_prefix():
+    _build()
+    for f in ("index.html", "sw.js"):
+        t = _read(os.path.join(HANT, f))
+        assert "haechi-hant-game-" in t and '"haechi-game-' not in t, f
+    sw = _read(os.path.join(DIST, "sw.js"))
+    assert 'key.startsWith(GAME_PREFIX)' in sw and 'startsWith("haechi-")' not in sw
+
+
+def test_hant_overrides():
+    out = os.path.join(OUT, "dist-overrides")
+    table = os.path.join(OUT, "hant-overrides-test.csv")
+    os.makedirs(OUT, exist_ok=True)
+    with open(table, "w", encoding="utf-8") as f:
+        f.write("from,to\n繼續學習,接著學習\n")
+    r = _run_build("--out", out, env=dict(os.environ, HAECHI_HANT_OVERRIDES=table))
+    assert r.returncode == 0, r.stdout + r.stderr
+    t = _read(os.path.join(out, "zh-hant", "index.html"))
+    assert "接著學習" in t and "繼續學習" not in t
+
+
+def test_hant_offline_and_caches_coexist():
+    _build("--out", DEV_OUT)
+    b = _Browser(DEV_OUT)
+    try:
+        pg = b.page
+        pg.goto(b.url)
+        b.home()
+        b.wait_controlled()
+        pg.evaluate("localStorage.setItem('haechi-korean.lang', 'hant')")
+        pg.goto(b.url + "zh-hant/")
+        pg.wait_for_selector(".screen.splash #go", timeout=20_000)
+        pg.wait_for_function("() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL.includes('/zh-hant/')",
+                             timeout=30_000)
+        pg.wait_for_function("""async () => { const k = await caches.keys();
+            return k.some((n) => n.startsWith('haechi-game-')) && k.some((n) => n.startsWith('haechi-hant-game-')); }""",
+                             timeout=30_000)
+        b.context.set_offline(True)
+        resp = pg.reload()
+        assert resp is not None and resp.from_service_worker
+        pg.wait_for_selector(".screen.splash #go", timeout=20_000)
+        assert pg.evaluate("document.documentElement.lang") == "zh-Hant"
+        assert "獬豸老師" in pg.inner_text("body")
+        b.context.set_offline(False)
+        assert b.errors == [], b.errors
+    finally:
+        b.close()
+
 
 def main():
     only = set(sys.argv[1:])  # 이름을 주면 그 시험만

@@ -7,10 +7,11 @@
 //   이름에 내용 지문이 있어 바뀌지 않으므로 저장본 먼저. 게임 저장본에 함께 들어 있어 새 판 활성화 때 함께 지워진다.
 // - GET이 아닌 요청, 다른 주소의 요청은 건드리지 않는다.
 // - 게임 저장본 이름에 판 번호와 내용 지문이 들어 있어, 새 판을 올리면 활성화 때 옛 저장본을 지운다.
-//   저장본 접두는 haechi- (같은 github.io 주소의 리아와 파이썬 저장본을 지우지 않게).
+//   저장본 접두는 GAME_PREFIX만 지운다(같은 주소의 리아와 파이썬 저장본, 다른 글자판 저장본을 지우지 않게).
 
 const VERSION = "__RIA_VERSION__";
-const GAME_CACHE = "haechi-game-__RIA_VERSION__-__RIA_HASH__";
+const GAME_PREFIX = "haechi-game-"; // 번체판(zh-hant/)은 빌드가 haechi-hant-game-으로 바꿈
+const GAME_CACHE = GAME_PREFIX + "__RIA_VERSION__-__RIA_HASH__";
 const GAME_FILES = __RIA_GAME_FILES__;
 const CHAPTER_FILES = __RIA_CHAPTER_FILES__;
 const CHAPTER_RE = /\/lessons\/ch[1-9]\d*-[0-9a-f]{8}\.json$/;
@@ -34,7 +35,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith("haechi-") && key !== GAME_CACHE) await caches.delete(key);
+      if (key.startsWith(GAME_PREFIX) && key !== GAME_CACHE) await caches.delete(key);
     }
     await self.clients.claim();
   })());
