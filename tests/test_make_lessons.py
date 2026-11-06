@@ -311,3 +311,11 @@ def test_fill_explain_keeps_hanja(tmp_path):
     ex = load_examples(_ex(tmp_path, "v01-c01-u01-002,저는 [[학생]]이에요.,我是学生。,cross,"), words)
     it = next(it for l in build_chapter(words, 1, ex)["LESSONS"] for it in l["items"] if "sentence" in it)
     assert it["explain"] == "저는 학생이에요. · 학생 = 学生 · 学生 = 학·생", it["explain"]
+
+
+def test_examples_xreview_2026_11_06():
+    """교차 검수로 다시 쓴 예문·오답 제외가 예문 표에 있음"""
+    rows = {r["entry_id"]: r for r in csv.DictReader(open(os.path.join(ROOT, "data", "examples.csv"), encoding="utf-8", newline=""))}
+    assert rows["v01-c04-u02-030"]["sentence_ko"] == "밥을 먹고 [[식혜]]를 마셨어요."
+    assert rows["v01-c03-u02-046"]["avoid"] == "아주"
+    assert rows["v01-c01-u01-006"]["zh"] == "王平先生是中国人。"

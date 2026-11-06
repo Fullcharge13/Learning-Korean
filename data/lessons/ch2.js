@@ -68,9 +68,9 @@ export const LESSONS = [
     "q": "「점원」是什么意思？",
     "options": [
      "（商店）店员",
-     "床",
+     "店",
      "课本",
-     "杯子"
+     "果汁"
     ],
     "answer": 0,
     "explain": "점원 = （商店）店员 · 店员 = 점·원"
@@ -141,9 +141,9 @@ export const LESSONS = [
     "q": "「잡지」是什么意思？",
     "options": [
      "杂志",
-     "杯子",
-     "啤酒",
-     "洗手间"
+     "果汁",
+     "图书馆",
+     "牛奶"
     ],
     "answer": 0,
     "explain": "잡지 = 杂志 · 杂志 = 잡·지"
@@ -241,8 +241,8 @@ export const LESSONS = [
     "q": "「책상」是什么意思？",
     "options": [
      "书桌",
-     "啤酒",
-     "尺",
+     "图书馆",
+     "市场",
      "书店"
     ],
     "answer": 0,
@@ -267,9 +267,9 @@ export const LESSONS = [
     "q": "「자」是什么意思？",
     "options": [
      "尺",
-     "帽子",
+     "床",
      "门",
-     "手绢"
+     "护照"
     ],
     "answer": 0,
     "explain": "자 = 尺"
@@ -280,9 +280,9 @@ export const LESSONS = [
     "q": "「지우개」是什么意思？",
     "options": [
      "橡皮",
-     "天气",
+     "家",
      "门",
-     "家"
+     "尺"
     ],
     "answer": 0,
     "explain": "지우개 = 橡皮"
@@ -308,7 +308,7 @@ export const LESSONS = [
      "钱",
      "上面",
      "药店",
-     "外面"
+     "天气"
     ],
     "answer": 0,
     "explain": "돈 = 钱"
@@ -319,8 +319,8 @@ export const LESSONS = [
     "q": "「카드」是什么意思？",
     "options": [
      "卡",
-     "包",
-     "橡皮",
+     "医院",
+     "洗手间",
      "真的"
     ],
     "answer": 0,
@@ -420,9 +420,9 @@ export const LESSONS = [
     "q": "「신분증」是什么意思？",
     "options": [
      "身份证",
-     "帽子",
+     "床",
      "电话",
-     "地铁"
+     "外面"
     ],
     "answer": 0,
     "explain": "신분증 = 身份证 · 身分证 = 신·분·증"
@@ -457,9 +457,9 @@ export const LESSONS = [
     "q": "「모자」是什么意思？",
     "options": [
      "帽子",
-     "日历",
-     "后面",
-     "家"
+     "杂志",
+     "咖啡店",
+     "尺"
     ],
     "answer": 0,
     "explain": "모자 = 帽子 · 帽子 = 모·자"
@@ -493,7 +493,7 @@ export const LESSONS = [
     "q": "「공책」是什么意思？",
     "options": [
      "笔记本",
-     "卡",
+     "口袋",
      "镜子",
      "车站"
     ],
@@ -521,7 +521,7 @@ export const LESSONS = [
      "手纸",
      "画",
      "饼干",
-     "办公室"
+     "包"
     ],
     "answer": 0,
     "explain": "휴지 = 手纸 · 休纸 = 휴·지"
@@ -614,9 +614,9 @@ export const LESSONS = [
     },
     "options": [
      "수첩",
-     "옷",
-     "달력",
-     "우체국"
+     "우체국",
+     "도서관",
+     "은행"
     ],
     "answer": 0,
     "explain": "가방에 수첩이 있어요. · 수첩 = 记事本，小本子 · 手帖 = 수·첩"
@@ -650,9 +650,9 @@ export const LESSONS = [
     "q": "「필통」是什么意思？",
     "options": [
      "铅笔盒",
-     "天气",
-     "橡皮",
-     "地下"
+     "家",
+     "洗手间",
+     "地图"
     ],
     "answer": 0,
     "explain": "필통 = 铅笔盒 · 笔筒 = 필·통"
@@ -690,7 +690,7 @@ export const LESSONS = [
     "options": [
      "那",
      "药店",
-     "杂志",
+     "杯子",
      "里面"
     ],
     "answer": 0,
@@ -828,8 +828,8 @@ export const LESSONS = [
     "options": [
      "日历",
      "钥匙",
-     "家",
-     "卡"
+     "尺",
+     "口袋"
     ],
     "answer": 0,
     "explain": "달력 = 日历"
@@ -1216,9 +1216,9 @@ export const LESSONS = [
     "q": "「주스」是什么意思？",
     "options": [
      "果汁",
-     "口袋",
-     "杂志",
-     "教堂"
+     "后面",
+     "杯子",
+     "教室"
     ],
     "answer": 0,
     "explain": "주스 = 果汁"
@@ -1369,9 +1369,9 @@ export const LESSONS = [
     "q": "「은행」是什么意思？",
     "options": [
      "银行",
-     "口袋",
-     "医院",
-     "啤酒"
+     "后面",
+     "卡",
+     "图书馆"
     ],
     "answer": 0,
     "explain": "은행 = 银行 · 银行 = 은·행"
@@ -1408,7 +1408,7 @@ export const LESSONS = [
     "options": [
      "图书馆",
      "前面",
-     "圆珠笔",
+     "地下",
      "画"
     ],
     "answer": 0,
@@ -1444,9 +1444,9 @@ export const LESSONS = [
     "q": "「식당」是什么意思？",
     "options": [
      "食堂",
-     "啤酒",
-     "牛奶",
-     "旁边"
+     "图书馆",
+     "电影院，剧院",
+     "日历"
     ],
     "answer": 0,
     "explain": "식당 = 食堂 · 食堂 = 식·당"
@@ -1471,7 +1471,7 @@ export const LESSONS = [
     "options": [
      "洗手间",
      "前面",
-     "办公室",
+     "包",
      "邮局"
     ],
     "answer": 0,
@@ -1543,7 +1543,7 @@ export const LESSONS = [
     "q": "「우체국」是什么意思？",
     "options": [
      "邮局",
-     "咖啡店",
+     "啤酒",
      "课本",
      "铅笔"
     ],
@@ -1569,9 +1569,9 @@ export const LESSONS = [
     "q": "「뒤」是什么意思？",
     "options": [
      "后面",
-     "卡",
+     "口袋",
      "公园",
-     "橡皮"
+     "洗手间"
     ],
     "answer": 0,
     "explain": "뒤 = 后面"
@@ -1582,9 +1582,9 @@ export const LESSONS = [
     "q": "「옆」是什么意思？",
     "options": [
      "旁边",
-     "报纸",
-     "后面",
-     "图书馆"
+     "教堂",
+     "咖啡店",
+     "圆珠笔"
     ],
     "answer": 0,
     "explain": "옆 = 旁边"
@@ -1609,7 +1609,7 @@ export const LESSONS = [
     "options": [
      "下面",
      "衣架",
-     "床",
+     "店",
      "公司"
     ],
     "answer": 0,
@@ -1622,8 +1622,8 @@ export const LESSONS = [
     "options": [
      "下面",
      "门",
-     "市场",
-     "口袋"
+     "帽子",
+     "后面"
     ],
     "answer": 0,
     "explain": "아래 = 下面"
@@ -1651,8 +1651,8 @@ export const LESSONS = [
     "q": "「안」是什么意思？",
     "options": [
      "里面",
-     "地下",
-     "图书馆",
+     "地图",
+     "圆珠笔",
      "银行"
     ],
     "answer": 0,
@@ -1751,8 +1751,8 @@ export const LESSONS = [
     "options": [
      "外面",
      "衣架",
-     "咖啡店",
-     "牛奶"
+     "啤酒",
+     "电影院，剧院"
     ],
     "answer": 0,
     "explain": "밖 = 外面"
@@ -1777,8 +1777,8 @@ export const LESSONS = [
     "options": [
      "杯子",
      "电脑",
-     "外面",
-     "杂志"
+     "天气",
+     "果汁"
     ],
     "answer": 0,
     "explain": "컵 = 杯子"
@@ -1789,7 +1789,7 @@ export const LESSONS = [
     "q": "「우유」是什么意思？",
     "options": [
      "牛奶",
-     "椅子",
+     "橡皮",
      "书店",
      "画"
     ],
@@ -1825,9 +1825,9 @@ export const LESSONS = [
     "q": "「맥주」是什么意思？",
     "options": [
      "啤酒",
-     "咖啡店",
+     "图书馆",
      "前面",
-     "卡"
+     "口袋"
     ],
     "answer": 0,
     "explain": "맥주 = 啤酒 · 麦酒 = 맥·주"
@@ -1861,7 +1861,7 @@ export const LESSONS = [
     "q": "「냉장고」是什么意思？",
     "options": [
      "冰箱",
-     "报纸",
+     "教堂",
      "黑板",
      "衣服"
     ],
@@ -1952,7 +1952,7 @@ export const LESSONS = [
      },
      {
       "ko": "극장",
-      "zh": "剧场，电影院",
+      "zh": "电影院，剧院",
       "hanja": "剧场"
      },
      {
@@ -1976,8 +1976,8 @@ export const LESSONS = [
     "options": [
      "家",
      "铅笔盒",
-     "手纸",
-     "杂志"
+     "手绢",
+     "杯子"
     ],
     "answer": 0,
     "explain": "집 = 家"
@@ -2013,7 +2013,7 @@ export const LESSONS = [
     "options": [
      "地铁",
      "东西",
-     "手纸",
+     "手绢",
      "书桌"
     ],
     "answer": 0,
@@ -2035,12 +2035,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c02-u04-006",
-    "q": "按顺序点音节：「剧场，电影院」",
+    "q": "按顺序点音节：「电影院，剧院」",
     "lines": [
      "극",
      "장"
     ],
-    "explain": "극장 = 剧场，电影院 · 剧场 = 극·장"
+    "explain": "극장 = 电影院，剧院 · 剧场 = 극·장"
    },
    {
     "type": "choice",
@@ -2048,9 +2048,9 @@ export const LESSONS = [
     "q": "「병원」是什么意思？",
     "options": [
      "医院",
-     "杯子",
+     "果汁",
      "公园",
-     "旁边"
+     "日历"
     ],
     "answer": 0,
     "explain": "병원 = 医院 · 病院 = 병·원"
@@ -2168,7 +2168,7 @@ export const LESSONS = [
     "options": [
      "公司",
      "粉笔",
-     "杯子",
+     "果汁",
      "站"
     ],
     "answer": 0,
@@ -2205,7 +2205,7 @@ export const LESSONS = [
      "市场",
      "粉笔",
      "铅笔",
-     "果汁"
+     "椅子"
     ],
     "answer": 0,
     "explain": "시장 = 市场 · 市场 = 시·장"
@@ -2239,9 +2239,9 @@ export const LESSONS = [
     "q": "「정류장」是什么意思？",
     "options": [
      "车站",
-     "外面",
+     "天气",
      "黑板",
-     "办公室"
+     "包"
     ],
     "answer": 0,
     "explain": "정류장 = 车站 · 停留场 = 정·류·장"
@@ -2275,9 +2275,9 @@ export const LESSONS = [
     "q": "「교회」是什么意思？",
     "options": [
      "教堂",
-     "地铁",
-     "护照",
-     "杂志"
+     "外面",
+     "报纸",
+     "杯子"
     ],
     "answer": 0,
     "explain": "교회 = 教堂 · 教会 = 교·회"
@@ -2301,7 +2301,7 @@ export const LESSONS = [
     "q": "「참」是什么意思？",
     "options": [
      "真的",
-     "办公室",
+     "包",
      "下面",
      "黑板"
     ],
@@ -2326,8 +2326,8 @@ export const LESSONS = [
     "options": [
      "杯子",
      "电脑",
-     "外面",
-     "杂志"
+     "天气",
+     "果汁"
     ],
     "answer": 0,
     "explain": "컵 = 杯子"
@@ -2398,9 +2398,9 @@ export const LESSONS = [
     "q": "「주스」是什么意思？",
     "options": [
      "果汁",
-     "口袋",
-     "杂志",
-     "教堂"
+     "后面",
+     "杯子",
+     "教室"
     ],
     "answer": 0,
     "explain": "주스 = 果汁"

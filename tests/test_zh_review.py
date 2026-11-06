@@ -107,3 +107,13 @@ def test_korean_typos_fixed():
 def test_no_space_separated_senses():
     bad = [(k, w["zh"]) for k, w in _final().items() if re.search(r"[一-鿿] +[一-鿿]", w["zh"])]
     assert not bad, bad[:10]
+
+
+def test_xreview_2026_11_06():
+    """한·중 문학 번역 스킬 교차 검수 반영: 뜻 5, 품사 8"""
+    final = _final()
+    assert final["v01-c02-u04-006"]["zh"] == "电影院，剧院"
+    assert final["v02-c07-u03-009"]["zh"] == "学长，学姐；前辈"
+    assert final["v02-c05-u05-007"]["pos"] == "부사"
+    assert final["v02-c08-u05-022"]["pos"] == "동사"
+    assert final["v02-c01-u02-004"]["pos"] == "명사"

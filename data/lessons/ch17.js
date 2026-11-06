@@ -106,8 +106,8 @@ export const LESSONS = [
     "options": [
      "免费",
      "问题",
-     "前辈；学长",
-     "烤（肉、鱼）"
+     "售票处",
+     "烧烤（烤肉、烤鱼等）"
     ],
     "answer": 0,
     "explain": "무료 = 免费 · 无料 = 무·료"
@@ -736,7 +736,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "선배",
-      "zh": "前辈；学长",
+      "zh": "学长，学姐；前辈",
       "hanja": "先辈"
      },
      {
@@ -860,12 +860,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v02-c07-u03-009",
-    "q": "按顺序点音节：「前辈；学长」",
+    "q": "按顺序点音节：「学长，学姐；前辈」",
     "lines": [
      "선",
      "배"
     ],
-    "explain": "선배 = 前辈；学长 · 先辈 = 선·배"
+    "explain": "선배 = 学长，学姐；前辈 · 先辈 = 선·배"
    },
    {
     "type": "choice",
@@ -1438,7 +1438,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "구이",
-      "zh": "烤（肉、鱼）"
+      "zh": "烧烤（烤肉、烤鱼等）"
      },
      {
       "ko": "부동산",
@@ -1526,7 +1526,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v02-c07-u05-013",
-    "q": "「烤（肉、鱼）」用韩语怎么说？",
+    "q": "「烧烤（烤肉、烤鱼等）」用韩语怎么说？",
     "options": [
      "구이",
      "천사",
@@ -1534,7 +1534,7 @@ export const LESSONS = [
      "웬일"
     ],
     "answer": 0,
-    "explain": "구이 = 烤（肉、鱼）"
+    "explain": "구이 = 烧烤（烤肉、烤鱼等）"
    },
    {
     "type": "choice",
@@ -1542,7 +1542,7 @@ export const LESSONS = [
     "q": "选出填入空白处的单词",
     "sentence": {
      "ko": "이사하려고 ＿＿에 가서 집을 알아봤어요.",
-     "zh": "为了搬家，我去房屋中介那儿看了看房子。"
+     "zh": "我打算搬家，就去房产中介那儿看了看房子。"
     },
     "options": [
      "부동산",
