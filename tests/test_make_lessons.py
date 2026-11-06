@@ -208,3 +208,38 @@ def test_korean_and_pos_override(tmp_path):
     plain = {w["entry_id"]: w for w in load_words(VOCAB, REVIEW)}
     other = next(k for k in words if k != "v01-c01-u01-010")
     assert (words[other]["ko"], words[other]["pos"]) == (plain[other]["ko"], plain[other]["pos"])
+
+
+EX_HEAD = "entry_id,sentence_ko,zh,status,note\n"
+
+
+def _ex(tmp_path, *rows, name="ex.csv"):
+    p = tmp_path / name
+    p.write_text(EX_HEAD + "".join(r + "\n" for r in rows), encoding="utf-8")
+    return str(p)
+
+
+def test_load_examples_splits_blank(tmp_path):
+    from make_lessons import load_examples
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,cross,"), load_words(VOCAB, REVIEW))
+    assert ex == {"v01-c01-u01-010": {"pre": "저 ", "form": "사람", "post": "은 학생이에요.", "zh": "那个人是学生。"}}
+
+
+def test_load_examples_skips_hold(tmp_path):
+    from make_lessons import load_examples
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,hold,x"), load_words(VOCAB, REVIEW))
+    assert ex == {}
+
+
+@pytest.mark.parametrize("row", [
+    "v01-c01-u01-010,저 사람은 학생이에요.,那个人是学生。,cross,",
+    "v01-c01-u01-010,[[저]] [[사람]]은 학생이에요.,那个人是学生。,cross,",
+    "v09-c09-u09-999,저 [[사람]]은 학생이에요.,那个人是学生。,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,這個人是學生。,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,x,",
+])
+def test_load_examples_rejects_bad_rows(tmp_path, row):
+    from make_lessons import load_examples
+    with pytest.raises(ValueError):
+        load_examples(_ex(tmp_path, row), load_words(VOCAB, REVIEW))

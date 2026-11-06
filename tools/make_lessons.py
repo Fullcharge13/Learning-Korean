@@ -62,6 +62,33 @@ def load_words(vocab_csvs, review_csv):
     return out
 
 
+EX_STATUS = {"cross", "native", "hold"}
+
+
+def load_examples(path, words):
+    """예문 표 → {entry_id: {pre, form, post, zh}}. hold는 뺀다. 잘못된 줄은 ValueError로 멈춘다."""
+    from zhcheck import is_simplified
+    ids = {w["entry_id"] for w in words}
+    out = {}
+    with open(path, encoding="utf-8", newline="") as f:
+        for r in csv.DictReader(f):
+            eid, s, zh, st = r["entry_id"], r["sentence_ko"], r["zh"].strip(), r["status"]
+            parts = s.split("[[")
+            if st not in EX_STATUS:
+                raise ValueError("example %s: unknown status %r" % (eid, st))
+            if eid not in ids:
+                raise ValueError("example %s: no such word" % eid)
+            if len(parts) != 2 or parts[1].count("]]") != 1 or "]]" in parts[0]:
+                raise ValueError("example %s: needs exactly one [[...]]" % eid)
+            if not zh or not is_simplified(zh):
+                raise ValueError("example %s: zh must be simplified Chinese" % eid)
+            if st == "hold":
+                continue
+            form, post = parts[1].split("]]")
+            out[eid] = {"pre": parts[0], "form": form, "post": post, "zh": zh}
+    return out
+
+
 def _chunks(words):
     parts = [words[i:i + CHUNK] for i in range(0, len(words), CHUNK)]
     if len(parts) > 1 and len(parts[-1]) <= TAIL:
