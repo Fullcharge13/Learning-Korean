@@ -271,6 +271,12 @@ function run(root, ctx, lesson, review, resumed = null) {
     b.addEventListener("click", () => { S.flow = nextCard(S.flow); step(); });
   }
 
+  // ---- 예문 빈칸 상자: 한국어 예문(빈칸 ＿＿) + 중국어 힌트 ----
+  function sentenceBox(s) {
+    const ko = String(s.ko || "").split("＿＿").map(esc).join('<span class="blank">＿＿</span>');
+    return `<div class="sent"><p class="sent-ko" lang="ko">${ko}</p><p class="sent-zh">${esc(s.zh || "")}</p></div>`;
+  }
+
   // ---- 문제 머리 ----
   function itemHead(cur) {
     const it = cur.item;
@@ -278,6 +284,7 @@ function run(root, ctx, lesson, review, resumed = null) {
       : it.type === "check" ? `<span class="tag check">检查理解</span>`
       : review && it.from ? `<span class="tag">${esc(it.from)} 复习</span>` : "";
     return `${tag}<h1 class="q">${esc(it.q || (it.type === "order" ? "按顺序点音节，拼出单词。" : "选出正确答案。"))}</h1>
+      ${it.sentence ? sentenceBox(it.sentence) : ""}
       ${it.code ? codeBlock(it.code) : ""}`;
   }
 

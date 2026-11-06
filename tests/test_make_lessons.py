@@ -208,3 +208,106 @@ def test_korean_and_pos_override(tmp_path):
     plain = {w["entry_id"]: w for w in load_words(VOCAB, REVIEW)}
     other = next(k for k in words if k != "v01-c01-u01-010")
     assert (words[other]["ko"], words[other]["pos"]) == (plain[other]["ko"], plain[other]["pos"])
+
+
+EX_HEAD = "entry_id,sentence_ko,zh,status,note\n"
+
+
+def _ex(tmp_path, *rows, name="ex.csv"):
+    p = tmp_path / name
+    p.write_text(EX_HEAD + "".join(r + "\n" for r in rows), encoding="utf-8")
+    return str(p)
+
+
+def test_load_examples_splits_blank(tmp_path):
+    from make_lessons import load_examples
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,cross,"), load_words(VOCAB, REVIEW))
+    assert ex == {"v01-c01-u01-010": {"pre": "저 ", "form": "사람", "post": "은 학생이에요.", "zh": "那个人是学生。", "avoid": []}}
+
+
+def test_load_examples_skips_hold(tmp_path):
+    from make_lessons import load_examples
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,hold,x"), load_words(VOCAB, REVIEW))
+    assert ex == {}
+
+
+@pytest.mark.parametrize("row", [
+    "v01-c01-u01-010,저 사람은 학생이에요.,那个人是学生。,cross,",
+    "v01-c01-u01-010,[[저]] [[사람]]은 학생이에요.,那个人是学生。,cross,",
+    "v09-c09-u09-999,저 [[사람]]은 학생이에요.,那个人是学生。,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,這個人是學生。,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,,cross,",
+    "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,x,",
+])
+def test_load_examples_rejects_bad_rows(tmp_path, row):
+    from make_lessons import load_examples
+    with pytest.raises(ValueError):
+        load_examples(_ex(tmp_path, row), load_words(VOCAB, REVIEW))
+
+
+def _fill_setup(tmp_path, status="cross"):
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,%s," % status), words)
+    return words, ex
+
+
+def _fills(ch):
+    return [(l, it) for l in ch["LESSONS"] for it in l["items"] if "sentence" in it]
+
+
+def test_fill_item_shape(tmp_path):
+    words, ex = _fill_setup(tmp_path)
+    ch = build_chapter(words, 1, ex)
+    fills = [(l, it) for l, it in _fills(ch) if not l.get("isExam")]
+    assert len(fills) == 1, fills
+    it = fills[0][1]
+    ko1 = {w["ko"] for w in words if w["chapter"] == 1}
+    assert it["type"] == "choice" and it["q"] == "选出填入空白处的单词"
+    assert it["options"][0] == "사람" and it["answer"] == 0
+    assert len(set(it["options"])) == 4 and set(it["options"]) <= ko1
+    s = it["sentence"]["ko"]
+    assert s.count("＿＿") == 1 and "[[" not in s and "사람" not in s.replace("＿＿", "")
+    assert it["sentence"]["zh"] == "那个人是学生。"
+    assert it["explain"].startswith("저 사람은 학생이에요. · 사람 = ")
+
+
+def test_fill_first_for_example_words(tmp_path):
+    words, ex = _fill_setup(tmp_path)
+    with_ex, without = build_chapter(words, 1, ex), build_chapter(words, 1)
+    for a, b in zip(with_ex["LESSONS"], without["LESSONS"]):
+        assert len(a["items"]) == len(b["items"]), a["id"]
+    lesson = next(l for l in with_ex["LESSONS"] if any(it["concept"] == "v01-c01-u01-010" for it in l["items"]))
+    first = next(it for it in lesson["items"] if it["concept"] == "v01-c01-u01-010")
+    assert "sentence" in first
+
+
+def test_no_examples_unchanged():
+    words = load_words(VOCAB, REVIEW)
+    assert json.dumps(build_chapter(words, 1), ensure_ascii=False) == json.dumps(build_chapter(words, 1, {}), ensure_ascii=False)
+
+
+def test_hold_example_not_asked(tmp_path):
+    words, ex = _fill_setup(tmp_path, status="hold")
+    assert _fills(build_chapter(words, 1, ex)) == []
+
+
+def test_fill_avoid_column(tmp_path):
+    """예문에 들어가도 말이 되는 단어(avoid, |로 구분)는 오답 카드로 내지 않음"""
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    p = tmp_path / "ex.csv"
+    p.write_text("entry_id,sentence_ko,zh,status,note,avoid\n"
+                 "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,cross,,친구|선생님|이름\n", encoding="utf-8")
+    ex = load_examples(str(p), words)
+    assert ex["v01-c01-u01-010"]["avoid"] == ["친구", "선생님", "이름"]
+    it = next(it for l in build_chapter(words, 1, ex)["LESSONS"] for it in l["items"] if "sentence" in it)
+    assert not {"친구", "선생님", "이름"} & set(it["options"]), it["options"]
+
+
+def test_fill_explain_keeps_hanja(tmp_path):
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-002,저는 [[학생]]이에요.,我是学生。,cross,"), words)
+    it = next(it for l in build_chapter(words, 1, ex)["LESSONS"] for it in l["items"] if "sentence" in it)
+    assert it["explain"] == "저는 학생이에요. · 학생 = 学生 · 学生 = 학·생", it["explain"]

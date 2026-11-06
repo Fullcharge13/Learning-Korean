@@ -703,6 +703,85 @@ def test_hant_lesson_playable():
         assert not a.errors, a.errors
 
 
+def _fill_lesson(longest=False):
+    """예문 빈칸 문제가 있는 일반 레슨 (lesson_id, 문제 번호). longest면 예문이 가장 긴 것"""
+    best = None
+    for n in range(1, 21):
+        text = open(os.path.join(ROOT, "data", "lessons", "ch%d.js" % n), encoding="utf-8").read()
+        for l in json.loads(text.split("export const LESSONS = ", 1)[1].rstrip().rstrip(";")):
+            if l.get("isExam"):
+                continue
+            for i, it in enumerate(l["items"]):
+                if "sentence" in it:
+                    if not longest:
+                        return l["id"], i
+                    if best is None or len(it["sentence"]["ko"]) > best[2]:
+                        best = (l["id"], i, len(it["sentence"]["ko"]))
+    return best[:2]
+
+
+def _walk_to(a, lid, idx):
+    """레슨을 열고 idx번 문제가 화면에 나올 때까지 카드·앞 문제를 넘긴다. 그 문제(앱이 받은 장 파일 기준)를 돌려줌"""
+    a.js("(id) => window.__ria.ctx.show('lesson', { id })", lid)
+    items = a.lesson(lid)["items"]
+    for _ in range(60):
+        a.page.wait_for_timeout(80)
+        if a.page.query_selector(".card-view"):
+            a.page.click("#act")
+            continue
+        if not a.page.query_selector("article.item"):
+            continue
+        if a.which_item(items) == idx:
+            return items[idx]
+        a.answer_touch(items[a.which_item(items)])
+        a.page.wait_for_selector("#result:not([hidden])")
+        a.cont()
+    raise AssertionError("fill item %s #%d never shown" % (lid, idx))
+
+
+def test_fill_item_shows_sentence():
+    lid, idx = _fill_lesson()
+    with App("iPhone 17") as a:
+        a.start()
+        it = _walk_to(a, lid, idx)
+        ko = a.page.inner_text(".sent .sent-ko")
+        print("    %s #%d: %r / %r" % (lid, idx, ko, a.page.inner_text(".sent .sent-zh")))
+        assert ko == it["sentence"]["ko"], ko
+        assert len(a.page.query_selector_all(".sent .blank")) == 1
+        assert a.page.inner_text(".sent .sent-zh") == it["sentence"]["zh"]
+        a.shot("fill-item.png")
+        a.answer_touch(it)
+        a.page.wait_for_selector("#result:not([hidden])")
+        assert not a.errors, a.errors
+
+
+def test_fill_sentence_fits():
+    lid, idx = _fill_lesson(longest=True)
+    fits = """() => [...document.querySelectorAll('.sent, .sent p, .opt')].map(e => ({ sw: e.scrollWidth, cw: e.clientWidth,
+        right: e.getBoundingClientRect().right, vw: innerWidth }))"""
+    for dev in ("iPhone 17e", "iPad Pro 11 landscape"):
+        with App(dev) as a:
+            a.start()
+            _walk_to(a, lid, idx)
+            got = a.js(fits)
+            a.shot("fill-longest-%s.png" % slug(dev))
+            assert a.page.query_selector(".sent .sent-ko"), "sentence box missing on " + dev
+            assert got and all(f["sw"] <= f["cw"] + 1 and f["right"] <= f["vw"] + 1 for f in got), (dev, got)
+
+
+def test_fill_in_hant():
+    import opencc
+    s2twp = opencc.OpenCC("s2twp")
+    lid, idx = _fill_lesson()
+    with App("iPhone 17", locale="zh-TW") as a:
+        a.start()
+        _walk_to(a, lid, idx)
+        zh = a.page.inner_text(".sent .sent-zh")
+        print("    hant: %r" % zh)
+        assert zh and s2twp.convert(zh) == zh, zh
+        assert not a.errors, a.errors
+
+
 def main():
     only = sys.argv[1:]
     tests = [(n, f) for n, f in globals().items() if n.startswith("test_") and callable(f) and (not only or n in only)]
