@@ -117,11 +117,13 @@ def today(n=0):
 class App:
     """기기 하나 + 새 저장소의 앱 한 판."""
 
-    def __init__(self, device="iPhone 17", save=None, reduced=False, url=None, extra=None):
+    def __init__(self, device="iPhone 17", save=None, reduced=False, url=None, extra=None, locale=None):
         e = env()
         opts = device_opts(device)
         if reduced:
             opts["reduced_motion"] = "reduce"
+        if locale:
+            opts["locale"] = locale
         # sw.js가 옛 빌드를 저장해 두지 않도록 서비스 작업자는 막는다(오프라인은 build_test.py가 시험)
         self.context = e["browser"].new_context(service_workers="block", **opts)
         self.page = self.context.new_page()
@@ -636,6 +638,69 @@ def test_ria_save_coexists():
         after = a.js("(k) => localStorage.getItem(k)", RIA_KEY)
         assert after == ria, after
         assert a.save()["completed_lessons"] == ["1-1"]
+
+
+def _to_settings(a):
+    a.page.click('[data-go="settings"]')
+    a.page.wait_for_selector(".screen.settings")
+
+
+def test_zh_tw_opens_hant():
+    with App("iPhone 17", locale="zh-TW") as a:
+        assert a.page.url.endswith("/zh-hant/"), a.page.url
+        assert a.js("document.documentElement.lang") == "zh-Hant"
+        a.start()
+        assert "開始第一課" in a.page.inner_text("#continue"), a.page.inner_text("#continue")
+        a.shot("hant-home.png")
+        assert not a.errors, a.errors
+
+
+def test_lang_buttons():
+    with App("iPhone 17", locale="zh-TW") as a:
+        a.start()
+        _to_settings(a)
+        btns = a.js("""() => [...document.querySelectorAll('[role=radiogroup] [data-lang]')].map(b => {
+            const r = b.getBoundingClientRect();
+            return { lang: b.dataset.lang, text: b.innerText.trim(), on: b.getAttribute('aria-checked'), w: r.width, h: r.height }; })""")
+        print("    lang buttons %s" % btns)
+        assert [b["lang"] for b in btns] == ["hans", "hant"], btns
+        assert [b["text"] for b in btns] == ["簡體", "繁體"], btns  # 번체판은 빌드 변환으로 简体→簡體
+        assert [b["on"] for b in btns] == ["false", "true"], btns
+        assert all(b["w"] >= 44 and b["h"] >= 44 for b in btns), btns
+        a.shot("hant-settings.png")
+
+
+def test_switch_back_to_hans_keeps_progress():
+    seed = {"saveVer": 2, "xp": 120, "completed_lessons": _lesson_ids([1]), "current_lesson": "2-1", "current_chapter": 2}
+    with App("iPhone 17", save=seed, locale="zh-TW") as a:
+        base = env()["url"]
+        assert a.page.url.endswith("/zh-hant/"), a.page.url
+        a.start()
+        assert a.page.inner_text(".status .stat.xp b") == "120"
+        _to_settings(a)
+        a.page.click('[data-lang="hans"]')
+        a.page.wait_for_url(base)
+        a.page.wait_for_selector(".screen.splash #go")
+        a.start()
+        assert a.js("document.documentElement.lang") == "zh-Hans"
+        btn = a.page.inner_text("#continue")
+        assert "继续学习" in btn and "2-1" in btn, btn
+        assert a.page.inner_text(".status .stat.xp b") == "120"
+        a.page.goto(base)
+        a.page.wait_for_selector(".screen.splash #go")
+        assert a.page.url == base and a.js("document.documentElement.lang") == "zh-Hans", a.page.url
+        assert not a.errors, a.errors
+
+
+def test_hant_lesson_playable():
+    with App("iPhone 17", locale="zh-TW") as a:
+        assert a.page.url.endswith("/zh-hant/"), a.page.url
+        a.start()
+        a.page.click("#continue")
+        a.play("1-1")
+        assert a.save()["completed_lessons"] == ["1-1"]
+        a.dismiss()
+        assert not a.errors, a.errors
 
 
 def main():

@@ -495,6 +495,7 @@ body.kbd-open .lesson-foot.has-dock { padding-bottom: 8px; }
 .switch[aria-checked="true"] span { background: var(--teal-ink); }
 .switch[aria-checked="true"] span::after { transform: translateX(34px); }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 6px; }
+.seg.two { grid-template-columns: repeat(2, 1fr); }
 .seg button { min-height: 48px; border-radius: 14px; background: var(--card); border: 2px solid var(--line); font-weight: 800; }
 .seg button[aria-checked="true"] { background: var(--teal-ink); color: #fff; border-color: var(--teal-ink); }
 input[type="text"] { width: 100%; min-height: 48px; font-size: 16px; padding: 10px 14px; border-radius: 14px; border: 2px solid var(--line); background: #fff; margin-top: 6px; }

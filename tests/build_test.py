@@ -829,7 +829,12 @@ def test_hant_is_traditional():
     _build()
     # 간체 전용 글자가 남았으면 한 번 더 s2twp 했을 때 바뀜. (s2t는 吃→喫 같은 옛 글자를 골라 대만 기준과 다름)
     s2twp = _opencc("s2twp")
+    import csv
+    with open(os.path.join(ROOT, "data", "zh-hant-overrides.csv"), encoding="utf-8", newline="") as f:
+        chosen = [r["to"] for r in csv.DictReader(f) if r["to"]]  # 사람이 고른 말은 s2twp 기준에서 뺌
     for name, hant, _ in _hant_texts():
+        for w in chosen:
+            hant = hant.replace(w, " ")
         runs = re.findall(r"[\u3400-\u9fff\uf900-\ufaff]+", hant)  # 한자 덩어리마다(덩어리끼리 이어 붙이면 없는 낱말이 생김)
         bad = [r for r in runs if s2twp.convert(r) != r]
         assert not bad, (name, bad[:5])
