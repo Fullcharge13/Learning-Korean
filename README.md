@@ -57,7 +57,7 @@ docs/img/ref/       해치·물건 참고 그림 시트
 
 ## 출처와 라이선스
 
-- **단어**: [Open Yonsei Korean Vocabulary](https://github.com/Amulopapa67/open-yonsei-korean-vocabulary) 1·2권(CC BY-SA 3.0). 뜻 일부를 고쳤고(`data/zh-review.csv`), 이를 바탕으로 만든 `data/zh-review.csv`, `data/lessons/`, `data/concepts.js`도 **CC BY-SA 3.0**이에요(`data/LICENSE-data.md`). 이 앱은 연세대학교와 관련이 없어요.
+- **단어**: [Open Yonsei Korean Vocabulary](https://github.com/Amulopapa67/open-yonsei-korean-vocabulary) 1·2권(CC BY-SA 3.0). 뜻 일부를 고쳤고(`data/zh-review.csv`), 이를 바탕으로 만든 `data/zh-review.csv`, `data/lessons/`, `data/concepts.js`도 **CC BY-SA 3.0**이에요(`data/LICENSE-data.md`). 원본 자료의 품사·한자어 출처 등은 국립국어원 「[한국어기초사전](https://krdict.korean.go.kr/)」(CC BY-SA 2.0 KR)을 참고했어요(`vendor/open-yonsei/THIRD_PARTY_NOTICES.md`). 이 앱은 연세대학교와 관련이 없어요.
 - **코드**: MIT (`LICENSE`).
 - **해치·물건 그림**: 사용자 제공 그림 시트(`docs/img/ref/`)를 잘라 썼어요.
 

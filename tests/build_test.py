@@ -954,6 +954,19 @@ def test_ci_checks_hant():
         assert name in ci, name
 
 
+def test_dictionary_attribution():
+    """국립국어원 한국어기초사전(CC BY-SA 2.0 KR) 출처: 앱 설정 줄·licenses.txt·제3자 고지 사본"""
+    _build()
+    for d in (DIST, HANT):
+        lic = _read(os.path.join(d, "licenses.txt"))
+        assert "韩国语基础词典" in lic or "韓國語基礎詞典" in lic, d
+        assert "CC BY-SA 2.0 KR" in lic and "https://krdict.korean.go.kr/" in lic, d
+    assert "韩国语基础词典" in _read(os.path.join(ROOT, "src", "ui", "settings.js"))
+    assert os.path.isfile(os.path.join(ROOT, "vendor", "open-yonsei", "THIRD_PARTY_NOTICES.md"))
+    for f in ("README.md", os.path.join("data", "LICENSE-data.md")):
+        assert "한국어기초사전" in _read(os.path.join(ROOT, f)), f
+
+
 def main():
     only = set(sys.argv[1:])  # 이름을 주면 그 시험만
     tests = [(n, f) for n, f in globals().items() if n.startswith("test_") and callable(f) and (not only or n in only)]
