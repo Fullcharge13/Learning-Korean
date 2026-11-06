@@ -85,7 +85,8 @@ def load_examples(path, words):
             if st == "hold":
                 continue
             form, post = parts[1].split("]]")
-            out[eid] = {"pre": parts[0], "form": form, "post": post, "zh": zh}
+            out[eid] = {"pre": parts[0], "form": form, "post": post, "zh": zh,
+                        "avoid": [x for x in (r.get("avoid") or "").split("|") if x]}
     return out
 
 
@@ -102,7 +103,7 @@ def _explain(w):
     return "%s = %s%s" % (w["ko"], w["zh"], note)
 
 
-def _options(w, pool, field, seed):
+def _options(w, pool, field, seed, ok=None, avoid=()):
     """정답 + 같은 품사 오답 3개(모자라면 같은 장 아무 품사). 못 채우면 None.
     표시 글자가 겹치는 후보, 정답과 뜻(zh)이나 한국어(ko)가 같은 단어(비가 오다·비가 내리다 = 下雨)는 뺀다 — 정답이 둘로 보임."""
     used = {w[field]}
@@ -110,7 +111,7 @@ def _options(w, pool, field, seed):
     rng = random.Random(seed)
     same_ko = {x["ko"] for x in pool if x["zh"] == w["zh"]} | {w["ko"]}
     same_zh = {x["zh"] for x in pool if x["ko"] == w["ko"]} | {w["zh"]}
-    clash = lambda x: x["zh"] in same_zh or x["ko"] in same_ko
+    clash = lambda x: x["zh"] in same_zh or x["ko"] in same_ko or x["ko"] in avoid or (ok and not ok(x[field]))
     for same_pos in (True, False):
         cands = sorted({x[field] for x in pool if (not same_pos or x["pos"] == w["pos"]) and not clash(x)} - used)
         rng.shuffle(cands)
@@ -122,16 +123,40 @@ def _options(w, pool, field, seed):
     return [w[field]] + picked if len(picked) == 3 else None
 
 
+# 받침 유무로 꼴이 바뀌는 조사: (조사, 앞말 끝 받침). ㄹ 받침은 으로 대신 로를 받는다.
+_PARTICLES = (("이에요", "other"), ("예요", "none"), ("으로", "other"), ("로", "none_or_l"), ("이", "other"), ("가", "none"),
+              ("을", "other"), ("를", "none"), ("은", "other"), ("는", "none"), ("과", "other"), ("와", "none"))
+
+
+def _final(word):
+    c = word.rstrip("?.!")[-1:]
+    if not ("가" <= c <= "힣"):
+        return None
+    f = (ord(c) - 0xAC00) % 28
+    return "none" if f == 0 else ("l" if f == 8 else "other")
+
+
+def _particle_ok(card, after):
+    """빈칸 뒤 조사(after 맨 앞)와 카드 끝 받침이 맞는지. 그런 조사가 아니면 늘 True"""
+    for p, need in _PARTICLES:
+        if after.startswith(p) and (len(after) == len(p) or not ("가" <= after[len(p)] <= "힣")):
+            f = _final(card)
+            return (f is None or f == need or (need == "none_or_l" and f in ("none", "l"))
+                    or (need == "other" and f == "l" and p != "으로"))
+    return True
+
+
 def _item(w, kind, pool, examples=None):
     seed = w["entry_id"] + ":" + kind
     if kind == "fill":
         ex = (examples or {}).get(w["entry_id"])
-        opts = ex and _options(w, pool, "ko", seed)
+        # 오답 카드: 예문에 들어가도 말이 되는 단어(avoid)와, 빈칸 뒤 조사 꼴(이/가 …)과 안 맞아 바로 지워지는 단어는 뺀다
+        opts = ex and _options(w, pool, "ko", seed, ok=lambda ko: _particle_ok(ko, ex["post"]), avoid=ex["avoid"])
         if not opts:
             return None
         return {"type": "choice", "concept": w["entry_id"], "q": "选出填入空白处的单词",
                 "sentence": {"ko": ex["pre"] + "＿＿" + ex["post"], "zh": ex["zh"]}, "options": opts, "answer": 0,
-                "explain": "%s%s%s · %s = %s" % (ex["pre"], ex["form"], ex["post"], w["ko"], w["zh"])}
+                "explain": "%s%s%s · %s" % (ex["pre"], ex["form"], ex["post"], _explain(w))}
     if kind == "order":
         if not (_hangul(w["ko"]) and 2 <= len(w["ko"]) <= 5):
             return None

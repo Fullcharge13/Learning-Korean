@@ -222,7 +222,7 @@ def _ex(tmp_path, *rows, name="ex.csv"):
 def test_load_examples_splits_blank(tmp_path):
     from make_lessons import load_examples
     ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,cross,"), load_words(VOCAB, REVIEW))
-    assert ex == {"v01-c01-u01-010": {"pre": "저 ", "form": "사람", "post": "은 학생이에요.", "zh": "那个人是学生。"}}
+    assert ex == {"v01-c01-u01-010": {"pre": "저 ", "form": "사람", "post": "은 학생이에요.", "zh": "那个人是学生。", "avoid": []}}
 
 
 def test_load_examples_skips_hold(tmp_path):
@@ -290,3 +290,24 @@ def test_no_examples_unchanged():
 def test_hold_example_not_asked(tmp_path):
     words, ex = _fill_setup(tmp_path, status="hold")
     assert _fills(build_chapter(words, 1, ex)) == []
+
+
+def test_fill_avoid_column(tmp_path):
+    """예문에 들어가도 말이 되는 단어(avoid, |로 구분)는 오답 카드로 내지 않음"""
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    p = tmp_path / "ex.csv"
+    p.write_text("entry_id,sentence_ko,zh,status,note,avoid\n"
+                 "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,cross,,친구|선생님|이름\n", encoding="utf-8")
+    ex = load_examples(str(p), words)
+    assert ex["v01-c01-u01-010"]["avoid"] == ["친구", "선생님", "이름"]
+    it = next(it for l in build_chapter(words, 1, ex)["LESSONS"] for it in l["items"] if "sentence" in it)
+    assert not {"친구", "선생님", "이름"} & set(it["options"]), it["options"]
+
+
+def test_fill_explain_keeps_hanja(tmp_path):
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-002,저는 [[학생]]이에요.,我是学生。,cross,"), words)
+    it = next(it for l in build_chapter(words, 1, ex)["LESSONS"] for it in l["items"] if "sentence" in it)
+    assert it["explain"] == "저는 학생이에요. · 학생 = 学生 · 学生 = 학·생", it["explain"]
