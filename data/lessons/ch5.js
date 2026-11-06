@@ -73,7 +73,7 @@ export const LESSONS = [
      "现在",
      "（学校的）假期",
      "几号，几天",
-     "一会儿，稍微"
+     "一会儿，片刻"
     ],
     "answer": 0,
     "explain": "지금 = 现在 · 只今 = 지·금"
@@ -368,7 +368,7 @@ export const LESSONS = [
   "summary": [
    "시간 = 时间",
    "반 = 半",
-   "시계 = 表",
+   "시계 = 钟表",
    "오전 = 上午"
   ],
   "cards": [
@@ -387,7 +387,7 @@ export const LESSONS = [
      },
      {
       "ko": "시계",
-      "zh": "表",
+      "zh": "钟表",
       "hanja": "时计"
      },
      {
@@ -451,12 +451,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c05-u01-019",
-    "q": "按顺序点音节：「表」",
+    "q": "按顺序点音节：「钟表」",
     "lines": [
      "시",
      "계"
     ],
-    "explain": "시계 = 表 · 时计 = 시·계"
+    "explain": "시계 = 钟表 · 时计 = 시·계"
    },
    {
     "type": "choice",
@@ -465,7 +465,7 @@ export const LESSONS = [
     "options": [
      "上午",
      "皮鞋",
-     "酒",
+     "钟表",
      "月"
     ],
     "answer": 0,
@@ -541,7 +541,7 @@ export const LESSONS = [
   "title": "第1单元 (4)",
   "goal": "认识 6 个新单词",
   "summary": [
-   "잠깐 = 一会儿，稍微",
+   "잠깐 = 一会儿，片刻",
    "과/와 = 跟，和",
    "이야기하다 = 说话",
    "고맙다 = 谢谢"
@@ -552,7 +552,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "잠깐",
-      "zh": "一会儿，稍微"
+      "zh": "一会儿，片刻"
      },
      {
       "ko": "과/와",
@@ -588,13 +588,13 @@ export const LESSONS = [
     "concept": "v01-c05-u01-025",
     "q": "「잠깐」是什么意思？",
     "options": [
-     "一会儿，稍微",
-     "酒",
+     "一会儿，片刻",
+     "钟表",
      "时间",
      "去年"
     ],
     "answer": 0,
-    "explain": "잠깐 = 一会儿，稍微"
+    "explain": "잠깐 = 一会儿，片刻"
    },
    {
     "type": "choice",
@@ -769,8 +769,8 @@ export const LESSONS = [
     "options": [
      "日，天",
      "月",
-     "购物",
-     "运动场"
+     "运动场",
+     "这次"
     ],
     "answer": 0,
     "explain": "일 = 日，天 · 日 = 일"
@@ -781,7 +781,7 @@ export const LESSONS = [
     "q": "「내일」是什么意思？",
     "options": [
      "明天",
-     "购物",
+     "运动场",
      "天",
      "今年"
     ],
@@ -903,7 +903,7 @@ export const LESSONS = [
      },
      {
       "ko": "하숙집",
-      "zh": "寄宿房，家庭旅馆"
+      "zh": "寄宿房（包伙食）"
      }
     ]
    }
@@ -915,9 +915,9 @@ export const LESSONS = [
     "q": "「월(월요일)」是什么意思？",
     "options": [
      "星期一",
-     "购物",
      "运动场",
-     "寄宿房，家庭旅馆"
+     "这次",
+     "寄宿房（包伙食）"
     ],
     "answer": 0,
     "explain": "월(월요일) = 星期一"
@@ -941,9 +941,9 @@ export const LESSONS = [
     "q": "「수(수요일)」是什么意思？",
     "options": [
      "星期三",
-     "课",
+     "购物",
      "今年",
-     "表"
+     "课"
     ],
     "answer": 0,
     "explain": "수(수요일) = 星期三"
@@ -980,7 +980,7 @@ export const LESSONS = [
     "q": "「토(토요일)」是什么意思？",
     "options": [
      "星期六",
-     "这次，这个",
+     "酒",
      "心情",
      "毕业典礼"
     ],
@@ -1003,7 +1003,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c05-u02-016",
-    "q": "「寄宿房，家庭旅馆」用韩语怎么说？",
+    "q": "「寄宿房（包伙食）」用韩语怎么说？",
     "options": [
      "하숙집",
      "파티",
@@ -1011,7 +1011,7 @@ export const LESSONS = [
      "수업"
     ],
     "answer": 0,
-    "explain": "하숙집 = 寄宿房，家庭旅馆"
+    "explain": "하숙집 = 寄宿房（包伙食）"
    },
    {
     "type": "check",
@@ -1240,7 +1240,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "때",
-      "zh": "时"
+      "zh": "时候"
      }
     ]
    }
@@ -1290,7 +1290,7 @@ export const LESSONS = [
      "从",
      "到……",
      "三十",
-     "谢谢"
+     "购物"
     ],
     "answer": 0,
     "explain": "부터 = 从"
@@ -1298,7 +1298,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c05-u02-029",
-    "q": "「时」用韩语怎么说？",
+    "q": "「时候」用韩语怎么说？",
     "options": [
      "때",
      "기분",
@@ -1306,7 +1306,7 @@ export const LESSONS = [
      "어제"
     ],
     "answer": 0,
-    "explain": "때 = 时"
+    "explain": "때 = 时候"
    },
    {
     "type": "choice",
@@ -1327,7 +1327,7 @@ export const LESSONS = [
     "q": "「졸업식」是什么意思？",
     "options": [
      "毕业典礼",
-     "运动场",
+     "这次",
      "明天",
      "去年"
     ],
@@ -1400,7 +1400,7 @@ export const LESSONS = [
     "options": [
      "早上",
      "星期五",
-     "时",
+     "时候",
      "昨天"
     ],
     "answer": 0,
@@ -1515,7 +1515,7 @@ export const LESSONS = [
   "goal": "认识 6 个新单词",
   "summary": [
    "타다 = 乘坐，搭乘",
-   "내리다 = 下",
+   "내리다 = 下（车）",
    "잠 = （睡）觉，睡眠",
    "저녁 = 晚上"
   ],
@@ -1529,7 +1529,7 @@ export const LESSONS = [
      },
      {
       "ko": "내리다",
-      "zh": "下"
+      "zh": "下（车）"
      },
      {
       "ko": "잠",
@@ -1574,7 +1574,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c05-u03-010",
-    "q": "「下」用韩语怎么说？",
+    "q": "「下（车）」用韩语怎么说？",
     "options": [
      "내리다",
      "이야기하다",
@@ -1582,7 +1582,7 @@ export const LESSONS = [
      "세수하다"
     ],
     "answer": 0,
-    "explain": "내리다 = 下"
+    "explain": "내리다 = 下（车）"
    },
    {
     "type": "choice",
@@ -1640,7 +1640,7 @@ export const LESSONS = [
     "options": [
      "吃饭",
      "济州岛",
-     "寄宿房，家庭旅馆",
+     "寄宿房（包伙食）",
      "星期五"
     ],
     "answer": 0,
@@ -1710,7 +1710,7 @@ export const LESSONS = [
     "q": "「어제」是什么意思？",
     "options": [
      "昨天",
-     "课",
+     "购物",
      "去年",
      "明年"
     ],
@@ -1809,7 +1809,7 @@ export const LESSONS = [
     "options": [
      "后天",
      "明天",
-     "一会儿，稍微",
+     "一会儿，片刻",
      "星期"
     ],
     "answer": 0,
@@ -2104,7 +2104,7 @@ export const LESSONS = [
      "运动场",
      "旅行",
      "星期四",
-     "酒"
+     "钟表"
     ],
     "answer": 0,
     "explain": "운동장 = 运动场 · 运动场 = 운·동·장"

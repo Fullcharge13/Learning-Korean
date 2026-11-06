@@ -103,7 +103,7 @@ export const LESSONS = [
      "到（时间），成为……",
      "笑",
      "阴",
-     "穿"
+     "穿（鞋袜）"
     ],
     "answer": 0,
     "explain": "되다 = 到（时间），成为……"
@@ -680,8 +680,8 @@ export const LESSONS = [
     "options": [
      "……的",
      "比",
-     "有雾",
-     "片酬，演出费"
+     "最近，这几天",
+     "爱好，兴趣"
     ],
     "answer": 0,
     "explain": "의 = ……的"
@@ -792,7 +792,7 @@ export const LESSONS = [
      },
      {
       "ko": "개다",
-      "zh": "晴"
+      "zh": "放晴，转晴"
      },
      {
       "ko": "안개가 끼다",
@@ -874,12 +874,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c09-u02-006",
-    "q": "按顺序点音节：「晴」",
+    "q": "按顺序点音节：「放晴，转晴」",
     "lines": [
      "개",
      "다"
     ],
-    "explain": "개다 = 晴"
+    "explain": "개다 = 放晴，转晴"
    },
    {
     "type": "choice",
@@ -1107,7 +1107,7 @@ export const LESSONS = [
    "예매 = 预购",
    "후 = 之后",
    "양말 = 袜子",
-   "신다 = 穿"
+   "신다 = 穿（鞋袜）"
   ],
   "cards": [
    {
@@ -1129,7 +1129,7 @@ export const LESSONS = [
      },
      {
       "ko": "신다",
-      "zh": "穿"
+      "zh": "穿（鞋袜）"
      }
     ]
    },
@@ -1197,13 +1197,13 @@ export const LESSONS = [
     "concept": "v01-c09-u02-020",
     "q": "「신다」是什么意思？",
     "options": [
-     "穿",
+     "穿（鞋袜）",
      "开，绽放",
-     "晴",
+     "放晴，转晴",
      "准备"
     ],
     "answer": 0,
-    "explain": "신다 = 穿"
+    "explain": "신다 = 穿（鞋袜）"
    },
    {
     "type": "choice",
@@ -1259,7 +1259,7 @@ export const LESSONS = [
    {
     "type": "check",
     "concept": "v01-c09-u02-020",
-    "q": "「穿」用韩语怎么说？",
+    "q": "「穿（鞋袜）」用韩语怎么说？",
     "options": [
      "신다",
      "등산하다",
@@ -1267,7 +1267,7 @@ export const LESSONS = [
      "개다"
     ],
     "answer": 0,
-    "explain": "신다 = 穿"
+    "explain": "신다 = 穿（鞋袜）"
    }
   ]
  },
@@ -1412,7 +1412,7 @@ export const LESSONS = [
      "准备",
      "爬山",
      "开，绽放",
-     "晴"
+     "放晴，转晴"
     ],
     "answer": 0,
     "explain": "준비하다 = 准备"
@@ -1485,7 +1485,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "빨래",
-      "zh": "洗，（要洗的）衣物"
+      "zh": "洗衣服；待洗衣物"
      },
      {
       "ko": "전국",
@@ -1552,7 +1552,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c09-u02-037",
-    "q": "「洗，（要洗的）衣物」用韩语怎么说？",
+    "q": "「洗衣服；待洗衣物」用韩语怎么说？",
     "options": [
      "빨래",
      "잠옷",
@@ -1560,7 +1560,7 @@ export const LESSONS = [
      "진달래"
     ],
     "answer": 0,
-    "explain": "빨래 = 洗，（要洗的）衣物"
+    "explain": "빨래 = 洗衣服；待洗衣物"
    },
    {
     "type": "order",
@@ -2364,8 +2364,8 @@ export const LESSONS = [
     "options": [
      "篇，部",
      "岁（表示年龄）",
-     "沙子",
-     "雪仗"
+     "江陵",
+     "雪"
     ],
     "answer": 0,
     "explain": "편 = 篇，部 · 篇 = 편"
@@ -2399,7 +2399,7 @@ export const LESSONS = [
     "q": "「짓다」是什么意思？",
     "options": [
      "建造，造",
-     "穿",
+     "穿（鞋袜）",
      "化妆",
      "阴"
     ],
@@ -2435,7 +2435,7 @@ export const LESSONS = [
     "q": "「이해하다」是什么意思？",
     "options": [
      "理解",
-     "穿",
+     "穿（鞋袜）",
      "开，绽放",
      "阅读"
     ],
@@ -2471,9 +2471,9 @@ export const LESSONS = [
     "q": "「억」是什么意思？",
     "options": [
      "亿",
-     "建造，造",
-     "睡衣",
-     "下雪"
+     "准备",
+     "去郊游",
+     "滑雪"
     ],
     "answer": 0,
     "explain": "억 = 亿 · 亿 = 억"
@@ -2498,8 +2498,8 @@ export const LESSONS = [
     "options": [
      "岁（表示年龄）",
      "篇，部",
-     "夜",
-     "去赏红叶"
+     "秋天",
+     "天气预报"
     ],
     "answer": 0,
     "explain": "세 = 岁（表示年龄） · 世 = 세"

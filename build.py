@@ -100,7 +100,7 @@ process.stdout.write(JSON.stringify({ index, files, contents, tasks }));
 """
 
 
-OWNED = ("index.html", "manifest.webmanifest", "sw.js", "icons", "img", "lessons", "licenses.txt")
+OWNED = ("index.html", "manifest.webmanifest", "sw.js", "icons", "img", "lessons", "licenses.txt", "zh-hant")
 
 
 
@@ -260,6 +260,8 @@ def build(out, update_docs_icons=False, build_id="", lessons_dir=None):
     with open(os.path.join(SRC, "index.html"), encoding="utf-8") as f:
         html = f.read()
 
+    with open(os.path.join(SRC, "lang.js"), encoding="utf-8") as f:
+        html = replace_block(html, "LANG", "<script>" + inline_script(f.read()) + "</script>")
     html = replace_block(html, "STYLE", "<style>" + b["css"].replace("</", "<\\/") + "</style>")
     html = html.replace("</title>\n", "</title>\n" + HEAD_LINKS.format(
         version=version, build_meta=('\n<meta name="ria-build" content="%s">' % html_attr(build_id)) if build_id else ""), 1)
@@ -323,13 +325,85 @@ def build(out, update_docs_icons=False, build_id="", lessons_dir=None):
     print("dist: %s" % os.path.relpath(out, ROOT))
     print("version %s" % version)
     print("app.js %.1f KB, css %.1f KB" % (len(b["app"].encode()) / 1024, len(b["css"].encode()) / 1024))
-    print("sw cache %s" % re.search(r'GAME_CACHE = "([^"]+)"', sw).group(1))
+    print("sw cache %s%s-%s" % (re.search(r'GAME_PREFIX = "([^"]+)"', sw).group(1), version, h.hexdigest()[:10]))
     print("index.html raw %.1f KB (limit %d KB), gzip %.1f KB" % (raw / 1024, MAX_RAW // 1024, gz / 1024))
     print("lessons: %d chapter files, %.1f KB total" % (len(chapter_sizes), sum(sz for _, sz in chapter_sizes) / 1024))
     for name, sz in chapter_sizes:
         print("  %s %.1f KB" % (name, sz / 1024))
     if raw > MAX_RAW:
         raise SystemExit("build: index.html is over %d KB" % (MAX_RAW // 1024))
+    build_hant(out)
+
+
+HANT_DIR = "zh-hant"
+HANT_TEXT = ("index.html", "manifest.webmanifest", "sw.js", "licenses.txt")
+HANT_OVERRIDES = os.path.join(ROOT, "data", "zh-hant-overrides.csv")
+
+
+def to_hant(text, overrides=()):
+    """간체판 글자 → 대만식 번체판 글자: OpenCC s2twp, 고칠 말 표, 저장본 접두, 언어 표시."""
+    import opencc
+    out = opencc.OpenCC("s2twp").convert(text)
+    for a, b in overrides:
+        out = out.replace(a, b)
+    return out.replace("haechi-game-", "haechi-hant-game-").replace("zh-Hans", "zh-Hant")
+
+
+def _hant_overrides():
+    import csv
+    path = os.environ.get("HAECHI_HANT_OVERRIDES") or HANT_OVERRIDES
+    with open(path, encoding="utf-8", newline="") as f:
+        return [(r["from"], r["to"]) for r in csv.DictReader(f) if r["from"]]
+
+
+def _hant_rename(dst):
+    """번체판 장 파일 이름·저장본 이름의 지문을 번체 내용으로 다시 만든다(고칠 말 표만 바뀌어도 새 판이 퍼지게)."""
+    lessons = os.path.join(dst, "lessons")
+    names = {}
+    for old in sorted(os.listdir(lessons)):
+        with open(os.path.join(lessons, old), "rb") as f:
+            digest = hashlib.sha256(f.read()).hexdigest()
+        new = re.sub(r"-[0-9a-f]{8}\.json$", "-%s.json" % digest[:8], old)
+        os.rename(os.path.join(lessons, old), os.path.join(lessons, new))
+        names["lessons/" + old] = "lessons/" + new
+    texts = {}
+    for rel in ("index.html", "sw.js"):
+        with open(os.path.join(dst, rel), encoding="utf-8") as f:
+            text = f.read()
+        for a, b in names.items():
+            text = text.replace(a, b)
+        texts[rel] = text
+    h = hashlib.sha256(texts["index.html"].encode("utf-8"))
+    for rel in ["manifest.webmanifest", "licenses.txt"] + sorted(names.values()):
+        with open(os.path.join(dst, rel), "rb") as f:
+            h.update(f.read())
+    texts["sw.js"] = re.sub(r'(GAME_PREFIX \+ "[^"]*-)[0-9a-f]{10}(")', lambda m: m.group(1) + h.hexdigest()[:10] + m.group(2), texts["sw.js"], count=1)
+    for rel, text in texts.items():
+        with open(os.path.join(dst, rel), "w", encoding="utf-8") as f:
+            f.write(text)
+
+
+def build_hant(out):
+    """간체판 결과(out/)를 변환해 out/zh-hant/에 번체판을 쓴다. 그림·아이콘은 복사(묶음 JS 경로를 고치지 않게)."""
+    dst = os.path.join(out, HANT_DIR)
+    os.makedirs(os.path.join(dst, "lessons"))
+    ov = _hant_overrides()
+    for rel in HANT_TEXT + tuple("lessons/" + n for n in sorted(os.listdir(os.path.join(out, "lessons")))):
+        with open(os.path.join(out, rel), encoding="utf-8") as f:
+            text = to_hant(f.read(), ov)
+        if rel == "manifest.webmanifest":  # 번체판 홈 화면 앱이 간체판(../)으로 바꿔도 앱 범위 안에 있게
+            m = json.loads(text)
+            m["scope"] = "../"
+            text = json.dumps(m, ensure_ascii=False, indent=2) + "\n"
+        with open(os.path.join(dst, rel), "w", encoding="utf-8") as f:
+            f.write(text)
+    for d in ("img", "icons"):
+        shutil.copytree(os.path.join(out, d), os.path.join(dst, d))
+    _hant_rename(dst)
+    raw = os.path.getsize(os.path.join(dst, "index.html"))
+    print("zh-hant/index.html raw %.1f KB" % (raw / 1024))
+    if raw > MAX_RAW:
+        raise SystemExit("build: zh-hant/index.html is over %d KB" % (MAX_RAW // 1024))
 
 
 def main():

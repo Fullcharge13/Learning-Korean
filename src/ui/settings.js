@@ -55,6 +55,18 @@ function courseCard(ctx) {
   </section>`;
 }
 
+/** 글자판 고르기: 간체판(/)·대만식 번체판(zh-hant/). src/lang.js(머리 스크립트)가 없으면 그리지 않음 */
+function langRow() {
+  const L = typeof window !== "undefined" && window.haechiLang;
+  if (!L) return "";
+  const cur = L.currentLang(document);
+  return `<div class="row col" role="group" aria-labelledby="lang-label">
+          <p class="row-label" id="lang-label">文字<small>简体中文 / 繁體中文（台灣）</small></p>
+          <div class="seg two" role="radiogroup" aria-label="文字">${[["hans", "简体"], ["hant", "繁體"]].map(([k, t]) =>
+            `<button role="radio" aria-checked="${k === cur}" data-lang="${k}">${t}</button>`).join("")}</div>
+        </div>`;
+}
+
 export function render(root, ctx) {
   const s = ctx.save;
   const goal = DAILY_GOALS.includes(s.settings.dailyGoal) ? s.settings.dailyGoal : 20;
@@ -64,6 +76,7 @@ export function render(root, ctx) {
       <h1 class="page-title">设置</h1>
       ${courseCard(ctx)}
       <section class="panel">
+        ${langRow()}
         <div class="row">
           <label for="snd" class="row-label">声音<small>答对、答错的音效</small></label>
           <button class="switch" id="snd" role="switch" aria-checked="${s.settings.sound !== false}"><span></span></button>
@@ -137,6 +150,9 @@ export function render(root, ctx) {
     const cur = ctx.save;
     ctx.commit({ ...cur, settings: { ...cur.settings, ...patch } });
   };
+  root.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
+    if (b.getAttribute("aria-checked") !== "true") window.haechiLang.switchLang(b.dataset.lang);
+  }));
   const snd = root.querySelector("#snd");
   snd.addEventListener("click", () => {
     const on = !(ctx.save.settings.sound !== false);

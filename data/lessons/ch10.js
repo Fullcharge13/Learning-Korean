@@ -11,7 +11,7 @@ export const LESSONS = [
    "초 = 初",
    "끝나다 = 结束",
    "찍다 = 拍（照片）",
-   "공휴일 = 公休日"
+   "공휴일 = 法定假日"
   ],
   "cards": [
    {
@@ -32,7 +32,7 @@ export const LESSONS = [
      },
      {
       "ko": "공휴일",
-      "zh": "公休日",
+      "zh": "法定假日",
       "hanja": "公休日"
      }
     ]
@@ -72,7 +72,7 @@ export const LESSONS = [
      "初",
      "……当中",
      "岁（表示年龄）",
-     "战争片"
+     "所以，那么"
     ],
     "answer": 0,
     "explain": "초 = 初 · 初 = 초"
@@ -105,13 +105,13 @@ export const LESSONS = [
     "concept": "v01-c10-u01-004",
     "q": "「공휴일」是什么意思？",
     "options": [
-     "公休日",
+     "法定假日",
      "春节",
-     "假，休假",
-     "做菜，烹饪"
+     "准备物品",
+     "刀"
     ],
     "answer": 0,
-    "explain": "공휴일 = 公休日 · 公休日 = 공·휴·일"
+    "explain": "공휴일 = 法定假日 · 公休日 = 공·휴·일"
    },
    {
     "type": "choice",
@@ -143,7 +143,7 @@ export const LESSONS = [
     "options": [
      "放假，假期",
      "阅读，读书",
-     "假期",
+     "做菜，烹饪",
      "连休"
     ],
     "answer": 0,
@@ -219,7 +219,7 @@ export const LESSONS = [
      },
      {
       "ko": "중학교",
-      "zh": "中学",
+      "zh": "初中",
       "hanja": "中学校"
      },
      {
@@ -280,8 +280,8 @@ export const LESSONS = [
     "options": [
      "现在",
      "温泉",
-     "假，休假",
-     "放假，假期"
+     "准备物品",
+     "方法"
     ],
     "answer": 0,
     "explain": "이제 = 现在"
@@ -302,13 +302,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c10-u01-014",
-    "q": "按顺序点音节：「中学」",
+    "q": "按顺序点音节：「初中」",
     "lines": [
      "중",
      "학",
      "교"
     ],
-    "explain": "중학교 = 中学 · 中学校 = 중·학·교"
+    "explain": "중학교 = 初中 · 中学校 = 중·학·교"
    },
    {
     "type": "choice",
@@ -405,7 +405,7 @@ export const LESSONS = [
      },
      {
       "ko": "밀리다",
-      "zh": "堆积"
+      "zh": "堵（车）；积压"
      }
     ]
    }
@@ -418,7 +418,7 @@ export const LESSONS = [
     "options": [
      "签证",
      "滑雪",
-     "家务",
+     "小说",
      "足球"
     ],
     "answer": 0,
@@ -453,8 +453,8 @@ export const LESSONS = [
     "q": "「학기」是什么意思？",
     "options": [
      "学期",
-     "主人公",
-     "家务",
+     "乒乓球",
+     "小说",
      "（计算机）显示器，监视器"
     ],
     "answer": 0,
@@ -491,8 +491,8 @@ export const LESSONS = [
     "options": [
      "登山鞋",
      "跆拳道",
-     "令人感动的",
-     "春节"
+     "住宿",
+     "景色，风景"
     ],
     "answer": 0,
     "explain": "등산화 = 登山鞋 · 登山靴 = 등·산·화"
@@ -500,7 +500,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c10-u01-024",
-    "q": "「堆积」用韩语怎么说？",
+    "q": "「堵（车）；积压」用韩语怎么说？",
     "options": [
      "밀리다",
      "치다",
@@ -508,7 +508,7 @@ export const LESSONS = [
      "사용하다"
     ],
     "answer": 0,
-    "explain": "밀리다 = 堆积"
+    "explain": "밀리다 = 堵（车）；积压"
    },
    {
     "type": "check",
@@ -533,7 +533,7 @@ export const LESSONS = [
   "summary": [
    "이곳저곳 = 到处，各处",
    "틈틈이 = 一有空，得空",
-   "휴가철 = 假期",
+   "휴가철 = 度假旺季",
    "방문 = 访问"
   ],
   "cards": [
@@ -550,7 +550,7 @@ export const LESSONS = [
      },
      {
       "ko": "휴가철",
-      "zh": "假期"
+      "zh": "度假旺季"
      },
      {
       "ko": "방문",
@@ -580,9 +580,9 @@ export const LESSONS = [
     "q": "「이곳저곳」是什么意思？",
     "options": [
      "到处，各处",
-     "最",
-     "台球",
-     "围棋"
+     "期间",
+     "学期",
+     "孩子"
     ],
     "answer": 0,
     "explain": "이곳저곳 = 到处，各处"
@@ -603,13 +603,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c10-u01-027",
-    "q": "按顺序点音节：「假期」",
+    "q": "按顺序点音节：「度假旺季」",
     "lines": [
      "휴",
      "가",
      "철"
     ],
-    "explain": "휴가철 = 假期"
+    "explain": "휴가철 = 度假旺季"
    },
    {
     "type": "choice",
@@ -617,9 +617,9 @@ export const LESSONS = [
     "q": "「방문」是什么意思？",
     "options": [
      "访问",
-     "期间",
-     "枪",
-     "准备物品"
+     "机器人",
+     "棒球",
+     "到处，各处"
     ],
     "answer": 0,
     "explain": "방문 = 访问 · 访问 = 방·문"
@@ -1157,7 +1157,7 @@ export const LESSONS = [
      "……的时候",
      "温泉",
      "活动",
-     "学期"
+     "家务"
     ],
     "answer": 0,
     "explain": "때 = ……的时候"
@@ -1170,7 +1170,7 @@ export const LESSONS = [
      "忧郁",
      "需要",
      "方便，舒服",
-     "可爱"
+     "可怕，害怕"
     ],
     "answer": 0,
     "explain": "우울하다 = 忧郁"
@@ -1206,7 +1206,7 @@ export const LESSONS = [
      "景色，风景",
      "活动",
      "滑雪",
-     "台球"
+     "学期"
     ],
     "answer": 0,
     "explain": "경치 = 景色，风景 · 景致 = 경·치"
@@ -1217,9 +1217,9 @@ export const LESSONS = [
     "q": "「노래방」是什么意思？",
     "options": [
      "练歌厅，KTV",
-     "住宿",
-     "刀",
-     "乒乓球"
+     "假日，休息日",
+     "到外面用餐",
+     "书店"
     ],
     "answer": 0,
     "explain": "노래방 = 练歌厅，KTV"
@@ -1288,8 +1288,8 @@ export const LESSONS = [
     "q": "「슬프다」是什么意思？",
     "options": [
      "悲伤",
-     "害怕",
      "可爱",
+     "可怕，害怕",
      "方便，舒服"
     ],
     "answer": 0,
@@ -1390,8 +1390,8 @@ export const LESSONS = [
     "q": "「어렵다」是什么意思？",
     "options": [
      "难",
+     "可怕，害怕",
      "可爱",
-     "害怕",
      "忧郁"
     ],
     "answer": 0,
@@ -1441,7 +1441,7 @@ export const LESSONS = [
      },
      {
       "ko": "무섭다",
-      "zh": "害怕"
+      "zh": "可怕，害怕"
      },
      {
       "ko": "너무",
@@ -1523,13 +1523,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c10-u03-014",
-    "q": "按顺序点音节：「害怕」",
+    "q": "按顺序点音节：「可怕，害怕」",
     "lines": [
      "무",
      "섭",
      "다"
     ],
-    "explain": "무섭다 = 害怕"
+    "explain": "무섭다 = 可怕，害怕"
    },
    {
     "type": "choice",
@@ -1562,13 +1562,13 @@ export const LESSONS = [
     "concept": "v01-c10-u03-014",
     "q": "「무섭다」是什么意思？",
     "options": [
-     "害怕",
+     "可怕，害怕",
      "方便，舒服",
      "悲伤",
      "需要"
     ],
     "answer": 0,
-    "explain": "무섭다 = 害怕"
+    "explain": "무섭다 = 可怕，害怕"
    }
   ]
  },
@@ -1639,9 +1639,9 @@ export const LESSONS = [
     "q": "「로봇」是什么意思？",
     "options": [
      "机器人",
-     "主人公",
+     "乒乓球",
      "病",
-     "家务"
+     "小说"
     ],
     "answer": 0,
     "explain": "로봇 = 机器人"
@@ -1666,8 +1666,8 @@ export const LESSONS = [
     "options": [
      "枪",
      "演员",
-     "江，河",
-     "期间"
+     "法定假日",
+     "机器人"
     ],
     "answer": 0,
     "explain": "총 = 枪 · 铳 = 총"
@@ -1678,9 +1678,9 @@ export const LESSONS = [
     "q": "「칼」是什么意思？",
     "options": [
      "刀",
-     "枪",
-     "书店",
-     "方法"
+     "棒球",
+     "令人感动的",
+     "旅游胜地，旅游区"
     ],
     "answer": 0,
     "explain": "칼 = 刀"
@@ -1716,8 +1716,8 @@ export const LESSONS = [
     "q": "「음악회」是什么意思？",
     "options": [
      "音乐会",
-     "棒球",
-     "乒乓球",
+     "比赛",
+     "书店",
      "连休"
     ],
     "answer": 0,
@@ -1818,8 +1818,8 @@ export const LESSONS = [
     "options": [
      "比赛",
      "病",
-     "到外面用餐",
-     "方法"
+     "台球",
+     "旅游胜地，旅游区"
     ],
     "answer": 0,
     "explain": "경기 = 比赛 · 竞技 = 경·기"
@@ -1880,8 +1880,8 @@ export const LESSONS = [
     "q": "「병」是什么意思？",
     "options": [
      "病",
-     "住宿",
-     "江，河",
+     "假日，休息日",
+     "法定假日",
      "高尔夫"
     ],
     "answer": 0,
@@ -1981,7 +1981,7 @@ export const LESSONS = [
     "options": [
      "去世，死",
      "哭",
-     "堆积",
+     "堵（车）；积压",
      "过（时间）"
     ],
     "answer": 0,
@@ -2017,7 +2017,7 @@ export const LESSONS = [
     "options": [
      "演员",
      "组，队",
-     "春节",
+     "景色，风景",
      "足球"
     ],
     "answer": 0,
@@ -2229,7 +2229,7 @@ export const LESSONS = [
     "q": "「등산」是什么意思？",
     "options": [
      "登山",
-     "书店",
+     "令人感动的",
      "世上，世界",
      "滑冰"
     ],
@@ -2305,8 +2305,8 @@ export const LESSONS = [
     "options": [
      "排球",
      "练歌厅，KTV",
-     "乒乓球",
-     "假日，休息日"
+     "书店",
+     "假，休假"
     ],
     "answer": 0,
     "explain": "배구 = 排球 · 排球 = 배·구"
@@ -2340,7 +2340,7 @@ export const LESSONS = [
     "q": "「테니스」是什么意思？",
     "options": [
      "网球",
-     "假日，休息日",
+     "假，休假",
      "网络",
      "滑冰"
     ],
@@ -2377,7 +2377,7 @@ export const LESSONS = [
     "options": [
      "羽毛球",
      "（计算机）显示器，监视器",
-     "期间",
+     "机器人",
      "活动"
     ],
     "answer": 0,
@@ -2474,9 +2474,9 @@ export const LESSONS = [
     "q": "「스케이트」是什么意思？",
     "options": [
      "滑冰",
-     "令人感动的",
-     "准备物品",
-     "排球"
+     "住宿",
+     "到处，各处",
+     "放假，假期"
     ],
     "answer": 0,
     "explain": "스케이트 = 滑冰"
@@ -2677,7 +2677,7 @@ export const LESSONS = [
      "或者",
      "电脑游戏",
      "……的时候",
-     "家务"
+     "导演"
     ],
     "answer": 0,
     "explain": "-거나 = 或者"
@@ -2688,8 +2688,8 @@ export const LESSONS = [
     "q": "「조사」是什么意思？",
     "options": [
      "调查",
-     "假期",
-     "期间",
+     "做菜，烹饪",
+     "机器人",
      "连休"
     ],
     "answer": 0,
@@ -2725,7 +2725,7 @@ export const LESSONS = [
     "q": "「방법」是什么意思？",
     "options": [
      "方法",
-     "导演",
+     "度假旺季",
      "病",
      "篮球"
     ],
@@ -2836,7 +2836,7 @@ export const LESSONS = [
     "options": [
      "运动",
      "签证",
-     "假，休假",
+     "准备物品",
      "海带汤"
     ],
     "answer": 0,
@@ -2875,8 +2875,8 @@ export const LESSONS = [
     "options": [
      "温泉",
      "病",
-     "做菜，烹饪",
-     "公休日"
+     "刀",
+     "初中"
     ],
     "answer": 0,
     "explain": "온천 = 温泉 · 温泉 = 온·천"
@@ -2912,7 +2912,7 @@ export const LESSONS = [
     "q": "「드라마」是什么意思？",
     "options": [
      "电视剧",
-     "单板滑雪",
+     "围棋",
      "……的时候",
      "网络"
     ],
@@ -2948,8 +2948,8 @@ export const LESSONS = [
     "q": "「와이셔츠」是什么意思？",
     "options": [
      "衬衫",
-     "春节",
-     "孩子",
+     "景色，风景",
+     "导演",
      "海带汤"
     ],
     "answer": 0,
@@ -2971,13 +2971,13 @@ export const LESSONS = [
     "concept": "v01-c10-u01-027",
     "q": "「휴가철」是什么意思？",
     "options": [
-     "假期",
-     "做菜，烹饪",
-     "最",
+     "度假旺季",
+     "准备物品",
+     "期间",
      "电视剧"
     ],
     "answer": 0,
-    "explain": "휴가철 = 假期"
+    "explain": "휴가철 = 度假旺季"
    },
    {
     "type": "choice",
@@ -3010,7 +3010,7 @@ export const LESSONS = [
     "options": [
      "放假，假期",
      "阅读，读书",
-     "假期",
+     "做菜，烹饪",
      "连休"
     ],
     "answer": 0,
@@ -3032,13 +3032,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c10-u01-014",
-    "q": "按顺序点音节：「中学」",
+    "q": "按顺序点音节：「初中」",
     "lines": [
      "중",
      "학",
      "교"
     ],
-    "explain": "중학교 = 中学 · 中学校 = 중·학·교"
+    "explain": "중학교 = 初中 · 中学校 = 중·학·교"
    },
    {
     "type": "choice",
@@ -3047,7 +3047,7 @@ export const LESSONS = [
     "options": [
      "家务",
      "现在",
-     "到外面用餐",
+     "台球",
      "诗集"
     ],
     "answer": 0,

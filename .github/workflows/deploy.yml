@@ -29,10 +29,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: npm ci
+      # build.py가 번체판(zh-hant/)을 OpenCC로 만든다
+      - run: pip install opencc-python-reimplemented==0.1.7
       # build.py가 앱 아이콘을 Playwright Chromium으로 찍는다(tools/icon.py)
       - run: pip install playwright && python -m playwright install --with-deps chromium
       - run: npm test
       - run: python build.py
+      # 번체판 변환 점검(브라우저 없이): 간체 전용 글자 없음, 한자 밖 글자는 그대로, 저장본 접두
+      - run: python tests/build_test.py test_hant_files test_hant_is_traditional test_hant_only_cjk_changed test_hant_cache_prefix
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

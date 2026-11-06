@@ -8,7 +8,7 @@ export const LESSONS = [
   "title": "第1单元",
   "goal": "认识 12 个新单词",
   "summary": [
-   "안녕하십니까 = 你好",
+   "안녕하십니까 = 您好",
    "네 = 是的",
    "저 = 我",
    "이름 = 姓名"
@@ -19,7 +19,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "안녕하십니까",
-      "zh": "你好"
+      "zh": "您好"
      },
      {
       "ko": "네",
@@ -44,7 +44,7 @@ export const LESSONS = [
      },
      {
       "ko": "씨",
-      "zh": "小姐，先生（用于姓之后，表示尊敬）",
+      "zh": "先生，女士（用于名字后）",
       "hanja": "氏"
      },
      {
@@ -72,7 +72,7 @@ export const LESSONS = [
      },
      {
       "ko": "그리고",
-      "zh": "和"
+      "zh": "还有；然后"
      },
      {
       "ko": "친구",
@@ -88,13 +88,13 @@ export const LESSONS = [
     "concept": "v01-c01-u01-001",
     "q": "「안녕하십니까」是什么意思？",
     "options": [
-     "你好",
+     "您好",
      "（宾格助词）",
      "初次见面",
      "印度人"
     ],
     "answer": 0,
-    "explain": "안녕하십니까 = 你好"
+    "explain": "안녕하십니까 = 您好"
    },
    {
     "type": "choice",
@@ -153,13 +153,13 @@ export const LESSONS = [
     "concept": "v01-c01-u01-006",
     "q": "「씨」是什么意思？",
     "options": [
-     "小姐，先生（用于姓之后，表示尊敬）",
-     "吃",
+     "先生，女士（用于名字后）",
      "听",
+     "哪（个）",
      "睡"
     ],
     "answer": 0,
-    "explain": "씨 = 小姐，先生（用于姓之后，表示尊敬） · 氏 = 씨"
+    "explain": "씨 = 先生，女士（用于名字后） · 氏 = 씨"
    },
    {
     "type": "choice",
@@ -205,7 +205,7 @@ export const LESSONS = [
      "我的",
      "哪（个）",
      "穿",
-     "大学生"
+     "姓"
     ],
     "answer": 0,
     "explain": "제 = 我的"
@@ -213,7 +213,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c01-u01-011",
-    "q": "「和」用韩语怎么说？",
+    "q": "「还有；然后」用韩语怎么说？",
     "options": [
      "그리고",
      "그럼",
@@ -221,7 +221,7 @@ export const LESSONS = [
      "제"
     ],
     "answer": 0,
-    "explain": "그리고 = 和"
+    "explain": "그리고 = 还有；然后"
    },
    {
     "type": "order",
@@ -236,7 +236,7 @@ export const LESSONS = [
    {
     "type": "check",
     "concept": "v01-c01-u01-001",
-    "q": "「你好」用韩语怎么说？",
+    "q": "「您好」用韩语怎么说？",
     "options": [
      "안녕하십니까",
      "인도 사람",
@@ -244,7 +244,7 @@ export const LESSONS = [
      "처음 뵙겠습니다."
     ],
     "answer": 0,
-    "explain": "안녕하십니까 = 你好"
+    "explain": "안녕하십니까 = 您好"
    }
   ]
  },
@@ -287,7 +287,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "아니요",
-      "zh": "不"
+      "zh": "不，不是"
      },
      {
       "ko": "일본",
@@ -315,7 +315,7 @@ export const LESSONS = [
      "哪（个）",
      "我的",
      "警察",
-     "公司职员"
+     "写"
     ],
     "answer": 0,
     "explain": "어느 = 哪（个）"
@@ -359,7 +359,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c01-u02-005",
-    "q": "「不」用韩语怎么说？",
+    "q": "「不，不是」用韩语怎么说？",
     "options": [
      "아니요",
      "네",
@@ -367,7 +367,7 @@ export const LESSONS = [
      "캐나다"
     ],
     "answer": 0,
-    "explain": "아니요 = 不"
+    "explain": "아니요 = 不，不是"
    },
    {
     "type": "order",
@@ -386,8 +386,8 @@ export const LESSONS = [
     "options": [
      "是吗",
      "不是",
-     "认识你很高兴",
-     "印度"
+     "（见到）高兴",
+     "印度人"
     ],
     "answer": 0,
     "explain": "그렇습니까 = 是吗"
@@ -614,8 +614,8 @@ export const LESSONS = [
     "q": "「에서」是什么意思？",
     "options": [
      "从，来自",
-     "在（表示地点、时间）",
-     "认识你很高兴",
+     "在，到（表地点、时间）",
+     "记者",
      "吃"
     ],
     "answer": 0,
@@ -876,7 +876,7 @@ export const LESSONS = [
      },
      {
       "ko": "그런데",
-      "zh": "（表示转折的连词）可……，那……"
+      "zh": "可是，不过；对了"
      },
      {
       "ko": "무엇",
@@ -889,7 +889,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "하십니까?",
-      "zh": "做吗？（敬语）"
+      "zh": "您做……吗？（敬语）"
      },
      {
       "ko": "교수",
@@ -982,13 +982,13 @@ export const LESSONS = [
     "concept": "v01-c01-u03-015",
     "q": "「그런데」是什么意思？",
     "options": [
-     "（表示转折的连词）可……，那……",
+     "可是，不过；对了",
      "那么",
-     "和",
-     "不是"
+     "还有；然后",
+     "不，不是"
     ],
     "answer": 0,
-    "explain": "그런데 = （表示转折的连词）可……，那……"
+    "explain": "그런데 = 可是，不过；对了"
    },
    {
     "type": "choice",
@@ -1008,13 +1008,13 @@ export const LESSONS = [
     "concept": "v01-c01-u03-017",
     "q": "「하십니까?」是什么意思？",
     "options": [
-     "做吗？（敬语）",
+     "您做……吗？（敬语）",
      "听",
      "穿",
      "睡"
     ],
     "answer": 0,
-    "explain": "하십니까? = 做吗？（敬语）"
+    "explain": "하십니까? = 您做……吗？（敬语）"
    },
    {
     "type": "choice",
@@ -1065,7 +1065,7 @@ export const LESSONS = [
   "summary": [
    "누구 = 谁",
    "처음 뵙겠습니다. = 初次见面",
-   "반갑다 = 认识你很高兴",
+   "반갑다 = （见到）高兴",
    "가다 = 去"
   ],
   "cards": [
@@ -1082,7 +1082,7 @@ export const LESSONS = [
      },
      {
       "ko": "반갑다",
-      "zh": "认识你很高兴"
+      "zh": "（见到）高兴"
      },
      {
       "ko": "가다",
@@ -1121,7 +1121,7 @@ export const LESSONS = [
      "谁",
      "什么",
      "我",
-     "大学生"
+     "姓"
     ],
     "answer": 0,
     "explain": "누구 = 谁"
@@ -1142,13 +1142,13 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c01-u04-003",
-    "q": "按顺序点音节：「认识你很高兴」",
+    "q": "按顺序点音节：「（见到）高兴」",
     "lines": [
      "반",
      "갑",
      "다"
     ],
-    "explain": "반갑다 = 认识你很高兴"
+    "explain": "반갑다 = （见到）高兴"
    },
    {
     "type": "choice",
@@ -1156,7 +1156,7 @@ export const LESSONS = [
     "q": "「가다」是什么意思？",
     "options": [
      "去",
-     "吃",
+     "听",
      "穿",
      "读"
     ],
@@ -1193,8 +1193,8 @@ export const LESSONS = [
     "q": "「인사하다」是什么意思？",
     "options": [
      "打招呼",
-     "做吗？（敬语）",
-     "去",
+     "写",
+     "吃",
      "穿"
     ],
     "answer": 0,
@@ -1275,7 +1275,7 @@ export const LESSONS = [
      },
      {
       "ko": "에",
-      "zh": "在（表示地点、时间）"
+      "zh": "在，到（表地点、时间）"
      }
     ]
    }
@@ -1288,7 +1288,7 @@ export const LESSONS = [
     "options": [
      "吃",
      "穿",
-     "听",
+     "您做……吗？（敬语）",
      "来了"
     ],
     "answer": 0,
@@ -1323,9 +1323,9 @@ export const LESSONS = [
     "q": "「읽다」是什么意思？",
     "options": [
      "读",
-     "写",
+     "去",
      "来了",
-     "做吗？（敬语）"
+     "写"
     ],
     "answer": 0,
     "explain": "읽다 = 读"
@@ -1358,18 +1358,18 @@ export const LESSONS = [
     "concept": "v01-c01-u04-015",
     "q": "「에」是什么意思？",
     "options": [
-     "在（表示地点、时间）",
+     "在，到（表地点、时间）",
      "从，来自",
      "打招呼",
      "英国"
     ],
     "answer": 0,
-    "explain": "에 = 在（表示地点、时间）"
+    "explain": "에 = 在，到（表地点、时间）"
    },
    {
     "type": "check",
     "concept": "v01-c01-u04-015",
-    "q": "「在（表示地点、时间）」用韩语怎么说？",
+    "q": "「在，到（表地点、时间）」用韩语怎么说？",
     "options": [
      "에",
      "에서",
@@ -1377,7 +1377,7 @@ export const LESSONS = [
      "아니다"
     ],
     "answer": 0,
-    "explain": "에 = 在（表示地点、时间）"
+    "explain": "에 = 在，到（表地点、时间）"
    }
   ]
  },
@@ -1395,13 +1395,13 @@ export const LESSONS = [
     "concept": "v01-c01-u01-001",
     "q": "「안녕하십니까」是什么意思？",
     "options": [
-     "你好",
+     "您好",
      "（宾格助词）",
      "初次见面",
      "印度人"
     ],
     "answer": 0,
-    "explain": "안녕하십니까 = 你好"
+    "explain": "안녕하십니까 = 您好"
    },
    {
     "type": "choice",
@@ -1481,7 +1481,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c01-u04-015",
-    "q": "「在（表示地点、时间）」用韩语怎么说？",
+    "q": "「在，到（表地点、时间）」用韩语怎么说？",
     "options": [
      "에",
      "에서",
@@ -1489,7 +1489,7 @@ export const LESSONS = [
      "아니다"
     ],
     "answer": 0,
-    "explain": "에 = 在（表示地点、时间）"
+    "explain": "에 = 在，到（表地点、时间）"
    },
    {
     "type": "check",
@@ -1499,7 +1499,7 @@ export const LESSONS = [
      "来",
      "打招呼",
      "见面",
-     "去"
+     "吃"
     ],
     "answer": 0,
     "explain": "오다 = 来"

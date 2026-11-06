@@ -42,7 +42,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "저것",
-      "zh": "那个（东西）"
+      "zh": "那个（远处的）"
      },
      {
       "ko": "사전",
@@ -70,7 +70,7 @@ export const LESSONS = [
      "（商店）店员",
      "床",
      "课本",
-     "杂志"
+     "杯子"
     ],
     "answer": 0,
     "explain": "점원 = （商店）店员 · 店员 = 점·원"
@@ -115,7 +115,7 @@ export const LESSONS = [
    {
     "type": "choice",
     "concept": "v01-c02-u01-005",
-    "q": "「那个（东西）」用韩语怎么说？",
+    "q": "「那个（远处的）」用韩语怎么说？",
     "options": [
      "저것",
      "이것",
@@ -123,7 +123,7 @@ export const LESSONS = [
      "이"
     ],
     "answer": 0,
-    "explain": "저것 = 那个（东西）"
+    "explain": "저것 = 那个（远处的）"
    },
    {
     "type": "order",
@@ -141,9 +141,9 @@ export const LESSONS = [
     "q": "「잡지」是什么意思？",
     "options": [
      "杂志",
-     "日历",
+     "杯子",
      "啤酒",
-     "橡皮"
+     "洗手间"
     ],
     "answer": 0,
     "explain": "잡지 = 杂志 · 杂志 = 잡·지"
@@ -269,7 +269,7 @@ export const LESSONS = [
      "尺",
      "帽子",
      "门",
-     "手纸"
+     "手绢"
     ],
     "answer": 0,
     "explain": "자 = 尺"
@@ -307,7 +307,7 @@ export const LESSONS = [
     "options": [
      "钱",
      "上面",
-     "纸",
+     "药店",
      "外面"
     ],
     "answer": 0,
@@ -320,8 +320,8 @@ export const LESSONS = [
     "options": [
      "卡",
      "包",
-     "椅子",
-     "百货商店"
+     "橡皮",
+     "真的"
     ],
     "answer": 0,
     "explain": "카드 = 卡"
@@ -421,7 +421,7 @@ export const LESSONS = [
     "options": [
      "身份证",
      "帽子",
-     "电视",
+     "电话",
      "地铁"
     ],
     "answer": 0,
@@ -457,7 +457,7 @@ export const LESSONS = [
     "q": "「모자」是什么意思？",
     "options": [
      "帽子",
-     "旁边",
+     "日历",
      "后面",
      "家"
     ],
@@ -519,7 +519,7 @@ export const LESSONS = [
     "q": "「휴지」是什么意思？",
     "options": [
      "手纸",
-     "电话",
+     "画",
      "饼干",
      "办公室"
     ],
@@ -534,7 +534,7 @@ export const LESSONS = [
   "title": "第1单元 (4)",
   "goal": "认识 11 个新单词",
   "summary": [
-   "수첩 = 手册",
+   "수첩 = 记事本，小本子",
    "과자 = 饼干",
    "종이 = 纸",
    "필통 = 铅笔盒"
@@ -545,7 +545,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "수첩",
-      "zh": "手册",
+      "zh": "记事本，小本子",
       "hanja": "手帖"
      },
      {
@@ -609,13 +609,13 @@ export const LESSONS = [
     "concept": "v01-c02-u01-025",
     "q": "「수첩」是什么意思？",
     "options": [
-     "手册",
+     "记事本，小本子",
      "地下",
      "医院",
      "帽子"
     ],
     "answer": 0,
-    "explain": "수첩 = 手册 · 手帖 = 수·첩"
+    "explain": "수첩 = 记事本，小本子 · 手帖 = 수·첩"
    },
    {
     "type": "choice",
@@ -647,7 +647,7 @@ export const LESSONS = [
     "options": [
      "铅笔盒",
      "天气",
-     "椅子",
+     "橡皮",
      "地下"
     ],
     "answer": 0,
@@ -672,7 +672,7 @@ export const LESSONS = [
     "q": "「그」是什么意思？",
     "options": [
      "那",
-     "那个（东西）",
+     "那个（远处的）",
      "这个（东西）",
      "哪儿"
     ],
@@ -685,8 +685,8 @@ export const LESSONS = [
     "q": "「저」是什么意思？",
     "options": [
      "那",
-     "纸",
-     "有，在",
+     "药店",
+     "杂志",
      "里面"
     ],
     "answer": 0,
@@ -861,7 +861,7 @@ export const LESSONS = [
      "教室",
      "里面",
      "上面",
-     "牛奶"
+     "电脑"
     ],
     "answer": 0,
     "explain": "교실 = 教室 · 教室 = 교·실"
@@ -922,8 +922,8 @@ export const LESSONS = [
     "options": [
      "窗户",
      "银行",
-     "粉笔",
-     "电视"
+     "纸",
+     "电话"
     ],
     "answer": 0,
     "explain": "창문 = 窗户 · 窓门 = 창·문"
@@ -936,7 +936,7 @@ export const LESSONS = [
   "title": "第2单元 (2)",
   "goal": "认识 8 个新单词",
   "summary": [
-   "옷걸이 = 衣挂",
+   "옷걸이 = 衣架",
    "문 = 门",
    "텔레비전 = 电视",
    "의자 = 椅子"
@@ -947,7 +947,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "옷걸이",
-      "zh": "衣挂"
+      "zh": "衣架"
      },
      {
       "ko": "문",
@@ -993,13 +993,13 @@ export const LESSONS = [
     "concept": "v01-c02-u02-009",
     "q": "「옷걸이」是什么意思？",
     "options": [
-     "衣挂",
-     "粉笔",
+     "衣架",
+     "纸",
      "（商店）店员",
      "黑板"
     ],
     "answer": 0,
-    "explain": "옷걸이 = 衣挂"
+    "explain": "옷걸이 = 衣架"
    },
    {
     "type": "choice",
@@ -1150,7 +1150,7 @@ export const LESSONS = [
      },
      {
       "ko": "에는",
-      "zh": "（表示时间、地点的助词“에”和表示对比的助词“는”连用）"
+      "zh": "（地点/时间助词+话题助词）"
      },
      {
       "ko": "하고",
@@ -1175,7 +1175,7 @@ export const LESSONS = [
     "q": "「날씨」是什么意思？",
     "options": [
      "天气",
-     "邮政局",
+     "邮局",
      "铅笔盒",
      "书店"
     ],
@@ -1213,8 +1213,8 @@ export const LESSONS = [
     "options": [
      "果汁",
      "口袋",
-     "日历",
-     "报纸"
+     "杂志",
+     "教堂"
     ],
     "answer": 0,
     "explain": "주스 = 果汁"
@@ -1247,13 +1247,13 @@ export const LESSONS = [
     "concept": "v01-c02-u02-023",
     "q": "「에는」是什么意思？",
     "options": [
-     "（表示时间、地点的助词“에”和表示对比的助词“는”连用）",
+     "（地点/时间助词+话题助词）",
      "和，跟",
      "也",
      "小"
     ],
     "answer": 0,
-    "explain": "에는 = （表示时间、地点的助词“에”和表示对比的助词“는”连用）"
+    "explain": "에는 = （地点/时间助词+话题助词）"
    },
    {
     "type": "choice",
@@ -1401,7 +1401,7 @@ export const LESSONS = [
      "图书馆",
      "前面",
      "圆珠笔",
-     "电话"
+     "画"
     ],
     "answer": 0,
     "explain": "도서관 = 图书馆 · 图书馆 = 도·서·관"
@@ -1437,8 +1437,8 @@ export const LESSONS = [
     "options": [
      "食堂",
      "啤酒",
-     "洗手间",
-     "教室"
+     "牛奶",
+     "旁边"
     ],
     "answer": 0,
     "explain": "식당 = 食堂 · 食堂 = 식·당"
@@ -1464,7 +1464,7 @@ export const LESSONS = [
      "洗手间",
      "前面",
      "办公室",
-     "邮政局"
+     "邮局"
     ],
     "answer": 0,
     "explain": "화장실 = 洗手间 · 化粧室 = 화·장·실"
@@ -1477,7 +1477,7 @@ export const LESSONS = [
   "title": "第3单元 (2)",
   "goal": "认识 8 个新单词",
   "summary": [
-   "우체국 = 邮政局",
+   "우체국 = 邮局",
    "사무실 = 办公室",
    "뒤 = 后面",
    "옆 = 旁边"
@@ -1488,7 +1488,7 @@ export const LESSONS = [
     "words": [
      {
       "ko": "우체국",
-      "zh": "邮政局",
+      "zh": "邮局",
       "hanja": "邮递局"
      },
      {
@@ -1534,13 +1534,13 @@ export const LESSONS = [
     "concept": "v01-c02-u03-009",
     "q": "「우체국」是什么意思？",
     "options": [
-     "邮政局",
+     "邮局",
      "咖啡店",
      "课本",
      "铅笔"
     ],
     "answer": 0,
-    "explain": "우체국 = 邮政局 · 邮递局 = 우·체·국"
+    "explain": "우체국 = 邮局 · 邮递局 = 우·체·국"
    },
    {
     "type": "choice",
@@ -1563,7 +1563,7 @@ export const LESSONS = [
      "后面",
      "卡",
      "公园",
-     "椅子"
+     "橡皮"
     ],
     "answer": 0,
     "explain": "뒤 = 后面"
@@ -1574,7 +1574,7 @@ export const LESSONS = [
     "q": "「옆」是什么意思？",
     "options": [
      "旁边",
-     "护照",
+     "报纸",
      "后面",
      "图书馆"
     ],
@@ -1600,7 +1600,7 @@ export const LESSONS = [
     "q": "「밑」是什么意思？",
     "options": [
      "下面",
-     "衣挂",
+     "衣架",
      "床",
      "公司"
     ],
@@ -1738,9 +1738,9 @@ export const LESSONS = [
     "q": "「밖」是什么意思？",
     "options": [
      "外面",
-     "衣挂",
+     "衣架",
      "咖啡店",
-     "洗手间"
+     "牛奶"
     ],
     "answer": 0,
     "explain": "밖 = 外面"
@@ -1764,9 +1764,9 @@ export const LESSONS = [
     "q": "「컵」是什么意思？",
     "options": [
      "杯子",
-     "牛奶",
+     "电脑",
      "外面",
-     "日历"
+     "杂志"
     ],
     "answer": 0,
     "explain": "컵 = 杯子"
@@ -1777,9 +1777,9 @@ export const LESSONS = [
     "q": "「우유」是什么意思？",
     "options": [
      "牛奶",
-     "果汁",
+     "椅子",
      "书店",
-     "电话"
+     "画"
     ],
     "answer": 0,
     "explain": "우유 = 牛奶 · 牛乳 = 우·유"
@@ -1849,9 +1849,9 @@ export const LESSONS = [
     "q": "「냉장고」是什么意思？",
     "options": [
      "冰箱",
-     "护照",
+     "报纸",
      "黑板",
-     "药店"
+     "衣服"
     ],
     "answer": 0,
     "explain": "냉장고 = 冰箱 · 冷藏库 = 냉·장·고"
@@ -1940,7 +1940,7 @@ export const LESSONS = [
      },
      {
       "ko": "극장",
-      "zh": "剧场",
+      "zh": "剧场，电影院",
       "hanja": "剧场"
      },
      {
@@ -1964,8 +1964,8 @@ export const LESSONS = [
     "options": [
      "家",
      "铅笔盒",
-     "手册",
-     "日历"
+     "手纸",
+     "杂志"
     ],
     "answer": 0,
     "explain": "집 = 家"
@@ -2001,7 +2001,7 @@ export const LESSONS = [
     "options": [
      "地铁",
      "东西",
-     "手册",
+     "手纸",
      "书桌"
     ],
     "answer": 0,
@@ -2023,12 +2023,12 @@ export const LESSONS = [
    {
     "type": "order",
     "concept": "v01-c02-u04-006",
-    "q": "按顺序点音节：「剧场」",
+    "q": "按顺序点音节：「剧场，电影院」",
     "lines": [
      "극",
      "장"
     ],
-    "explain": "극장 = 剧场 · 剧场 = 극·장"
+    "explain": "극장 = 剧场，电影院 · 剧场 = 극·장"
    },
    {
     "type": "choice",
@@ -2036,9 +2036,9 @@ export const LESSONS = [
     "q": "「병원」是什么意思？",
     "options": [
      "医院",
-     "杂志",
+     "杯子",
      "公园",
-     "教室"
+     "旁边"
     ],
     "answer": 0,
     "explain": "병원 = 医院 · 病院 = 병·원"
@@ -2138,7 +2138,7 @@ export const LESSONS = [
      },
      {
       "ko": "교회",
-      "zh": "教会",
+      "zh": "教堂",
       "hanja": "教会"
      },
      {
@@ -2155,9 +2155,9 @@ export const LESSONS = [
     "q": "「회사」是什么意思？",
     "options": [
      "公司",
-     "笔记本",
-     "杂志",
-     "窗户"
+     "粉笔",
+     "杯子",
+     "站"
     ],
     "answer": 0,
     "explain": "회사 = 公司 · 会社 = 회·사"
@@ -2191,9 +2191,9 @@ export const LESSONS = [
     "q": "「시장」是什么意思？",
     "options": [
      "市场",
-     "笔记本",
+     "粉笔",
      "铅笔",
-     "杯子"
+     "果汁"
     ],
     "answer": 0,
     "explain": "시장 = 市场 · 市场 = 시·장"
@@ -2262,13 +2262,13 @@ export const LESSONS = [
     "concept": "v01-c02-u04-018",
     "q": "「교회」是什么意思？",
     "options": [
-     "教会",
+     "教堂",
      "地铁",
-     "手绢",
-     "日历"
+     "护照",
+     "杂志"
     ],
     "answer": 0,
-    "explain": "교회 = 教会 · 教会 = 교·회"
+    "explain": "교회 = 教堂 · 教会 = 교·회"
    },
    {
     "type": "choice",
@@ -2313,9 +2313,9 @@ export const LESSONS = [
     "q": "「컵」是什么意思？",
     "options": [
      "杯子",
-     "牛奶",
+     "电脑",
      "外面",
-     "日历"
+     "杂志"
     ],
     "answer": 0,
     "explain": "컵 = 杯子"
@@ -2350,7 +2350,7 @@ export const LESSONS = [
     "q": "「날씨」是什么意思？",
     "options": [
      "天气",
-     "邮政局",
+     "邮局",
      "铅笔盒",
      "书店"
     ],
@@ -2387,8 +2387,8 @@ export const LESSONS = [
     "options": [
      "果汁",
      "口袋",
-     "日历",
-     "报纸"
+     "杂志",
+     "教堂"
     ],
     "answer": 0,
     "explain": "주스 = 果汁"

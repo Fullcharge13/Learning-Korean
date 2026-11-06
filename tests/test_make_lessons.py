@@ -190,3 +190,21 @@ def test_main_writes_vol2_concepts(tmp_path):
     text = concepts.read_text(encoding="utf-8")
     assert '"id": "v02-c01-u01-001", "name": "친구 · 朋友", "chapter": 11' in text
     assert (tmp_path / "lessons" / "ch11.js").exists()
+
+
+def test_korean_and_pos_override(tmp_path):
+    rows = list(csv.DictReader(open(REVIEW, encoding="utf-8", newline="")))
+    for r in rows:
+        r["korean_new"] = r["pos_new"] = ""
+        if r["entry_id"] == "v01-c01-u01-010":
+            r["korean_new"], r["pos_new"] = "사람들", "대명사"
+    p = tmp_path / "review.csv"
+    with open(p, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    words = {w["entry_id"]: w for w in load_words(VOCAB, str(p))}
+    assert (words["v01-c01-u01-010"]["ko"], words["v01-c01-u01-010"]["pos"]) == ("사람들", "대명사")
+    plain = {w["entry_id"]: w for w in load_words(VOCAB, REVIEW)}
+    other = next(k for k in words if k != "v01-c01-u01-010")
+    assert (words[other]["ko"], words[other]["pos"]) == (plain[other]["ko"], plain[other]["pos"])
