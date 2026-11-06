@@ -243,3 +243,50 @@ def test_load_examples_rejects_bad_rows(tmp_path, row):
     from make_lessons import load_examples
     with pytest.raises(ValueError):
         load_examples(_ex(tmp_path, row), load_words(VOCAB, REVIEW))
+
+
+def _fill_setup(tmp_path, status="cross"):
+    from make_lessons import load_examples
+    words = load_words(VOCAB, REVIEW)
+    ex = load_examples(_ex(tmp_path, "v01-c01-u01-010,저 [[사람]]은 학생이에요.,那个人是学生。,%s," % status), words)
+    return words, ex
+
+
+def _fills(ch):
+    return [(l, it) for l in ch["LESSONS"] for it in l["items"] if "sentence" in it]
+
+
+def test_fill_item_shape(tmp_path):
+    words, ex = _fill_setup(tmp_path)
+    ch = build_chapter(words, 1, ex)
+    fills = [(l, it) for l, it in _fills(ch) if not l.get("isExam")]
+    assert len(fills) == 1, fills
+    it = fills[0][1]
+    ko1 = {w["ko"] for w in words if w["chapter"] == 1}
+    assert it["type"] == "choice" and it["q"] == "选出填入空白处的单词"
+    assert it["options"][0] == "사람" and it["answer"] == 0
+    assert len(set(it["options"])) == 4 and set(it["options"]) <= ko1
+    s = it["sentence"]["ko"]
+    assert s.count("＿＿") == 1 and "[[" not in s and "사람" not in s.replace("＿＿", "")
+    assert it["sentence"]["zh"] == "那个人是学生。"
+    assert it["explain"].startswith("저 사람은 학생이에요. · 사람 = ")
+
+
+def test_fill_first_for_example_words(tmp_path):
+    words, ex = _fill_setup(tmp_path)
+    with_ex, without = build_chapter(words, 1, ex), build_chapter(words, 1)
+    for a, b in zip(with_ex["LESSONS"], without["LESSONS"]):
+        assert len(a["items"]) == len(b["items"]), a["id"]
+    lesson = next(l for l in with_ex["LESSONS"] if any(it["concept"] == "v01-c01-u01-010" for it in l["items"]))
+    first = next(it for it in lesson["items"] if it["concept"] == "v01-c01-u01-010")
+    assert "sentence" in first
+
+
+def test_no_examples_unchanged():
+    words = load_words(VOCAB, REVIEW)
+    assert json.dumps(build_chapter(words, 1), ensure_ascii=False) == json.dumps(build_chapter(words, 1, {}), ensure_ascii=False)
+
+
+def test_hold_example_not_asked(tmp_path):
+    words, ex = _fill_setup(tmp_path, status="hold")
+    assert _fills(build_chapter(words, 1, ex)) == []

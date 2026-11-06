@@ -6,7 +6,7 @@
 - 앱 장 id = (권 - 1) × 10 + 과: 1권 1~10과 → 1~10장, 2권 1~10과 → 11~20장(제목 「第二册 第N课」).
 
 - 장 = 1권 과(chapter), 레슨 = 단원 단어를 sequence 순 8개씩(남는 4개 이하는 앞 레슨에 붙임), 장 끝에 장 평가.
-- 문제: 韩→中, 中→韩(choice), 음절 카드(order). 일반 레슨 터치 max(6, 단어 수) + check 1(단어마다 한 문제 이상),
+- 문제: 韩→中, 中→韩(choice), 음절 카드(order), 예문 빈칸(choice + sentence, data/examples.csv에 예문 있는 단어). 일반 레슨 터치 max(6, 단어 수) + check 1(단어마다 한 문제 이상),
   장 평가 터치 8 + check 1.
 - 무작위는 random.Random(문자열 시드)만 써서 같은 입력이면 같은 출력.
 - 결과물은 CC BY-SA 3.0 (data/LICENSE-data.md).
@@ -122,8 +122,16 @@ def _options(w, pool, field, seed):
     return [w[field]] + picked if len(picked) == 3 else None
 
 
-def _item(w, kind, pool):
+def _item(w, kind, pool, examples=None):
     seed = w["entry_id"] + ":" + kind
+    if kind == "fill":
+        ex = (examples or {}).get(w["entry_id"])
+        opts = ex and _options(w, pool, "ko", seed)
+        if not opts:
+            return None
+        return {"type": "choice", "concept": w["entry_id"], "q": "选出填入空白处的单词",
+                "sentence": {"ko": ex["pre"] + "＿＿" + ex["post"], "zh": ex["zh"]}, "options": opts, "answer": 0,
+                "explain": "%s%s%s · %s = %s" % (ex["pre"], ex["form"], ex["post"], w["ko"], w["zh"])}
     if kind == "order":
         if not (_hangul(w["ko"]) and 2 <= len(w["ko"]) <= 5):
             return None
@@ -136,18 +144,22 @@ def _item(w, kind, pool):
     return {"type": "choice", "concept": w["entry_id"], "q": q, "options": opts, "answer": 0, "explain": _explain(w)}
 
 
-def _items(words, pool, n, seed):
-    """단어마다 문제 종류를 돌려 쓰고, 안 맞는 종류는 다음 종류로. 단어가 모자라면 다른 종류로 한 바퀴 더."""
+def _items(words, pool, n, seed, examples=None):
+    """단어마다 문제 종류를 돌려 쓰고, 안 맞는 종류는 다음 종류로. 단어가 모자라면 다른 종류로 한 바퀴 더.
+    예문이 있는 단어는 첫 바퀴에서 빈칸 문제(fill)를 먼저 시도한다."""
+    examples = examples or {}
     items, done = [], set()
     for rnd in range(len(KINDS)):
         for i, w in enumerate(words):
             if len(items) == n:
                 break
-            for k in range(len(KINDS)):
-                kind = KINDS[(i + rnd + k) % len(KINDS)]
+            kinds = [KINDS[(i + rnd + k) % len(KINDS)] for k in range(len(KINDS))]
+            if rnd == 0 and w["entry_id"] in examples:
+                kinds.insert(0, "fill")
+            for kind in kinds:
                 if (w["entry_id"], kind) in done:
                     continue
-                it = _item(w, kind, pool)
+                it = _item(w, kind, pool, examples)
                 if it:
                     done.add((w["entry_id"], kind))
                     items.append(it)
@@ -183,7 +195,7 @@ def _chapter_title(w):
     return ("第%d课" if w["volume"] == 1 else "第二册 第%d课") % w["book_chapter"]
 
 
-def build_chapter(words, chapter):
+def build_chapter(words, chapter, examples=None):
     pool = sorted((w for w in words if w["chapter"] == chapter), key=lambda w: (w["unit"], w["sequence"]))
     ch_title = _chapter_title(pool[0])
     lessons = []
@@ -195,23 +207,27 @@ def build_chapter(words, chapter):
             title = "第%d单元" % u + (" (%d)" % k if len(parts) > 1 else "")
             lessons.append({"id": lid, "chapter": chapter, "title": title, "goal": "认识 %d 个新单词" % len(part),
                             "summary": ["%s = %s" % (w["ko"], w["zh"]) for w in part[:4]],
-                            "cards": _cards(part), "items": _items(part, pool, max(TOUCH, len(part)), lid)})
+                            "cards": _cards(part), "items": _items(part, pool, max(TOUCH, len(part)), lid, examples)})
     eid = "%d-%d" % (chapter, len(lessons) + 1)
     exam_words = random.Random("exam:%d" % chapter).sample(pool, min(len(pool), EXAM_TOUCH))
     lessons.append({"id": eid, "chapter": chapter, "title": ch_title + " 测验", "goal": "复习本课单词",
-                    "summary": [], "isExam": True, "cards": [], "items": _items(exam_words, pool, EXAM_TOUCH, eid)})
+                    "summary": [], "isExam": True, "cards": [], "items": _items(exam_words, pool, EXAM_TOUCH, eid, examples)})
     return {"CHAPTER": {"id": chapter, "title": ch_title}, "LESSONS": lessons}
 
 
-def main(out_dir=None, vocab=None, review=None, concepts_file=None):
+def main(out_dir=None, vocab=None, review=None, concepts_file=None, examples_file=None):
     out_dir = out_dir or os.path.join(ROOT, "data", "lessons")
     concepts_file = concepts_file or os.path.join(ROOT, "data", "concepts.js")
     words = load_words(vocab or [os.path.join(ROOT, "vendor", "open-yonsei", "vol-%02d.csv" % v) for v in (1, 2)],
                        review or os.path.join(ROOT, "data", "zh-review.csv"))
+    # 예문 표는 실제 단어 자료와 짝. 시험이 단어 자료만 바꾸면 예문 없이 만든다
+    if examples_file is None and vocab is None:
+        examples_file = os.path.join(ROOT, "data", "examples.csv")
+    examples = load_examples(examples_file, words) if examples_file else {}
     os.makedirs(out_dir, exist_ok=True)
     total = 0
     for ch in sorted({w["chapter"] for w in words}):
-        data = build_chapter(words, ch)
+        data = build_chapter(words, ch, examples)
         total += len(data["LESSONS"])
         with open(os.path.join(out_dir, "ch%d.js" % ch), "w", encoding="utf-8") as f:
             f.write("// 자동 생성: tools/make_lessons.py — 고치지 말고 다시 만드세요. 데이터 라이선스 CC BY-SA 3.0 (data/LICENSE-data.md)\n")

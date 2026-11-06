@@ -7,6 +7,7 @@
 - order: 2~5개 한글 음절 카드
 - 보류(hold) 단어는 어디에도 없음
 - 성공 기준 1: 보류 아닌 1·2권 단어가 모두 한 번 이상 문제에 나옴
+- 예문 빈칸 문제: 빈칸 하나·번역 있음·정답이 그 단어, 예문 있는(보류 아닌) 단어는 모두 빈칸으로 한 번 이상
 - 화면에 보이는 중국어는 모두 간체
 """
 import argparse
@@ -45,7 +46,7 @@ def rows(p):
         return list(csv.DictReader(f))
 
 
-def check(mods, vocab, review):
+def check(mods, vocab, review, examples=()):
     errs = []
     hold = {r["entry_id"] for r in review if r["verdict"] == "hold"}
     fix = {r["entry_id"]: r["chinese_new"] for r in review if r["verdict"] == "fix"}
@@ -55,7 +56,7 @@ def check(mods, vocab, review):
         zh_of.setdefault(ko, set()).add(zh)
         ko_of.setdefault(zh, set()).add(ko)
     want = {r["entry_id"] for r in vocab} - hold
-    seen = set()
+    seen, filled = set(), set()
     for fname, m in mods.items():
         for l in m["LESSONS"]:
             where = "%s %s" % (fname, l.get("id"))
@@ -83,7 +84,16 @@ def check(mods, vocab, review):
                         errs.append("%s: bad answer %r" % (at, it.get("answer")))
                     texts += o
                     ans = final.get(it.get("concept"))
-                    z2k = it.get("q", "").endswith("用韩语怎么说？")
+                    sent = it.get("sentence")
+                    if sent is not None:
+                        filled.add(it.get("concept"))
+                        texts.append(sent.get("zh", ""))
+                        if sent.get("ko", "").count("＿＿") != 1 or "[[" in sent.get("ko", "") or not sent.get("zh"):
+                            errs.append("%s: fill sentence needs one blank and a translation: %r" % (at, sent))
+                        if ans and o and o[it["answer"]] != ans[0]:
+                            errs.append("%s: fill answer %r is not the word %r" % (at, o[it["answer"]], ans[0]))
+                    # 빈칸 문제는 한국어 카드를 고르므로 中→韩처럼 같은 뜻 오답을 막는다
+                    z2k = it.get("q", "").endswith("用韩语怎么说？") or sent is not None
                     for d in (o[:it["answer"]] + o[it["answer"] + 1:]) if ans else []:
                         if (z2k and ans[1] in zh_of.get(d, ())) or (not z2k and ans[0] in ko_of.get(d, ())):
                             errs.append("%s: distractor %r means the same as the answer %r" % (at, d, ans))
@@ -97,6 +107,9 @@ def check(mods, vocab, review):
     leaked = seen & hold
     if leaked:
         errs.append("hold words used: %s" % sorted(leaked))
+    no_fill = {r["entry_id"] for r in examples if r["status"] != "hold"} - hold - filled
+    if no_fill:
+        errs.append("%d example words never asked as fill, e.g. %s" % (len(no_fill), sorted(no_fill)[:5]))
     missing = want - seen
     if missing:
         errs.append("%d words never asked (success criterion 1), e.g. %s" % (len(missing), sorted(missing)[:5]))
@@ -109,7 +122,7 @@ def main():
     a = ap.parse_args()
     mods = load(os.path.abspath(a.lessons_dir))
     errs = check(mods, [r for v in (1, 2) for r in rows(os.path.join(ROOT, "vendor", "open-yonsei", "vol-%02d.csv" % v))],
-                 rows(os.path.join(ROOT, "data", "zh-review.csv")))
+                 rows(os.path.join(ROOT, "data", "zh-review.csv")), rows(os.path.join(ROOT, "data", "examples.csv")))
     n = sum(len(m["LESSONS"]) for m in mods.values())
     for e in errs:
         print("FAIL", e)
